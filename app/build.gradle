@@ -16,6 +16,11 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    buildTypes.each {
+        it.buildConfigField "String", "BINANCE_API_KEY", BinanceApiKey
+        it.buildConfigField "String", "BINANCE_SECRET_KEY", BinanceSecretKey
+    }
 }
 
 dependencies {
@@ -26,6 +31,13 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
     implementation 'com.squareup.okhttp3:okhttp:3.9.1'
-    compile group: 'commons-codec', name: 'commons-codec', version: '1.5'
+    compile group: 'commons-codec', name: 'commons-codec', version: '1.6'
+    compile 'com.squareup.retrofit2:retrofit:2.3.0'
+    compile 'com.google.code.gson:gson:2.8.0'
+    compile 'com.squareup.retrofit2:converter-gson:2.1.0'
+    compile "io.reactivex.rxjava2:rxjava:2.1.8"
+    compile 'com.squareup.retrofit2:adapter-rxjava2:2.3.0'
+    compile 'io.reactivex.rxjava2:rxandroid:2.0.1'
+
 
 }
