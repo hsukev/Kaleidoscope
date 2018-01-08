@@ -28,7 +28,7 @@ public class BittrexRequestInterceptor implements Interceptor {
     public Response intercept(Chain chain) throws IOException {
         Request originalRequest = chain.request();
         if(originalRequest.headers().size()==0) return chain.proceed(originalRequest);
-        Log.d("HttpInterceptor", originalRequest.headers().toString() );
+//        Log.d("HttpInterceptor", originalRequest.headers().toString() );
 //        Log.d("HttpInterceptor", originalRequest.headers().name(0));
         Request.Builder newBuilder = originalRequest.newBuilder();
 
@@ -49,8 +49,8 @@ public class BittrexRequestInterceptor implements Interceptor {
         }
 
         Request request = newBuilder.build();
-        Log.d(LOG, request.headers().toString());
-        Log.d("HttpInterceptorNew", request.toString());
+//        Log.d(LOG, request.headers().toString());
+//        Log.d("HttpInterceptorNew", request.toString());
         return chain.proceed(request);
     }
 }
