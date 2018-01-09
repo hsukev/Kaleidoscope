@@ -1,17 +1,24 @@
 
 package urbanutility.design.kaleidoscope.model;
 
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+@Entity(tableName = "binance_orders")
 public class BinanceOrder implements Parcelable {
+
 
     @SerializedName("symbol")
     @Expose
     private String symbol;
+    @PrimaryKey
+    @NonNull
     @SerializedName("orderId")
     @Expose
     private Integer orderId;
