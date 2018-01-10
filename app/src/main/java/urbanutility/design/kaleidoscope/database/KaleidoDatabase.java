@@ -21,7 +21,7 @@ public abstract class KaleidoDatabase extends RoomDatabase {
     public static KaleidoDatabase getAppDatabase(Context context) {
         if (INSTANCE == null) {
             INSTANCE =
-                    Room.databaseBuilder(context.getApplicationContext(), KaleidoDatabase.class, "user-database")
+                    Room.databaseBuilder(context.getApplicationContext(), KaleidoDatabase.class, "binance_orders")
                             // allow queries on the main thread.
                             // Don't do this on a real app! See PersistenceBasicSample for an example.
                             .allowMainThreadQueries()

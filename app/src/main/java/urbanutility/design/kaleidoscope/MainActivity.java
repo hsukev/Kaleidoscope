@@ -1,30 +1,31 @@
 package urbanutility.design.kaleidoscope;
 
 
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
+import android.arch.persistence.room.Room;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
-import android.util.Pair;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 
-import java.util.ArrayList;
+import com.facebook.stetho.Stetho;
+
 import java.util.List;
 
-import io.reactivex.ObservableSource;
-import io.reactivex.Single;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.functions.BiFunction;
-import io.reactivex.functions.Function;
-import io.reactivex.observers.DisposableObserver;
-import io.reactivex.schedulers.Schedulers;
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 import urbanutility.design.kaleidoscope.client.BittrexRequestInterceptor;
 import urbanutility.design.kaleidoscope.client.KaleidoService;
+import urbanutility.design.kaleidoscope.database.KaleidoDatabase;
 import urbanutility.design.kaleidoscope.model.BinanceOrder;
-import urbanutility.design.kaleidoscope.model.BinancePriceTicker;
-import urbanutility.design.kaleidoscope.model.BinanceServerTime;
+import urbanutility.design.kaleidoscope.view.KaleidoViewModel;
+import urbanutility.design.kaleidoscope.view.OrdersAdapter;
 
 /**
  * Created by jerye on 1/4/2018.
@@ -37,71 +38,38 @@ import urbanutility.design.kaleidoscope.model.BinanceServerTime;
  */
 
 public class MainActivity extends AppCompatActivity {
-    public List<List<BinanceOrder>> transactionHistory = new ArrayList<>();
-    String LOG = "MainActivity";
-    String[] tradeSymbols = {"ETHBTC",
-            "LTCBTC",
-            "NEOBTC",
-            "NEOBTC",
-            "NEOBTC",
-            "BCCBTC",
-            "MCOBTC",
-            "EVXBTC",
-            "REQBTC",
-            "REQBTC",
-            "REQBTC",
-            "REQBTC",
-            "REQBTC",
-            "REQBTC",
-            "REQBTC",
-            "REQETH",
-            "REQETH",
-            "REQETH",
-            "TRXBTC",
-            "TRXBTC",
-            "POWRBTC",
-            "POWRBTC",
-            "XRPBTC",
-            "XRPBTC",
-            "XRPBTC",
-            "XRPBTC",
-            "STORJBTC",
-            "STORJBTC",
-            "STORJBTC",
-            "VENBTC",
-            "KMDBTC",
-            "XMRBTC",
-            "BATBTC",
-            "QSPBTC",
-            "QSPBTC",
-            "QSPBTC",
-            "QSPBTC",
-            "QSPBTC",
-            "QSPETH",
-            "QSPETH",
-            "QSPETH",
-            "QSPETH",
-            "XLMBTC",
-            "XLMBTC",
-            "WABIBTC",
-            "WABIBTC",
-            "WABIBTC",
-            "WABIBTC",
-            "WABIETH",
-            "ELFBTC",
-            "ELFBTC",
-            "AIONBTC",
-            "AIONBTC",
-            "AIONBTC",
-            "WINGSBTC",
-            "APPCBTC",
-            "APPCBTC"};
+    @BindView(R.id.recyclerView)
+    RecyclerView recycler;
+    OrdersAdapter adapter;
+
+    String TAG = "MainActivity";
+
     private OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
+    private KaleidoViewModel kaleidoViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ButterKnife.bind(this);
+        Stetho.initializeWithDefaults(this);
+        final KaleidoDatabase db = Room.databaseBuilder(this, KaleidoDatabase.class,"binance_orders").build();
+
+        kaleidoViewModel = ViewModelProviders.of(this).get(KaleidoViewModel.class);
+
+        adapter = new OrdersAdapter(this);
+        recycler.setAdapter(adapter);
+        recycler.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL,false));
+
+
+        final Observer<List<BinanceOrder>> kaleidoObserver = new Observer<List<BinanceOrder>>() {
+            @Override
+            public void onChanged(@Nullable List<BinanceOrder> binanceOrders) {
+                adapter.addOrder(binanceOrders);
+            }
+        };
+
+        kaleidoViewModel.getOrderHistory().observe(MainActivity.this,kaleidoObserver);
 
         Retrofit.Builder retrofitBuilder = new Retrofit.Builder()
                 .addConverterFactory(GsonConverterFactory.create())
@@ -115,95 +83,69 @@ public class MainActivity extends AppCompatActivity {
         Retrofit retrofit = retrofitBuilder.build();
         final KaleidoService kaleidoService = retrofit.create(KaleidoService.class);
 
-//        Observable.just(tradeSymbols)
+
+//        Single<BinanceServerTime> serverTimeSingle = kaleidoService.getServerTime();
+//        serverTimeSingle
 //                .subscribeOn(Schedulers.io())
-//                .flatMapIterable(new Function<String[], Iterable<String>>() {
+//                .zipWith(kaleidoService.getPriceTickers().subscribeOn(Schedulers.newThread()),
+//                        new BiFunction<BinanceServerTime, List<BinancePriceTicker>, Pair<BinanceServerTime, List<BinancePriceTicker>>>() {
+//                            @Override
+//                            public Pair<BinanceServerTime, List<BinancePriceTicker>> apply(BinanceServerTime binanceServerTime, List<BinancePriceTicker> binancePriceTickers) throws Exception {
+//                                return new Pair<>(binanceServerTime, binancePriceTickers);
+//                            }
+//                        })
+//                .map(new Function<Pair<BinanceServerTime, List<BinancePriceTicker>>, List<Pair<BinanceServerTime, BinancePriceTicker>>>() {
 //                    @Override
-//                    public Iterable<String> apply(String[] strings) throws Exception {
-//                        return Arrays.asList(strings);
+//                    public List<Pair<BinanceServerTime, BinancePriceTicker>> apply(Pair<BinanceServerTime, List<BinancePriceTicker>> binanceServerTimeListPair) throws Exception {
+//                        List<Pair<BinanceServerTime, BinancePriceTicker>> listOfPairs = new ArrayList<>();
+//                        for (BinancePriceTicker binancePriceTicker : binanceServerTimeListPair.second) {
+//                            listOfPairs.add(new Pair<>(binanceServerTimeListPair.first, binancePriceTicker));
+//                        }
+//                        return listOfPairs;
 //                    }
 //                })
-//                .flatMap(new Function<String, ObservableSource<List<BinanceOrder>>>() {
+//                .flattenAsObservable(new Function<List<Pair<BinanceServerTime, BinancePriceTicker>>, Iterable<Pair<BinanceServerTime, BinancePriceTicker>>>() {
 //                    @Override
-//                    public ObservableSource<List<BinanceOrder>> apply(String s) throws Exception {
-//                        return kaleidoService.getAllOrders(s, 1515394177677L, 300000);
+//                    public Iterable<Pair<BinanceServerTime, BinancePriceTicker>> apply(List<Pair<BinanceServerTime, BinancePriceTicker>> pairs) throws Exception {
+//                        return pairs;
 //                    }
 //                })
-//                .observeOn(AndroidSchedulers.mainThread())
+//
+//                .flatMap(new Function<Pair<BinanceServerTime, BinancePriceTicker>, ObservableSource<List<BinanceOrder>>>() {
+//                    @Override
+//                    public ObservableSource<List<BinanceOrder>> apply(Pair<BinanceServerTime, BinancePriceTicker> binanceServerTimeBinancePriceTickerPair) throws Exception {
+//                        return kaleidoService.getAllOrders(binanceServerTimeBinancePriceTickerPair.second.getSymbol(), binanceServerTimeBinancePriceTickerPair.first.getServerTime(), 300000);
+//                    }
+//                })
 //                .subscribe(new DisposableObserver<List<BinanceOrder>>() {
 //                    @Override
 //                    public void onNext(List<BinanceOrder> binanceOrders) {
-//
+//                        if (binanceOrders.size() > 0) {
+//                            for(BinanceOrder order:binanceOrders){
+//                                db.kaleidoDao().insertBinanceOrder(order);
+//                            }
+//                        }
 //                    }
 //
 //                    @Override
 //                    public void onError(Throwable e) {
-//
+//                        Log.d(TAG, e.getMessage());
 //                    }
 //
 //                    @Override
 //                    public void onComplete() {
-//
+//                        for (List<BinanceOrder> list : transactionHistory) {
+//                            for (BinanceOrder order : list) {
+//                                Log.d(TAG, order.getSymbol() + ": " + order.getExecutedQty());
+//                            }
+//                        }
 //                    }
-//                })
+//                });
 
-        Single<BinanceServerTime> serverTimeSingle = kaleidoService.getServerTime();
-        serverTimeSingle
-                .subscribeOn(Schedulers.io())
-                .zipWith(kaleidoService.getPriceTickers().subscribeOn(Schedulers.newThread()),
-                        new BiFunction<BinanceServerTime, List<BinancePriceTicker>, Pair<BinanceServerTime, List<BinancePriceTicker>>>() {
-                            @Override
-                            public Pair<BinanceServerTime, List<BinancePriceTicker>> apply(BinanceServerTime binanceServerTime, List<BinancePriceTicker> binancePriceTickers) throws Exception {
-                                return new Pair<>(binanceServerTime, binancePriceTickers);
-                            }
-                        })
-                .map(new Function<Pair<BinanceServerTime, List<BinancePriceTicker>>, List<Pair<BinanceServerTime, BinancePriceTicker>>>() {
-                    @Override
-                    public List<Pair<BinanceServerTime, BinancePriceTicker>> apply(Pair<BinanceServerTime, List<BinancePriceTicker>> binanceServerTimeListPair) throws Exception {
-                        List<Pair<BinanceServerTime, BinancePriceTicker>> listOfPairs = new ArrayList<>();
-                        for (BinancePriceTicker binancePriceTicker : binanceServerTimeListPair.second) {
-                            listOfPairs.add(new Pair<>(binanceServerTimeListPair.first, binancePriceTicker));
-                        }
-                        return listOfPairs;
-                    }
-                })
-                .flattenAsObservable(new Function<List<Pair<BinanceServerTime, BinancePriceTicker>>, Iterable<Pair<BinanceServerTime, BinancePriceTicker>>>() {
-                    @Override
-                    public Iterable<Pair<BinanceServerTime, BinancePriceTicker>> apply(List<Pair<BinanceServerTime, BinancePriceTicker>> pairs) throws Exception {
-                        return pairs;
-                    }
-                })
 
-                .flatMap(new Function<Pair<BinanceServerTime, BinancePriceTicker>, ObservableSource<List<BinanceOrder>>>() {
-                    @Override
-                    public ObservableSource<List<BinanceOrder>> apply(Pair<BinanceServerTime, BinancePriceTicker> binanceServerTimeBinancePriceTickerPair) throws Exception {
-                        return kaleidoService.getAllOrders(binanceServerTimeBinancePriceTickerPair.second.getSymbol(), binanceServerTimeBinancePriceTickerPair.first.getServerTime(), 300000);
-                    }
-                })
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new DisposableObserver<List<BinanceOrder>>() {
-                    @Override
-                    public void onNext(List<BinanceOrder> binanceOrders) {
-                        if (binanceOrders.size() > 0) {
-                            transactionHistory.add(binanceOrders);
-                        }
-                    }
+    }
 
-                    @Override
-                    public void onError(Throwable e) {
-                        Log.d(LOG, e.getMessage());
-                    }
-
-                    @Override
-                    public void onComplete() {
-                        for (List<BinanceOrder> list : transactionHistory) {
-                            for (BinanceOrder order : list) {
-                                Log.d(LOG, order.getSymbol() + ": " + order.getExecutedQty());
-                            }
-                        }
-                    }
-                });
-
+    private void setUpView(){
 
     }
 }

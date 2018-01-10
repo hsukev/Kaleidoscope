@@ -1,8 +1,11 @@
 package urbanutility.design.kaleidoscope.database;
 
 
+import android.arch.lifecycle.LiveData;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.Query;
+
+import java.util.List;
 
 import urbanutility.design.kaleidoscope.model.BinanceOrder;
 
@@ -17,5 +20,5 @@ public interface KaleidoDao {
     public void insertBinanceOrder(BinanceOrder... binanceOrders);
 
     @Query("SELECT * FROM binance_orders")
-    public BinanceOrder[] fetchOrderHistory();
+    LiveData<List<BinanceOrder>> fetchOrderHistory();
 }
