@@ -29,4 +29,9 @@ public class KaleidoViewModel extends AndroidViewModel {
     public LiveData<List<BinanceOrder>> getOrderHistory(){
         return mOrderHistory;
     }
+
+    public void insertOrderHistory(BinanceOrder order){
+
+    }
+
 }
