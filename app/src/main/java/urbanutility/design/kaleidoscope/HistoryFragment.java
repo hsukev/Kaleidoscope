@@ -5,6 +5,7 @@ import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -31,9 +32,10 @@ import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 import urbanutility.design.kaleidoscope.client.BittrexRequestInterceptor;
 import urbanutility.design.kaleidoscope.client.KaleidoService;
-import urbanutility.design.kaleidoscope.model.BinanceOrder;
-import urbanutility.design.kaleidoscope.model.BinancePriceTicker;
-import urbanutility.design.kaleidoscope.model.BinanceServerTime;
+import urbanutility.design.kaleidoscope.model.KaleidoOrder;
+import urbanutility.design.kaleidoscope.model.binance.BinanceOrder;
+import urbanutility.design.kaleidoscope.model.binance.BinancePriceTicker;
+import urbanutility.design.kaleidoscope.model.binance.BinanceServerTime;
 import urbanutility.design.kaleidoscope.view.KaleidoViewModel;
 import urbanutility.design.kaleidoscope.view.OrdersAdapter;
 
@@ -43,6 +45,8 @@ import urbanutility.design.kaleidoscope.view.OrdersAdapter;
 public class HistoryFragment extends Fragment {
     @BindView(R.id.recyclerView)
     RecyclerView recycler;
+    @BindView(R.id.floatingActionButton)
+    FloatingActionButton fab;
 
     private KaleidoViewModel kaleidoViewModel;
     private OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
@@ -94,20 +98,29 @@ public class HistoryFragment extends Fragment {
         adapter = new OrdersAdapter(getContext());
         recycler.setAdapter(adapter);
         recycler.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
+
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                addExchangeButton();
+            }
+        });
     }
 
     private void setUpViewModelAndObserver(){
+        //move to main activity
         kaleidoViewModel = ViewModelProviders.of(this).get(KaleidoViewModel.class);
-        final Observer<List<BinanceOrder>> kaleidoObserver = new Observer<List<BinanceOrder>>() {
+        //remain in fragment custom
+        final Observer<List<KaleidoOrder>> kaleidoObserver = new Observer<List<KaleidoOrder>>() {
             @Override
-            public void onChanged(@Nullable List<BinanceOrder> binanceOrders) {
-                adapter.addOrder(binanceOrders);
+            public void onChanged(@Nullable List<KaleidoOrder> kaleidoOrders) {
+                adapter.addOrder(kaleidoOrders);
             }
         };
-        kaleidoViewModel.getOrderHistory().observe(HistoryFragment.this,kaleidoObserver);
+        kaleidoViewModel.getAllOrders().observe(HistoryFragment.this,kaleidoObserver);
     }
 
-    public void addExchange(View view) {
+    public void addExchangeButton() {
         Single<BinanceServerTime> serverTimeSingle = kaleidoService.getServerTime();
         serverTimeSingle
                 .subscribeOn(Schedulers.io())
@@ -146,7 +159,8 @@ public class HistoryFragment extends Fragment {
                     public void onNext(List<BinanceOrder> binanceOrders) {
                         if (binanceOrders.size() > 0) {
                             for (BinanceOrder order : binanceOrders) {
-                                kaleidoViewModel.insertOrderHistory(order);
+                                KaleidoOrder kaleidoOrder = new KaleidoOrder(order);
+                                kaleidoViewModel.insertOrder(kaleidoOrder);
                             }
                         }
                     }

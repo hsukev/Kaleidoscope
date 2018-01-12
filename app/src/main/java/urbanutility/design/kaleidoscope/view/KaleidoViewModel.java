@@ -7,7 +7,8 @@ import android.arch.lifecycle.LiveData;
 import java.util.List;
 
 import urbanutility.design.kaleidoscope.database.KaleidoDatabase;
-import urbanutility.design.kaleidoscope.model.BinanceOrder;
+import urbanutility.design.kaleidoscope.model.KaleidoBalance;
+import urbanutility.design.kaleidoscope.model.KaleidoOrder;
 
 /**
  * Created by jerye on 1/9/2018.
@@ -15,23 +16,29 @@ import urbanutility.design.kaleidoscope.model.BinanceOrder;
 
 public class KaleidoViewModel extends AndroidViewModel {
 
-    private LiveData<List<BinanceOrder>> mOrderHistory;
     private KaleidoDatabase kaleidoDatabase;
 
     public KaleidoViewModel(Application application){
         super(application);
 
         kaleidoDatabase = kaleidoDatabase.getAppDatabase(this.getApplication());
-        mOrderHistory = kaleidoDatabase.kaleidoDao().fetchOrderHistory();
-
     }
 
-    public LiveData<List<BinanceOrder>> getOrderHistory(){
-        return mOrderHistory;
+    //use async
+    public LiveData<List<KaleidoOrder>> getAllOrders(){
+        return kaleidoDatabase.kaleidoDao().getAllOrders();
     }
 
-    public void insertOrderHistory(BinanceOrder order){
+    public LiveData<List<KaleidoBalance>> getAllBalances(){
+        return kaleidoDatabase.kaleidoDao().getAllBalances();
+    }
 
+    public void insertOrder(KaleidoOrder kaleidoOrder){
+        kaleidoDatabase.kaleidoDao().insertOrder(kaleidoOrder);
+    }
+
+    public void insertBalance(KaleidoBalance kaleidoBalance){
+        kaleidoDatabase.kaleidoDao().insertBalance(kaleidoBalance);
     }
 
 }

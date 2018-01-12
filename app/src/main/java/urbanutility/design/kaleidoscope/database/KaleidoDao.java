@@ -7,7 +7,8 @@ import android.arch.persistence.room.Query;
 
 import java.util.List;
 
-import urbanutility.design.kaleidoscope.model.BinanceOrder;
+import urbanutility.design.kaleidoscope.model.KaleidoBalance;
+import urbanutility.design.kaleidoscope.model.KaleidoOrder;
 
 /**
  * Created by jerye on 1/8/2018.
@@ -17,8 +18,14 @@ import urbanutility.design.kaleidoscope.model.BinanceOrder;
 public interface KaleidoDao {
 
     @Insert
-    public void insertBinanceOrder(BinanceOrder... binanceOrders);
+    void insertOrder(KaleidoOrder... kaleidoOrders);
 
-    @Query("SELECT * FROM binance_orders")
-    LiveData<List<BinanceOrder>> fetchOrderHistory();
+    @Insert
+    void insertBalance(KaleidoBalance... kaleidoBalances);
+
+    @Query("SELECT * FROM kaleido_orders")
+    LiveData<List<KaleidoOrder>> getAllOrders();
+
+    @Query("SELECT * FROM kaleido_balances")
+    LiveData<List<KaleidoBalance>> getAllBalances();
 }

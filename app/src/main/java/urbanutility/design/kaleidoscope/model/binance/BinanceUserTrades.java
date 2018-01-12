@@ -1,4 +1,4 @@
-package urbanutility.design.kaleidoscope.model;
+package urbanutility.design.kaleidoscope.model.binance;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -46,7 +46,7 @@ public class BinanceUserTrades implements Parcelable
     protected BinanceUserTrades(Parcel in) {
         this.total = ((Long) in.readValue((Long.class.getClassLoader())));
         this.pages = ((Long) in.readValue((Long.class.getClassLoader())));
-        in.readList(this.data, (urbanutility.design.kaleidoscope.model.BinanceTrade.class.getClassLoader()));
+        in.readList(this.data, (BinanceTrade.class.getClassLoader()));
         this.page = ((Long) in.readValue((Long.class.getClassLoader())));
         this.rows = ((Long) in.readValue((Long.class.getClassLoader())));
     }

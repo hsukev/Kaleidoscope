@@ -58,6 +58,8 @@ public class MainActivity extends AppCompatActivity {
                 case 0:
                     return CurrentPriceFragment.newInstance();
                 case 1:
+                    return ComparisonFragment.newInstance();
+                case 2:
                     return HistoryFragment.newInstance();
                 default:
                     return null;
@@ -66,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public int getCount() {
-            return 2;
+            return 3;
         }
     }
 

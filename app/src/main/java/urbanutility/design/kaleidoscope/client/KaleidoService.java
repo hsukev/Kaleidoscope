@@ -7,9 +7,9 @@ import io.reactivex.Single;
 import retrofit2.http.GET;
 import retrofit2.http.Headers;
 import retrofit2.http.Query;
-import urbanutility.design.kaleidoscope.model.BinanceOrder;
-import urbanutility.design.kaleidoscope.model.BinancePriceTicker;
-import urbanutility.design.kaleidoscope.model.BinanceServerTime;
+import urbanutility.design.kaleidoscope.model.binance.BinanceOrder;
+import urbanutility.design.kaleidoscope.model.binance.BinancePriceTicker;
+import urbanutility.design.kaleidoscope.model.binance.BinanceServerTime;
 
 /**
  * Created by jerye on 1/5/2018.

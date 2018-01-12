@@ -13,14 +13,14 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import urbanutility.design.kaleidoscope.R;
-import urbanutility.design.kaleidoscope.model.BinanceOrder;
+import urbanutility.design.kaleidoscope.model.KaleidoOrder;
 
 /**
  * Created by jerye on 1/10/2018.
  */
 
 public class OrdersAdapter extends RecyclerView.Adapter<OrdersAdapter.OrdersViewHolder> {
-    List<BinanceOrder> list = new ArrayList<>();
+    List<KaleidoOrder> list = new ArrayList<>();
     Context mContext;
     public OrdersAdapter(Context context){
         mContext = context;
@@ -53,7 +53,7 @@ public class OrdersAdapter extends RecyclerView.Adapter<OrdersAdapter.OrdersView
         }
     }
 
-    public void addOrder(List<BinanceOrder> orders){
+    public void addOrder(List<KaleidoOrder> orders){
         list = orders;
         notifyDataSetChanged();
     }
