@@ -1,4 +1,4 @@
-package urbanutility.design.kaleidoscope.model.binance;
+package urbanutility.design.kaleidoscope.module.binance.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;

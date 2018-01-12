@@ -1,4 +1,4 @@
-package urbanutility.design.kaleidoscope.client;
+package urbanutility.design.kaleidoscope.module.binance.client;
 
 import android.util.Log;
 
@@ -8,18 +8,19 @@ import okhttp3.HttpUrl;
 import okhttp3.Interceptor;
 import okhttp3.Request;
 import okhttp3.Response;
+import urbanutility.design.kaleidoscope.clients.HmacSigner;
 
 /**
  * Created by jerye on 1/4/2018.
  */
 
-public class BittrexRequestInterceptor implements Interceptor {
+public class BinanceRequestInterceptor implements Interceptor {
     private String mApiKey;
     private String mSecretKey;
     private String LOG = "HttpInteceptor";
 
 
-    public BittrexRequestInterceptor(String apiKey, String secretKey){
+    public BinanceRequestInterceptor(String apiKey, String secretKey){
         mApiKey = apiKey;
         mSecretKey = secretKey;
     }

@@ -14,7 +14,7 @@ import java.io.IOException;
 
 import urbanutility.design.kaleidoscope.database.KaleidoDao;
 import urbanutility.design.kaleidoscope.database.KaleidoDatabase;
-import urbanutility.design.kaleidoscope.model.binance.BinanceOrder;
+import urbanutility.design.kaleidoscope.module.binance.model.BinanceOrder;
 import urbanutility.design.kaleidoscope.util.TestBinanceOrder;
 /**
  * Created by jerye on 1/8/2018.

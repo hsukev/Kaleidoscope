@@ -3,6 +3,7 @@ package urbanutility.design.kaleidoscope.database;
 
 import android.arch.lifecycle.LiveData;
 import android.arch.persistence.room.Insert;
+import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
 
 import java.util.List;
@@ -17,7 +18,7 @@ import urbanutility.design.kaleidoscope.model.KaleidoOrder;
 @android.arch.persistence.room.Dao
 public interface KaleidoDao {
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     void insertOrder(KaleidoOrder... kaleidoOrders);
 
     @Insert

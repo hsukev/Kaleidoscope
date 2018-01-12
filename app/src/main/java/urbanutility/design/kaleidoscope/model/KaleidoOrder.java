@@ -4,7 +4,7 @@ import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
 import android.support.annotation.NonNull;
 
-import urbanutility.design.kaleidoscope.model.binance.BinanceOrder;
+import urbanutility.design.kaleidoscope.module.binance.model.BinanceOrder;
 
 /**
  * Created by jerye on 1/11/2018.
