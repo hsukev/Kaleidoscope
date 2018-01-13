@@ -14,6 +14,7 @@ import retrofit2.Retrofit;
 import urbanutility.design.kaleidoscope.BuildConfig;
 import urbanutility.design.kaleidoscope.ChainRequestor;
 import urbanutility.design.kaleidoscope.HistoryFragment;
+import urbanutility.design.kaleidoscope.model.KaleidoBalance;
 import urbanutility.design.kaleidoscope.model.KaleidoOrder;
 import urbanutility.design.kaleidoscope.module.binance.model.BinanceOrder;
 import urbanutility.design.kaleidoscope.module.binance.model.BinancePriceTicker;
@@ -65,11 +66,8 @@ public class BinanceChainRequestor implements ChainRequestor {
                     @Override
                     public void onNext(List<BinanceOrder> binanceOrders) {
                         if (binanceOrders.size() > 0) {
-
-                            for (BinanceOrder order : binanceOrders) {
-                                KaleidoOrder kaleidoOrder = new KaleidoOrder(order);
-                                kaleidoViewModel.insertOrder(kaleidoOrder);
-                            }
+                            insertOrderTable(binanceOrders);
+                            updateBalanceTable(binanceOrders);
                         }
                     }
 
@@ -85,10 +83,22 @@ public class BinanceChainRequestor implements ChainRequestor {
                 });
     }
 
-//    public KaleidoBalance calculateBalance(){
-//        //math
-//        return new KaleidoBalance()
-//    }
+    private void insertOrderTable(List<BinanceOrder> binanceOrders){
+        for (BinanceOrder order : binanceOrders) {
+            KaleidoOrder kaleidoOrder = new KaleidoOrder(order);
+            kaleidoViewModel.insertOrder(kaleidoOrder);
+        }
+    }
+    private void updateBalanceTable(List<BinanceOrder> binanceOrders){
+        KaleidoBalance balance = kaleidoViewModel.getBalance(binanceOrders.get(0).getSymbol());
+
+        for (BinanceOrder order : binanceOrders){
+            //math: calculate average
+            //update balance
+        }
+
+        kaleidoViewModel.insertBalance(balance);
+    }
 
 
 

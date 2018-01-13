@@ -3,4 +3,18 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string name="import_button">Import</string>
+    <string name="latest_transactions">Latest Transactions</string>
+    <string-array name="exchange_dropdown">
+        <item>binance</item>
+        <item>cryptopia</item>
+        <item>bittrex</item>
+        <item>kucoins</item>
+        <item>gemini</item>
+        <item>gdax</item>
+        <item>coinbase</item>
+        <item>poloniex</item>
+    </string-array>
+
 </resources>

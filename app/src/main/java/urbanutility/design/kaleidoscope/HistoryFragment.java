@@ -5,13 +5,14 @@ import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Spinner;
+import android.widget.TextView;
 
 import java.util.List;
 
@@ -31,8 +32,10 @@ import urbanutility.design.kaleidoscope.view.OrdersAdapter;
 public class HistoryFragment extends Fragment {
     @BindView(R.id.recyclerView)
     RecyclerView recycler;
-    @BindView(R.id.floatingActionButton)
-    FloatingActionButton fab;
+    @BindView(R.id.spinner)
+    Spinner spinner;
+    @BindView(R.id.import_button)
+    TextView importButton;
 
     public KaleidoViewModel kaleidoViewModel;
     public Retrofit.Builder retrofitBuilder;
@@ -73,11 +76,11 @@ public class HistoryFragment extends Fragment {
         recycler.setAdapter(adapter);
         recycler.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
 
-        fab.setOnClickListener(new View.OnClickListener() {
+        importButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 KaleidoExchangePort exchangePort = new KaleidoExchangePort(HistoryFragment.this);
-                exchangePort.addExchange("binance");
+                exchangePort.addExchange(spinner.getSelectedItem().toString());
             }
         });
     }

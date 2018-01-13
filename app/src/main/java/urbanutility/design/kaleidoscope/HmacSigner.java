@@ -1,4 +1,4 @@
-package urbanutility.design.kaleidoscope.clients;
+package urbanutility.design.kaleidoscope;
 
 import org.apache.commons.codec.binary.Hex;
 

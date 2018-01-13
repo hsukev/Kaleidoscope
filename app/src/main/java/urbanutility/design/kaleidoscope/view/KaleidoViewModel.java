@@ -29,9 +29,12 @@ public class KaleidoViewModel extends AndroidViewModel {
         return kaleidoDatabase.kaleidoDao().getAllOrders();
     }
 
-
     public LiveData<List<KaleidoBalance>> getAllBalances(){
         return kaleidoDatabase.kaleidoDao().getAllBalances();
+    }
+
+    public KaleidoBalance getBalance(String symbol){
+        return kaleidoDatabase.kaleidoDao().getBalance(symbol);
     }
 
     public void insertOrder(KaleidoOrder kaleidoOrder){
