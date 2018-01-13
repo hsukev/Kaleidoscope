@@ -59,7 +59,6 @@ public class HistoryFragment extends Fragment {
         setUpViewModelAndObserver();
         setUpUI();
         setUpRetrofitBuilder();
-
         return view;
     }
 

@@ -1,5 +1,6 @@
 package urbanutility.design.kaleidoscope;
 
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import urbanutility.design.kaleidoscope.module.binance.client.BinanceChainRequestor;
@@ -38,6 +39,6 @@ public class KaleidoExchangePort {
 
 
     public void UpdateAll(){
-
+        PreferenceManager.getDefaultSharedPreferences(historyFragment.getContext());
     }
 }

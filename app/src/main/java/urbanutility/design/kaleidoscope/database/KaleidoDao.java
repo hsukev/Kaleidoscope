@@ -5,6 +5,7 @@ import android.arch.lifecycle.LiveData;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
+import android.arch.persistence.room.Transaction;
 
 import java.util.List;
 
@@ -16,17 +17,25 @@ import urbanutility.design.kaleidoscope.model.KaleidoOrder;
  */
 
 @android.arch.persistence.room.Dao
-public interface KaleidoDao {
+public abstract class KaleidoDao {
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    void insertOrder(KaleidoOrder... kaleidoOrders);
+    public abstract void insertOrder(KaleidoOrder... kaleidoOrders);
 
     @Insert
-    void insertBalance(KaleidoBalance... kaleidoBalances);
+    public abstract void insertBalance(KaleidoBalance... kaleidoBalances);
 
     @Query("SELECT * FROM kaleido_orders")
-    LiveData<List<KaleidoOrder>> getAllOrders();
+    public abstract LiveData<List<KaleidoOrder>> getAllOrders();
+
+    @Transaction
+    public void queryAndUpdate(){
+        
+    }
+
+
 
     @Query("SELECT * FROM kaleido_balances")
-    LiveData<List<KaleidoBalance>> getAllBalances();
+    public abstract LiveData<List<KaleidoBalance>> getAllBalances();
+
 }

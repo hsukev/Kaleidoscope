@@ -1,14 +1,11 @@
 package urbanutility.design.kaleidoscope.module.binance.client;
 
 import android.util.Log;
-import android.util.Pair;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.ObservableSource;
 import io.reactivex.Single;
-import io.reactivex.functions.BiFunction;
 import io.reactivex.functions.Function;
 import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
@@ -20,7 +17,6 @@ import urbanutility.design.kaleidoscope.HistoryFragment;
 import urbanutility.design.kaleidoscope.model.KaleidoOrder;
 import urbanutility.design.kaleidoscope.module.binance.model.BinanceOrder;
 import urbanutility.design.kaleidoscope.module.binance.model.BinancePriceTicker;
-import urbanutility.design.kaleidoscope.module.binance.model.BinanceServerTime;
 import urbanutility.design.kaleidoscope.view.KaleidoViewModel;
 
 /**
@@ -50,43 +46,26 @@ public class BinanceChainRequestor implements ChainRequestor {
 
     @Override
     public void requestAndInsert() {
-        Single<BinanceServerTime> serverTimeSingle = binanceService.getServerTime();
-        serverTimeSingle
-                .subscribeOn(Schedulers.io())
-                .zipWith(binanceService.getPriceTickers().subscribeOn(Schedulers.newThread()),
-                        new BiFunction<BinanceServerTime, List<BinancePriceTicker>, Pair<BinanceServerTime, List<BinancePriceTicker>>>() {
-                            @Override
-                            public Pair<BinanceServerTime, List<BinancePriceTicker>> apply(BinanceServerTime binanceServerTime, List<BinancePriceTicker> binancePriceTickers) throws Exception {
-                                return new Pair<>(binanceServerTime, binancePriceTickers);
-                            }
-                        })
-                .map(new Function<Pair<BinanceServerTime, List<BinancePriceTicker>>, List<Pair<BinanceServerTime, BinancePriceTicker>>>() {
+        Single<List<BinancePriceTicker>> binancePriceTicker = binanceService.getPriceTickers();
+        binancePriceTicker
+                .subscribeOn(Schedulers.newThread())
+                .flattenAsObservable(new Function<List<BinancePriceTicker>, Iterable<BinancePriceTicker>>() {
                     @Override
-                    public List<Pair<BinanceServerTime, BinancePriceTicker>> apply(Pair<BinanceServerTime, List<BinancePriceTicker>> binanceServerTimeListPair) throws Exception {
-                        List<Pair<BinanceServerTime, BinancePriceTicker>> listOfPairs = new ArrayList<>();
-                        for (BinancePriceTicker binancePriceTicker : binanceServerTimeListPair.second) {
-                            listOfPairs.add(new Pair<>(binanceServerTimeListPair.first, binancePriceTicker));
-                        }
-                        return listOfPairs;
+                    public Iterable<BinancePriceTicker> apply(List<BinancePriceTicker> binancePriceTickers) throws Exception {
+                        return binancePriceTickers;
                     }
                 })
-                .flattenAsObservable(new Function<List<Pair<BinanceServerTime, BinancePriceTicker>>, Iterable<Pair<BinanceServerTime, BinancePriceTicker>>>() {
+                .flatMap(new Function<BinancePriceTicker, ObservableSource<List<BinanceOrder>>>() {
                     @Override
-                    public Iterable<Pair<BinanceServerTime, BinancePriceTicker>> apply(List<Pair<BinanceServerTime, BinancePriceTicker>> pairs) throws Exception {
-                        return pairs;
-                    }
-                })
-
-                .flatMap(new Function<Pair<BinanceServerTime, BinancePriceTicker>, ObservableSource<List<BinanceOrder>>>() {
-                    @Override
-                    public ObservableSource<List<BinanceOrder>> apply(Pair<BinanceServerTime, BinancePriceTicker> binanceServerTimeBinancePriceTickerPair) throws Exception {
-                        return binanceService.getAllOrders(binanceServerTimeBinancePriceTickerPair.second.getSymbol(), binanceServerTimeBinancePriceTickerPair.first.getServerTime(), 300000);
+                    public ObservableSource<List<BinanceOrder>> apply(BinancePriceTicker binancePriceTicker) throws Exception {
+                        return binanceService.getAllOrders(binancePriceTicker.getSymbol(), System.currentTimeMillis(), 300000);
                     }
                 })
                 .subscribe(new DisposableObserver<List<BinanceOrder>>() {
                     @Override
                     public void onNext(List<BinanceOrder> binanceOrders) {
                         if (binanceOrders.size() > 0) {
+
                             for (BinanceOrder order : binanceOrders) {
                                 KaleidoOrder kaleidoOrder = new KaleidoOrder(order);
                                 kaleidoViewModel.insertOrder(kaleidoOrder);
@@ -101,11 +80,16 @@ public class BinanceChainRequestor implements ChainRequestor {
 
                     @Override
                     public void onComplete() {
-
+                        //calculate average and insert to db
                     }
                 });
-
-
     }
+
+//    public KaleidoBalance calculateBalance(){
+//        //math
+//        return new KaleidoBalance()
+//    }
+
+
 
 }

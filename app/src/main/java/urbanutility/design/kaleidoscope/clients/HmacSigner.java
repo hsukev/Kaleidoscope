@@ -21,7 +21,7 @@ public class HmacSigner{
 
 
 
-    //Binance - query string + key
+    //Binance = query string + key
     public static String signSHA256(String message, String secretKey){
         try{
             Mac hmac_sha256 = Mac.getInstance(ALGORITHM_HMAC_SHA256);
@@ -35,7 +35,12 @@ public class HmacSigner{
         }
     }
 
-    //Bittrex - nonce + key
+    //Cryptopia = nonce + time?
+    public static String signMD5(){
+        return null;
+    }
+
+    //Bittrex = nonce + key
     public static String signSHA512(String key){
         return null;
     }
