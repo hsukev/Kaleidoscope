@@ -1,4 +1,4 @@
-package urbanutility.design.kaleidoscope.module.binance.client;
+package urbanutility.design.kaleidoscope.exchange.binance.client;
 
 import java.util.List;
 
@@ -7,11 +7,11 @@ import io.reactivex.Single;
 import retrofit2.http.GET;
 import retrofit2.http.Headers;
 import retrofit2.http.Query;
-import urbanutility.design.kaleidoscope.module.binance.model.Binance24hTicker;
-import urbanutility.design.kaleidoscope.module.binance.model.BinanceBalance;
-import urbanutility.design.kaleidoscope.module.binance.model.BinanceOrder;
-import urbanutility.design.kaleidoscope.module.binance.model.BinancePriceTicker;
-import urbanutility.design.kaleidoscope.module.binance.model.BinanceServerTime;
+import urbanutility.design.kaleidoscope.exchange.binance.model.Binance24hTicker;
+import urbanutility.design.kaleidoscope.exchange.binance.model.BinanceBalance;
+import urbanutility.design.kaleidoscope.exchange.binance.model.BinanceOrder;
+import urbanutility.design.kaleidoscope.exchange.binance.model.BinancePriceTicker;
+import urbanutility.design.kaleidoscope.exchange.binance.model.BinanceServerTime;
 
 /**
  * Created by jerye on 1/5/2018.

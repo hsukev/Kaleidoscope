@@ -1,0 +1,16 @@
+package urbanutility.design.kaleidoscope.datatypes;
+
+/**
+ * Created by Jason on 1/13/2018.
+ */
+
+public class OrderType {
+    public String id; /* For Database use only */
+    public String exchange; /* Binance, Kraken... */
+    public String symbol;
+    public String type; /* Buy or Sell */
+    public long amount;
+    public long txFee;
+    public long price;
+    public String time; /* ISO 8601 format: "yyyy-MM-dd'T'HH:mm:ssZ" */
+}

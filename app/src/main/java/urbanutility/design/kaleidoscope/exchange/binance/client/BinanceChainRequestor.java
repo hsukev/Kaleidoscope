@@ -1,4 +1,4 @@
-package urbanutility.design.kaleidoscope.module.binance.client;
+package urbanutility.design.kaleidoscope.exchange.binance.client;
 
 import android.util.Log;
 
@@ -14,10 +14,10 @@ import retrofit2.Retrofit;
 import urbanutility.design.kaleidoscope.BuildConfig;
 import urbanutility.design.kaleidoscope.ChainRequestor;
 import urbanutility.design.kaleidoscope.HistoryFragment;
-import urbanutility.design.kaleidoscope.model.KaleidoBalance;
+import urbanutility.design.kaleidoscope.model.KaleidoRawBalance;
 import urbanutility.design.kaleidoscope.model.KaleidoOrder;
-import urbanutility.design.kaleidoscope.module.binance.model.BinanceOrder;
-import urbanutility.design.kaleidoscope.module.binance.model.BinancePriceTicker;
+import urbanutility.design.kaleidoscope.exchange.binance.model.BinanceOrder;
+import urbanutility.design.kaleidoscope.exchange.binance.model.BinancePriceTicker;
 import urbanutility.design.kaleidoscope.view.KaleidoViewModel;
 
 /**
@@ -90,7 +90,7 @@ public class BinanceChainRequestor implements ChainRequestor {
         }
     }
     private void updateBalanceTable(List<BinanceOrder> binanceOrders){
-        KaleidoBalance balance = kaleidoViewModel.getBalance(binanceOrders.get(0).getSymbol());
+        KaleidoRawBalance balance = kaleidoViewModel.getBalance(binanceOrders.get(0).getSymbol());
 
         for (BinanceOrder order : binanceOrders){
             //math: calculate average

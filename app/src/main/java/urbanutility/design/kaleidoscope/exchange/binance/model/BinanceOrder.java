@@ -1,5 +1,5 @@
 
-package urbanutility.design.kaleidoscope.module.binance.model;
+package urbanutility.design.kaleidoscope.exchange.binance.model;
 
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
@@ -54,7 +54,7 @@ public class BinanceOrder implements Parcelable {
     private String icebergQty;
     @SerializedName("time")
     @Expose
-    private Long time;
+    private String time;
     public final static Parcelable.Creator<BinanceOrder> CREATOR = new Creator<BinanceOrder>() {
 
 
@@ -84,7 +84,7 @@ public class BinanceOrder implements Parcelable {
         this.side = ((String) in.readValue((String.class.getClassLoader())));
         this.stopPrice = ((String) in.readValue((String.class.getClassLoader())));
         this.icebergQty = ((String) in.readValue((String.class.getClassLoader())));
-        this.time = ((Long) in.readValue((Long.class.getClassLoader())));
+        this.time = ((String) in.readValue((String.class.getClassLoader())));
     }
 
     public BinanceOrder() {
@@ -186,11 +186,11 @@ public class BinanceOrder implements Parcelable {
         this.icebergQty = icebergQty;
     }
 
-    public Long getTime() {
+    public String getTime() {
         return time;
     }
 
-    public void setTime(Long time) {
+    public void setTime(String time) {
         this.time = time;
     }
 

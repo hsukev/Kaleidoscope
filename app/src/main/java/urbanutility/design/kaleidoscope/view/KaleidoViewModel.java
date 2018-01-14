@@ -7,7 +7,7 @@ import android.arch.lifecycle.LiveData;
 import java.util.List;
 
 import urbanutility.design.kaleidoscope.database.KaleidoDatabase;
-import urbanutility.design.kaleidoscope.model.KaleidoBalance;
+import urbanutility.design.kaleidoscope.model.KaleidoRawBalance;
 import urbanutility.design.kaleidoscope.model.KaleidoOrder;
 
 /**
@@ -29,11 +29,11 @@ public class KaleidoViewModel extends AndroidViewModel {
         return kaleidoDatabase.kaleidoDao().getAllOrders();
     }
 
-    public LiveData<List<KaleidoBalance>> getAllBalances(){
+    public LiveData<List<KaleidoRawBalance>> getAllBalances(){
         return kaleidoDatabase.kaleidoDao().getAllBalances();
     }
 
-    public KaleidoBalance getBalance(String symbol){
+    public KaleidoRawBalance getBalance(String symbol){
         return kaleidoDatabase.kaleidoDao().getBalance(symbol);
     }
 
@@ -41,7 +41,7 @@ public class KaleidoViewModel extends AndroidViewModel {
         kaleidoDatabase.kaleidoDao().insertOrder(kaleidoOrder);
     }
 
-    public void insertBalance(KaleidoBalance kaleidoBalance){
+    public void insertBalance(KaleidoRawBalance kaleidoBalance){
         kaleidoDatabase.kaleidoDao().insertBalance(kaleidoBalance);
     }
 

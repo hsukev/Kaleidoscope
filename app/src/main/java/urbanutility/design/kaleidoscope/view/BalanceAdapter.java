@@ -13,14 +13,14 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import urbanutility.design.kaleidoscope.R;
-import urbanutility.design.kaleidoscope.model.KaleidoBalance;
+import urbanutility.design.kaleidoscope.model.KaleidoRawBalance;
 
 /**
  * Created by jerye on 1/12/2018.
  */
 
 public class BalanceAdapter extends RecyclerView.Adapter<BalanceAdapter.BalanceViewHolder> {
-    private List<KaleidoBalance> list = new ArrayList<>();
+    private List<KaleidoRawBalance> list = new ArrayList<>();
     private Context mContext;
 
     public BalanceAdapter(Context context){

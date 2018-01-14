@@ -22,7 +22,7 @@ import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 import urbanutility.design.kaleidoscope.model.KaleidoOrder;
-import urbanutility.design.kaleidoscope.module.binance.client.BinanceService;
+import urbanutility.design.kaleidoscope.exchange.binance.client.BinanceService;
 import urbanutility.design.kaleidoscope.view.KaleidoViewModel;
 import urbanutility.design.kaleidoscope.view.OrdersAdapter;
 
