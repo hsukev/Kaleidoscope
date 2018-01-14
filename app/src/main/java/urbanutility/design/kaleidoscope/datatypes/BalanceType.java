@@ -7,7 +7,11 @@ package urbanutility.design.kaleidoscope.datatypes;
 /* Used for storing raw balance data from API */
 public class BalanceType {
     public String symbol;
-    public long totalQty;
-    public long averagePrice;
+    public String exchange;
+    public long amount;
+
+    public BalanceType () {
+
+    }
 }
 

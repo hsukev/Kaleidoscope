@@ -9,8 +9,13 @@ public class OrderType {
     public String exchange; /* Binance, Kraken... */
     public String symbol;
     public String type; /* Buy or Sell */
+    public long price;
+    public long btcUsdRate;
     public long amount;
     public long txFee;
-    public long price;
     public String time; /* ISO 8601 format: "yyyy-MM-dd'T'HH:mm:ssZ" */
+
+    public OrderType () {
+
+    }
 }

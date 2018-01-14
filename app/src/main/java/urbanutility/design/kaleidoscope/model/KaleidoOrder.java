@@ -29,6 +29,10 @@ public class KaleidoOrder {
         this.ordertype.price = Long.valueOf(binanceOrder.getPrice());
         this.ordertype.time = binanceOrder.getTime();
     }
+    public KaleidoOrder(GdaxRate gdaxRate) {
+        this.ordertype.id = gdaxRate.getClientOrderId();
+        this.ordertype.btcUsdRate = gdaxRate.getRate();
+    }
 
     @NonNull
     public OrderType getOrdertype() {
