@@ -12,6 +12,7 @@ public class PositionType {
     public long realizedGain;
     public long unrealizedGain;
     public long amount;
+    public long changePercent;
 
     public PositionType () {
 
