@@ -36,6 +36,8 @@ public class CurrentPriceFragment extends Fragment {
         CurrentPriceFragment fragment = new CurrentPriceFragment();
         fragment.setArguments(args);
         return fragment;
+
+
     }
 
 

@@ -1,12 +1,13 @@
 package urbanutility.design.kaleidoscope.module.binance.client;
 
-import android.util.Log;
+import com.google.gson.JsonElement;
 
 import java.util.List;
 
 import io.reactivex.ObservableSource;
 import io.reactivex.Single;
 import io.reactivex.functions.Function;
+import io.reactivex.functions.Predicate;
 import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
 import okhttp3.OkHttpClient;
@@ -16,8 +17,11 @@ import urbanutility.design.kaleidoscope.ChainRequestor;
 import urbanutility.design.kaleidoscope.HistoryFragment;
 import urbanutility.design.kaleidoscope.model.KaleidoBalance;
 import urbanutility.design.kaleidoscope.model.KaleidoOrder;
+import urbanutility.design.kaleidoscope.module.binance.model.BinanceAccountInfo;
+import urbanutility.design.kaleidoscope.module.binance.model.BinanceBalance;
 import urbanutility.design.kaleidoscope.module.binance.model.BinanceOrder;
 import urbanutility.design.kaleidoscope.module.binance.model.BinancePriceTicker;
+import urbanutility.design.kaleidoscope.module.gdax.client.GdaxService;
 import urbanutility.design.kaleidoscope.view.KaleidoViewModel;
 
 /**
@@ -30,6 +34,7 @@ public class BinanceChainRequestor implements ChainRequestor {
     private KaleidoViewModel kaleidoViewModel;
     private Retrofit.Builder retrofitBuilder;
     private BinanceService binanceService;
+    private GdaxService gdaxService;
 
     public BinanceChainRequestor(HistoryFragment historyFragment){
         this.retrofitBuilder = historyFragment.retrofitBuilder;
@@ -42,11 +47,42 @@ public class BinanceChainRequestor implements ChainRequestor {
                 .client(httpClient.build())
                 .build()
                 .create(BinanceService.class);
+        gdaxService = retrofitBuilder.baseUrl("https://api.gdax.com/")
+                .build()
+                .create(GdaxService.class);
+
     }
+
 
 
     @Override
     public void requestAndInsert() {
+        getRawOrders();
+        getRawBalance();
+
+
+//                .subscribe(new DisposableObserver<List<BinanceOrder>>() {
+//                    @Override
+//                    public void onNext(List<BinanceOrder> binanceOrders) {
+//                        if (binanceOrders.size() > 0) {
+//                            insertOrderTable(binanceOrders);
+//                            updateBalanceTable(binanceOrders);
+//                        }
+//                    }
+//
+//                    @Override
+//                    public void onError(Throwable e) {
+//                        Log.d(TAG, e.getMessage());
+//                    }
+//
+//                    @Override
+//                    public void onComplete() {
+//                        //calculate average and insert to db
+//                    }
+//                });
+    }
+
+    private void getRawOrders(){
         Single<List<BinancePriceTicker>> binancePriceTicker = binanceService.getPriceTickers();
         binancePriceTicker
                 .subscribeOn(Schedulers.newThread())
@@ -62,25 +98,69 @@ public class BinanceChainRequestor implements ChainRequestor {
                         return binanceService.getAllOrders(binancePriceTicker.getSymbol(), System.currentTimeMillis(), 300000);
                     }
                 })
-                .subscribe(new DisposableObserver<List<BinanceOrder>>() {
+                .filter(new Predicate<List<BinanceOrder>>() {
                     @Override
-                    public void onNext(List<BinanceOrder> binanceOrders) {
-                        if (binanceOrders.size() > 0) {
-                            insertOrderTable(binanceOrders);
-                            updateBalanceTable(binanceOrders);
-                        }
+                    public boolean test(List<BinanceOrder> binanceOrders) throws Exception {
+                        return binanceOrders.size()>0;
+                    }
+                })
+                .flatMapIterable(new Function<List<BinanceOrder>, Iterable<BinanceOrder>>() {
+                    @Override
+                    public Iterable<BinanceOrder> apply(List<BinanceOrder> binanceOrders) throws Exception {
+                        return binanceOrders;
+                    }
+                })
+                .flatMap(new Function<BinanceOrder, ObservableSource<JsonElement>>() {
+                    @Override
+                    public ObservableSource<JsonElement> apply(BinanceOrder binanceOrder) throws Exception {
+                        kaleidoViewModel.insertOrder();
+                        return gdaxService.getHistoricBtc2Usd();
+                    }
+                })
+                .subscribe();
+
+    }
+
+    private void getRawBalance(){
+        Single<BinanceAccountInfo> binanceBalanceSingle = binanceService.getAccountInfo(System.currentTimeMillis());
+        binanceBalanceSingle
+                .subscribeOn(Schedulers.newThread())
+                .map(new Function<BinanceAccountInfo, List<BinanceBalance>>() {
+                    @Override
+                    public List<BinanceBalance> apply(BinanceAccountInfo binanceAccountInfo) throws Exception {
+                        return binanceAccountInfo.getBalances();
+                    }
+                })
+                .flattenAsObservable(new Function<List<BinanceBalance>, Iterable<BinanceBalance>>() {
+                    @Override
+                    public Iterable<BinanceBalance> apply(List<BinanceBalance> binanceBalances) throws Exception {
+                        return binanceBalances;
+                    }
+                })
+                .map(new Function<BinanceBalance, KaleidoBalance>() {
+                    @Override
+                    public KaleidoBalance apply(BinanceBalance binanceBalance) throws Exception {
+                        KaleidoBalance kaleidoBalance = null;
+                        return kaleidoBalance;
+                    }
+                })
+                .subscribe(new DisposableObserver<KaleidoBalance>() {
+                    @Override
+                    public void onNext(KaleidoBalance kaleidoBalance) {
+                        insertBalanceTable(kaleidoBalance);
                     }
 
                     @Override
                     public void onError(Throwable e) {
-                        Log.d(TAG, e.getMessage());
+
                     }
 
                     @Override
                     public void onComplete() {
-                        //calculate average and insert to db
+
                     }
                 });
+
     }
 
     private void insertOrderTable(List<BinanceOrder> binanceOrders){
@@ -89,15 +169,8 @@ public class BinanceChainRequestor implements ChainRequestor {
             kaleidoViewModel.insertOrder(kaleidoOrder);
         }
     }
-    private void updateBalanceTable(List<BinanceOrder> binanceOrders){
-        KaleidoBalance balance = kaleidoViewModel.getBalance(binanceOrders.get(0).getSymbol());
-
-        for (BinanceOrder order : binanceOrders){
-            //math: calculate average
-            //update balance
-        }
-
-        kaleidoViewModel.insertBalance(balance);
+    private void insertBalanceTable(KaleidoBalance kaleidoBalances){
+        kaleidoViewModel.insertBalance(kaleidoBalances);
     }
 
 

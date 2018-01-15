@@ -22,7 +22,6 @@ import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 import urbanutility.design.kaleidoscope.model.KaleidoOrder;
-import urbanutility.design.kaleidoscope.module.binance.client.BinanceService;
 import urbanutility.design.kaleidoscope.view.KaleidoViewModel;
 import urbanutility.design.kaleidoscope.view.OrdersAdapter;
 
@@ -39,7 +38,6 @@ public class HistoryFragment extends Fragment {
 
     public KaleidoViewModel kaleidoViewModel;
     public Retrofit.Builder retrofitBuilder;
-    BinanceService binanceService;
     OrdersAdapter adapter;
     String TAG = HistoryFragment.class.getName();
 
