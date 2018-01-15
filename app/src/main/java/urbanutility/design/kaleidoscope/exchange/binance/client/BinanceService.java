@@ -1,4 +1,4 @@
-package urbanutility.design.kaleidoscope.module.binance.client;
+package urbanutility.design.kaleidoscope.exchange.binance.client;
 
 import java.util.List;
 
@@ -12,6 +12,11 @@ import urbanutility.design.kaleidoscope.module.binance.model.BinanceAccountInfo;
 import urbanutility.design.kaleidoscope.module.binance.model.BinanceOrder;
 import urbanutility.design.kaleidoscope.module.binance.model.BinancePriceTicker;
 import urbanutility.design.kaleidoscope.module.binance.model.BinanceServerTime;
+import urbanutility.design.kaleidoscope.exchange.binance.model.Binance24hTicker;
+import urbanutility.design.kaleidoscope.exchange.binance.model.BinanceBalance;
+import urbanutility.design.kaleidoscope.exchange.binance.model.BinanceOrder;
+import urbanutility.design.kaleidoscope.exchange.binance.model.BinancePriceTicker;
+import urbanutility.design.kaleidoscope.exchange.binance.model.BinanceServerTime;
 
 /**
  * Created by jerye on 1/5/2018.
@@ -36,6 +41,6 @@ public interface BinanceService {
     Single<List<BinancePriceTicker>> getPriceTickers();
 
     @Headers(BinanceApiConstants.ENDPOINT_SECURITY_TYPE_SIGNED_HEADER)
-    @GET("/api/v3/account") //balance
-    Single<BinanceAccountInfo> getAccountInfo(@Query("timestamp") long timestamp);
+    @GET("/api/v3/account")
+    Single<BinanceBalance> getAccountInfo(@Query("timestamp") long timestamp);
 }

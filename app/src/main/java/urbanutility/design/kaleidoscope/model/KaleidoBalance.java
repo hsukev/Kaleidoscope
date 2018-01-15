@@ -3,6 +3,7 @@ package urbanutility.design.kaleidoscope.model;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
 import android.support.annotation.NonNull;
+import urbanutility.design.kaleidoscope.datatypes.BalanceType;
 
 /**
  * Created by jerye on 1/12/2018.
@@ -12,37 +13,18 @@ import android.support.annotation.NonNull;
 public class KaleidoBalance {
     @PrimaryKey
     @NonNull
-    private String symbol;
-    private String totalQty;
-    private String averagePrice;
+    private BalanceType balanceType;
 
-    public KaleidoBalance(String symbol, String totalQty, String averagePrice) {
-        this.symbol = symbol;
-        this.totalQty = totalQty;
-        this.averagePrice = averagePrice;
+    public KaleidoBalance(BalanceType balance) {
+        this.balanceType = balance;
     }
 
-    public String getSymbol() {
-        return symbol;
+    @NonNull
+    public BalanceType getBalanceType() {
+        return balanceType;
     }
 
-    public void setSymbol(String symbol) {
-        this.symbol = symbol;
-    }
-
-    public String getTotalQty() {
-        return totalQty;
-    }
-
-    public void setTotalQty(String totalQty) {
-        this.totalQty = totalQty;
-    }
-
-    public String getAveragePrice() {
-        return averagePrice;
-    }
-
-    public void setAveragePrice(String averagePrice) {
-        this.averagePrice = averagePrice;
+    public void setBalanceType(@NonNull BalanceType balanceType) {
+        this.balanceType = balanceType;
     }
 }

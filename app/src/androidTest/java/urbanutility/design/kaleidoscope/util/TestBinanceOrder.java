@@ -1,6 +1,6 @@
 package urbanutility.design.kaleidoscope.util;
 
-import urbanutility.design.kaleidoscope.module.binance.model.BinanceOrder;
+import urbanutility.design.kaleidoscope.exchange.binance.model.BinanceOrder;
 
 /**
  * Created by jerye on 1/9/2018.

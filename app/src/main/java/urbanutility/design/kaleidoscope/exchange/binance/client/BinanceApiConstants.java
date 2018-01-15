@@ -1,4 +1,4 @@
-package urbanutility.design.kaleidoscope.module.binance.client;
+package urbanutility.design.kaleidoscope.exchange.binance.client;
 
 /**
  * Created by jerye on 1/4/2018.

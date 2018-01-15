@@ -1,4 +1,4 @@
-package urbanutility.design.kaleidoscope.module.binance.client;
+package urbanutility.design.kaleidoscope.exchange.binance.client;
 
 import com.google.gson.JsonElement;
 
@@ -22,6 +22,8 @@ import urbanutility.design.kaleidoscope.module.binance.model.BinanceBalance;
 import urbanutility.design.kaleidoscope.module.binance.model.BinanceOrder;
 import urbanutility.design.kaleidoscope.module.binance.model.BinancePriceTicker;
 import urbanutility.design.kaleidoscope.module.gdax.client.GdaxService;
+import urbanutility.design.kaleidoscope.exchange.binance.model.BinanceOrder;
+import urbanutility.design.kaleidoscope.exchange.binance.model.BinancePriceTicker;
 import urbanutility.design.kaleidoscope.view.KaleidoViewModel;
 
 /**

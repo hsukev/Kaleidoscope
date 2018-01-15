@@ -3,7 +3,7 @@ package urbanutility.design.kaleidoscope;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
-import urbanutility.design.kaleidoscope.module.binance.client.BinanceChainRequestor;
+import urbanutility.design.kaleidoscope.exchange.binance.client.BinanceChainRequestor;
 
 /**
  * Created by jerye on 1/12/2018.
