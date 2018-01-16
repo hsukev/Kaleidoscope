@@ -34,7 +34,7 @@ public class OrdersAdapter extends RecyclerView.Adapter<OrdersAdapter.OrdersView
 
     @Override
     public void onBindViewHolder(OrdersViewHolder holder, int position) {
-        holder.orderSymbol.setText(list.get(position).getSymbol());
+        holder.orderSymbol.setText(list.get(position).getOrdertype().symbol);
     }
 
     @Override

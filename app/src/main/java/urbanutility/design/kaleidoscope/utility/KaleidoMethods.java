@@ -23,7 +23,7 @@ public abstract class KaleidoMethods {
         return sum;
     }
 
-    protected ArrayList<OrderType> FilterOrderType(List<OrderType> list, String symbol) {
+    protected List<OrderType> FilterOrderType(List<OrderType> list, String symbol) {
         List<OrderType> outputList = new ArrayList<>();
         for (OrderType entry: list) {
             if (entry.type.equalsIgnoreCase(symbol)) {

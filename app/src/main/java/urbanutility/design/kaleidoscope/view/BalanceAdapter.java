@@ -35,9 +35,9 @@ public class BalanceAdapter extends RecyclerView.Adapter<BalanceAdapter.BalanceV
 
     @Override
     public void onBindViewHolder(BalanceViewHolder holder, int position) {
-        holder.balanceSymbol.setText(list.get(position).getSymbol());
-        holder.balanceAveragePrice.setText(list.get(position).getAveragePrice());
-        holder.balanceQuantity.setText(list.get(position).getTotalQty());
+        holder.balanceSymbol.setText(list.get(position).getBalanceType().symbol);
+        holder.balanceAveragePrice.setText(String.valueOf(list.get(position).getBalanceType().amount));
+        holder.balanceQuantity.setText(list.get(position).getBalanceType().exchange);
     }
 
     @Override

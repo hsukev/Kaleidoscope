@@ -17,7 +17,7 @@ import urbanutility.design.kaleidoscope.HmacSigner;
 public class BinanceRequestInterceptor implements Interceptor {
     private String mApiKey;
     private String mSecretKey;
-    private String LOG = "HttpInteceptor";
+    private String LOG = "HttpInterceptor";
 
 
     public BinanceRequestInterceptor(String apiKey, String secretKey){
@@ -43,14 +43,14 @@ public class BinanceRequestInterceptor implements Interceptor {
             if(isSignedRequired){
                 String query = originalRequest.url().query();
                 String signedKey = HmacSigner.signSHA256(query, mSecretKey);
-//                Log.d(LOG, signedKey);
+                Log.d(LOG, signedKey);
                 HttpUrl signedURL = originalRequest.url().newBuilder().addQueryParameter("signature", signedKey).build();
                 newBuilder.url(signedURL);
             }
         }
 
         Request request = newBuilder.build();
-        Log.d(LOG, request.headers().toString());
+//        Log.d(LOG, request.headers().toString());
 //        Log.d("HttpInterceptorNew", request.toString());
         return chain.proceed(request);
     }

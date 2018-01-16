@@ -1,4 +1,4 @@
-package urbanutility.design.kaleidoscope.module.cryptopia.client;
+package urbanutility.design.kaleidoscope.exchange.cryptopia.client;
 
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;

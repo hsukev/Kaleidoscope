@@ -7,13 +7,8 @@ import io.reactivex.Single;
 import retrofit2.http.GET;
 import retrofit2.http.Headers;
 import retrofit2.http.Query;
-import urbanutility.design.kaleidoscope.module.binance.model.Binance24hTicker;
-import urbanutility.design.kaleidoscope.module.binance.model.BinanceAccountInfo;
-import urbanutility.design.kaleidoscope.module.binance.model.BinanceOrder;
-import urbanutility.design.kaleidoscope.module.binance.model.BinancePriceTicker;
-import urbanutility.design.kaleidoscope.module.binance.model.BinanceServerTime;
 import urbanutility.design.kaleidoscope.exchange.binance.model.Binance24hTicker;
-import urbanutility.design.kaleidoscope.exchange.binance.model.BinanceBalance;
+import urbanutility.design.kaleidoscope.exchange.binance.model.BinanceAccountInfo;
 import urbanutility.design.kaleidoscope.exchange.binance.model.BinanceOrder;
 import urbanutility.design.kaleidoscope.exchange.binance.model.BinancePriceTicker;
 import urbanutility.design.kaleidoscope.exchange.binance.model.BinanceServerTime;
@@ -42,5 +37,5 @@ public interface BinanceService {
 
     @Headers(BinanceApiConstants.ENDPOINT_SECURITY_TYPE_SIGNED_HEADER)
     @GET("/api/v3/account")
-    Single<BinanceBalance> getAccountInfo(@Query("timestamp") long timestamp);
+    Single<BinanceAccountInfo> getAccountInfo(@Query("timestamp") long timestamp);
 }

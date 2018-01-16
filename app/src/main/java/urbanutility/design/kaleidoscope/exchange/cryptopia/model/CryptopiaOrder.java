@@ -1,4 +1,4 @@
-package urbanutility.design.kaleidoscope.module.cryptopia.model;
+package urbanutility.design.kaleidoscope.exchange.cryptopia.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;

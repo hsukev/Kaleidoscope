@@ -1,6 +1,5 @@
 package urbanutility.design.kaleidoscope.datatypes;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -9,7 +8,7 @@ import java.util.List;
 
 public class BaseCurrencyType {
     public String type; /* BTC or USD */
-    public ArrayList<PositionType> positions;
+    public List<PositionType> positions;
 
     public BaseCurrencyType () {
     }

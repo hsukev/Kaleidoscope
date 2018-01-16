@@ -8,10 +8,15 @@ package urbanutility.design.kaleidoscope.datatypes;
 public class BalanceType {
     public String symbol;
     public String exchange;
-    public long amount;
+    public double amount;
 
-    public BalanceType () {
-
+    public BalanceType(String symbol, String exchange, double amount) {
+        this.symbol = symbol;
+        this.exchange = exchange;
+        this.amount = amount;
     }
+
+
+
 }
 

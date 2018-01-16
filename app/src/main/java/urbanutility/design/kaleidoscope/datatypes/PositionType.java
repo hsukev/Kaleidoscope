@@ -6,13 +6,13 @@ package urbanutility.design.kaleidoscope.datatypes;
 
 public class PositionType {
     public String symbol;
-    public long cost;
-    public long costPerUnit;
-    public long currentVal;
-    public long realizedGain;
-    public long unrealizedGain;
-    public long amount;
-    public long changePercent;
+    public double cost;
+    public double costPerUnit;
+    public double currentVal;
+    public double realizedGain;
+    public double unrealizedGain;
+    public double amount;
+    public double changePercent;
 
     public PositionType () {
 

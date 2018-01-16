@@ -27,11 +27,9 @@ public abstract class KaleidoDao {
     @Query("SELECT * FROM kaleido_orders")
     public abstract LiveData<List<KaleidoOrder>> getAllOrders();
 
-    @Query("SELECT * FROM KaleidoRawBalance")
+    @Query("SELECT * FROM kaleido_balances")
     public abstract LiveData<List<KaleidoBalance>> getAllBalances();
 
-    @Query("SELECT * FROM KaleidoRawBalance WHERE symbol == :symbol ")
+    @Query("SELECT * FROM kaleido_balances WHERE symbol == :symbol ")
     public abstract KaleidoBalance getBalance(String symbol);
-
-
 }
