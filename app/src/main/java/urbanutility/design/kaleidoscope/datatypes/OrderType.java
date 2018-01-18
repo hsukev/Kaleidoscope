@@ -8,7 +8,7 @@ public class OrderType {
     public String id; /* For Database use only */
     public String exchange; /* Binance, Kraken... */
     public String symbol;
-    public String type; /* Buy or Sell */
+    public String side; /* Buy or Sell */
     public double price;
     public double btcUsdRate;
     public double amount;

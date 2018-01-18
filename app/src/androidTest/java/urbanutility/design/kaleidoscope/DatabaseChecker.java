@@ -15,7 +15,11 @@ import java.io.IOException;
 import urbanutility.design.kaleidoscope.database.KaleidoDao;
 import urbanutility.design.kaleidoscope.database.KaleidoDatabase;
 import urbanutility.design.kaleidoscope.exchange.binance.model.BinanceOrder;
+import urbanutility.design.kaleidoscope.model.KaleidoOrder;
 import urbanutility.design.kaleidoscope.util.TestBinanceOrder;
+
+import static org.junit.Assert.assertEquals;
+
 /**
  * Created by jerye on 1/8/2018.
  */
@@ -40,11 +44,10 @@ public class DatabaseChecker {
     }
 
     @Test
-    public void writeOrderAndReadSymbol() throws  Exception {
+        public void writeOrderAndReadSymbol() throws  Exception {
         BinanceOrder binanceOrder = TestBinanceOrder.createTestBinanceOrder();
-//        mKaleidoDao.insertBinanceOrder(binanceOrder);
-//        BinanceOrder[] list = mKaleidoDao.fetchOrderHistory();
+        mKaleidoDao.insertOrder(new KaleidoOrder(binanceOrder, 1.21122144));
 
-//        assertEquals("LTCBTC", list[0].getSymbol());
+        assertEquals("NEOBTC", mKaleidoDao.getOrder("NEOBTC").getOrdertype().symbol);
     }
 }

@@ -32,4 +32,7 @@ public abstract class KaleidoDao {
 
     @Query("SELECT * FROM kaleido_balances WHERE symbol == :symbol ")
     public abstract KaleidoBalance getBalance(String symbol);
+
+    @Query("SELECT * FROM kaleido_orders WHERE symbol == :symbol")
+    public abstract KaleidoOrder getOrder(String symbol);
 }

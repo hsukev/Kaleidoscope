@@ -26,7 +26,7 @@ public abstract class KaleidoMethods {
     protected List<OrderType> FilterOrderType(List<OrderType> list, String symbol) {
         List<OrderType> outputList = new ArrayList<>();
         for (OrderType entry: list) {
-            if (entry.type.equalsIgnoreCase(symbol)) {
+            if (entry.side.equalsIgnoreCase(symbol)) {
                 outputList.add(entry);
             }
         }
@@ -50,4 +50,5 @@ public abstract class KaleidoMethods {
         }
         return outputList;
     }
+
 }

@@ -5,10 +5,10 @@ import android.util.Pair;
 
 import com.google.gson.JsonElement;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
+import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
 import io.reactivex.Single;
 import io.reactivex.functions.BiFunction;
@@ -29,6 +29,7 @@ import urbanutility.design.kaleidoscope.exchange.binance.model.BinancePriceTicke
 import urbanutility.design.kaleidoscope.exchange.gdax.client.GdaxService;
 import urbanutility.design.kaleidoscope.model.KaleidoBalance;
 import urbanutility.design.kaleidoscope.model.KaleidoOrder;
+import urbanutility.design.kaleidoscope.utility.KaleidoFunctions;
 import urbanutility.design.kaleidoscope.view.KaleidoViewModel;
 
 /**
@@ -42,8 +43,6 @@ public class BinanceChainRequestor implements ChainRequestor {
     private Retrofit.Builder retrofitBuilder;
     private BinanceService binanceService;
     private GdaxService gdaxService;
-    private Date d,dEnd;
-    private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
     private String startTime;
     private String endTime;
     private long fifteenInMilli = 900000;
@@ -70,25 +69,32 @@ public class BinanceChainRequestor implements ChainRequestor {
     @Override
     public void requestAndInsert() {
         getRawOrders();
-        getRawBalance();
+//        getRawBalance();
+
     }
 
     private void getRawOrders() {
 
         final Single<List<BinancePriceTicker>> binancePriceTicker = binanceService.getPriceTickers();
         binancePriceTicker
-                .subscribeOn(Schedulers.io())
+                .subscribeOn(Schedulers.single())
                 .flattenAsObservable(new Function<List<BinancePriceTicker>, Iterable<BinancePriceTicker>>() {
                     @Override
                     public Iterable<BinancePriceTicker> apply(List<BinancePriceTicker> binancePriceTickers) throws Exception {
-                        Log.d("order", binancePriceTickers.size()+"");
+                        Log.d("order", binancePriceTickers.size() + "");
                         return binancePriceTickers;
+                    }
+                })
+                .concatMap(new Function<BinancePriceTicker, ObservableSource<BinancePriceTicker>>() {
+                    @Override
+                    public ObservableSource<BinancePriceTicker> apply(BinancePriceTicker binancePriceTicker) throws Exception {
+                        return Observable.just(binancePriceTicker).delay(1000, TimeUnit.MILLISECONDS);
                     }
                 })
                 .flatMap(new Function<BinancePriceTicker, ObservableSource<List<BinanceOrder>>>() {
                     @Override
                     public ObservableSource<List<BinanceOrder>> apply(BinancePriceTicker binancePriceTicker) throws Exception {
-                        return binanceService.getAllOrders(binancePriceTicker.getSymbol(), System.currentTimeMillis()-10000, 300000);
+                        return binanceService.getAllOrders(binancePriceTicker.getSymbol(), System.currentTimeMillis() - 10000, 300000);
                     }
                 })
                 .filter(new Predicate<List<BinanceOrder>>() {
@@ -103,28 +109,37 @@ public class BinanceChainRequestor implements ChainRequestor {
                         return binanceOrders;
                     }
                 })
+                .filter(new Predicate<BinanceOrder>() {
+                    @Override
+                    public boolean test(BinanceOrder binanceOrder) throws Exception {
+                        return binanceOrder.getStatus().equals("FILLED");
+                    }
+                })
                 .map(new Function<BinanceOrder, BinanceOrder>() {
                     @Override
                     public BinanceOrder apply(BinanceOrder binanceOrder) throws Exception {
                         Long orderTime = Long.parseLong(binanceOrder.getTime());
-                        d = new Date(orderTime);
-                        dEnd = new Date(orderTime+fifteenInMilli);
-                        startTime = sdf.format(d);
-                        endTime = sdf.format(dEnd);
+                        startTime = KaleidoFunctions.convertMilliISO8601(orderTime);
+                        endTime = KaleidoFunctions.convertMilliISO8601(orderTime+fifteenInMilli);
                         return binanceOrder;
                     }
                 })
-                .zipWith(gdaxService.getHistoricBtc2Usd(startTime,endTime,60 ).subscribeOn(Schedulers.newThread()),
-                        new BiFunction<BinanceOrder, JsonElement, Pair<BinanceOrder, Double>>() {
-                            @Override
-                            public Pair<BinanceOrder, Double> apply(BinanceOrder binanceOrder, JsonElement jsonElement) throws Exception {
-                                Log.d(TAG, jsonElement.getAsJsonArray().get(0).toString());
-                                return new Pair<>(binanceOrder, jsonElement.getAsJsonArray().get(0).getAsJsonArray().get(4).getAsDouble());
-                            }
-                        })
+                .flatMap(new Function<BinanceOrder, ObservableSource<JsonElement>>() {
+                    @Override
+                    public ObservableSource<JsonElement> apply(BinanceOrder binanceOrder) throws Exception {
+                        return gdaxService.getHistoricBtc2Usd(startTime, endTime, 60);
+                    }
+                }, new BiFunction<BinanceOrder, JsonElement, Pair<BinanceOrder, Double>>() {
+                    @Override
+                    public Pair<BinanceOrder, Double> apply(BinanceOrder binanceOrder, JsonElement jsonElement) throws Exception {
+                        Double btcUsdRate = jsonElement.getAsJsonArray().get(0).getAsJsonArray().get(4).getAsDouble();
+                        return new Pair<>(binanceOrder, btcUsdRate);
+                    }
+                })
                 .subscribe(new DisposableObserver<Pair<BinanceOrder, Double>>() {
                     @Override
                     public void onNext(Pair<BinanceOrder, Double> binanceOrderDoublePair) {
+                        Log.d(TAG, binanceOrderDoublePair.first.getSymbol() + binanceOrderDoublePair.first.getStatus() + " btcUsd: " + binanceOrderDoublePair.second);
                         insertOrderTable(binanceOrderDoublePair);
                     }
 
@@ -135,15 +150,15 @@ public class BinanceChainRequestor implements ChainRequestor {
 
                     @Override
                     public void onComplete() {
-
+                        Log.e(TAG, "complete");
                     }
                 });
     }
 
     private void getRawBalance() {
-        Single<BinanceAccountInfo> binanceBalanceSingle = binanceService.getAccountInfo(System.currentTimeMillis());
+        Single<BinanceAccountInfo> binanceBalanceSingle = binanceService.getAccountInfo(System.currentTimeMillis() - 10000, 300000);
         binanceBalanceSingle
-                .subscribeOn(Schedulers.newThread())
+                .subscribeOn(Schedulers.io())
                 .map(new Function<BinanceAccountInfo, List<BinanceBalance>>() {
                     @Override
                     public List<BinanceBalance> apply(BinanceAccountInfo binanceAccountInfo) throws Exception {
@@ -159,14 +174,14 @@ public class BinanceChainRequestor implements ChainRequestor {
                 .filter(new Predicate<BinanceBalance>() {
                     @Override
                     public boolean test(BinanceBalance binanceBalance) throws Exception {
-                        return !binanceBalance.getFree().equals("0.0");
+                        return Double.parseDouble(binanceBalance.getFree()) > 0;
                     }
                 })
                 .map(new Function<BinanceBalance, KaleidoBalance>() {
                     @Override
                     public KaleidoBalance apply(BinanceBalance binanceBalance) throws Exception {
                         BalanceType balanceType = new BalanceType(binanceBalance.getAsset(), "binance", Double.parseDouble(binanceBalance.getFree()));
-                        return new KaleidoBalance(String.valueOf(System.currentTimeMillis()),balanceType);
+                        return new KaleidoBalance(String.valueOf(System.currentTimeMillis()), balanceType);
                     }
                 })
                 .subscribe(new DisposableObserver<KaleidoBalance>() {
@@ -190,6 +205,7 @@ public class BinanceChainRequestor implements ChainRequestor {
 
     private void insertOrderTable(Pair<BinanceOrder, Double> orderPair) {
         KaleidoOrder kaleidoOrder = new KaleidoOrder(orderPair.first, orderPair.second);
+        Log.d(TAG, kaleidoOrder.toString());
         kaleidoViewModel.insertOrder(kaleidoOrder);
     }
 

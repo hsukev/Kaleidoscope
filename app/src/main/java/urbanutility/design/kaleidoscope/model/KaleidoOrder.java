@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 
 import urbanutility.design.kaleidoscope.datatypes.OrderType;
 import urbanutility.design.kaleidoscope.exchange.binance.model.BinanceOrder;
+import urbanutility.design.kaleidoscope.utility.KaleidoFunctions;
 
 /**
  * Created by jerye on 1/11/2018.
@@ -17,22 +18,25 @@ public class KaleidoOrder {
     @PrimaryKey
     @NonNull
     public String primaryId;
+
     @Embedded
-    private OrderType ordertype;
+    public OrderType ordertype;
 
     public KaleidoOrder() {
     }
 
     //Overload constructor for every exchange
     public KaleidoOrder(BinanceOrder binanceOrder, Double btcUsdRate) {
+        ordertype = new OrderType();
         this.primaryId=binanceOrder.getClientOrderId();
-        this.ordertype.id = binanceOrder.getClientOrderId();
+        this.ordertype.id = String.valueOf(binanceOrder.getClientOrderId());
         this.ordertype.exchange = "binance";
         this.ordertype.symbol = binanceOrder.getSymbol();
-        this.ordertype.amount = Long.valueOf(binanceOrder.getOrigQty());
-        this.ordertype.txFee = 0L;
-        this.ordertype.price = Long.valueOf(binanceOrder.getPrice());
-        this.ordertype.time = binanceOrder.getTime();
+        this.ordertype.amount = Double.parseDouble(binanceOrder.getExecutedQty());
+        this.ordertype.side = binanceOrder.getSide();
+        this.ordertype.txFee = 0.0d;
+        this.ordertype.price = Double.parseDouble(binanceOrder.getPrice());
+        this.ordertype.time = KaleidoFunctions.convertMilliISO8601(binanceOrder.getTime());
         this.ordertype.btcUsdRate = btcUsdRate;
     }
 //    public KaleidoOrder(GdaxRate gdaxRate) {

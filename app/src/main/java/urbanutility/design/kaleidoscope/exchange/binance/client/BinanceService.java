@@ -37,5 +37,5 @@ public interface BinanceService {
 
     @Headers(BinanceApiConstants.ENDPOINT_SECURITY_TYPE_SIGNED_HEADER)
     @GET("/api/v3/account")
-    Single<BinanceAccountInfo> getAccountInfo(@Query("timestamp") long timestamp);
+    Single<BinanceAccountInfo> getAccountInfo(@Query("timestamp") long timestamp, @Query("recvWindow") long receiveWindow);
 }

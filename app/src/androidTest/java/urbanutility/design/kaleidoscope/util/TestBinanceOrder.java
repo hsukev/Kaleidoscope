@@ -22,7 +22,8 @@ public class TestBinanceOrder {
         binanceOrder.setSide("0");
         binanceOrder.setStopPrice("213");
         binanceOrder.setIcebergQty("0");
-        binanceOrder.setTime(144446656233L);
+        binanceOrder.setTime("1444466562");
         return binanceOrder;
     }
+
 }
