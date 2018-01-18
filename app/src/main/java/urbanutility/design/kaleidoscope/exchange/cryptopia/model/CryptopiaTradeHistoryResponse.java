@@ -8,7 +8,7 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
-public class CryptopiaMarkets implements Parcelable
+public class CryptopiaTradeHistoryResponse implements Parcelable
 {
 
     @SerializedName("Success")
@@ -19,30 +19,30 @@ public class CryptopiaMarkets implements Parcelable
     private Object message;
     @SerializedName("Data")
     @Expose
-    private List<CryptopiaOrder> data = null;
-    public final static Parcelable.Creator<CryptopiaMarkets> CREATOR = new Creator<CryptopiaMarkets>() {
+    private List<CryptopiaTradeHistory> data = null;
+    public final static Creator<CryptopiaTradeHistoryResponse> CREATOR = new Creator<CryptopiaTradeHistoryResponse>() {
 
 
         @SuppressWarnings({
                 "unchecked"
         })
-        public CryptopiaMarkets createFromParcel(Parcel in) {
-            return new CryptopiaMarkets(in);
+        public CryptopiaTradeHistoryResponse createFromParcel(Parcel in) {
+            return new CryptopiaTradeHistoryResponse(in);
         }
 
-        public CryptopiaMarkets[] newArray(int size) {
-            return (new CryptopiaMarkets[size]);
+        public CryptopiaTradeHistoryResponse[] newArray(int size) {
+            return (new CryptopiaTradeHistoryResponse[size]);
         }
 
     };
 
-    protected CryptopiaMarkets(Parcel in) {
+    protected CryptopiaTradeHistoryResponse(Parcel in) {
         this.success = ((Boolean) in.readValue((Boolean.class.getClassLoader())));
         this.message = ((Object) in.readValue((Object.class.getClassLoader())));
         in.readList(this.data, (CryptopiaOrder.class.getClassLoader()));
     }
 
-    public CryptopiaMarkets() {
+    public CryptopiaTradeHistoryResponse() {
     }
 
     public Boolean getSuccess() {
@@ -61,11 +61,11 @@ public class CryptopiaMarkets implements Parcelable
         this.message = message;
     }
 
-    public List<CryptopiaOrder> getData() {
+    public List<CryptopiaTradeHistory> getData() {
         return data;
     }
 
-    public void setData(List<CryptopiaOrder> data) {
+    public void setData(List<CryptopiaTradeHistory> data) {
         this.data = data;
     }
 
