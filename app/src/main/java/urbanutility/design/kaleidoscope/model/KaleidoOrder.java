@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 
 import urbanutility.design.kaleidoscope.datatypes.OrderType;
 import urbanutility.design.kaleidoscope.exchange.binance.model.BinanceOrder;
+import urbanutility.design.kaleidoscope.exchange.cryptopia.model.CryptopiaTradeHistory;
 import urbanutility.design.kaleidoscope.utility.KaleidoFunctions;
 
 /**
@@ -27,6 +28,19 @@ public class KaleidoOrder {
 
     //Overload constructor for every exchange
     public KaleidoOrder(BinanceOrder binanceOrder, Double btcUsdRate) {
+        ordertype = new OrderType();
+        this.primaryId=binanceOrder.getClientOrderId();
+        this.ordertype.id = String.valueOf(binanceOrder.getClientOrderId());
+        this.ordertype.exchange = "binance";
+        this.ordertype.symbol = binanceOrder.getSymbol();
+        this.ordertype.amount = Double.parseDouble(binanceOrder.getExecutedQty());
+        this.ordertype.side = binanceOrder.getSide();
+        this.ordertype.txFee = 0.0d;
+        this.ordertype.price = Double.parseDouble(binanceOrder.getPrice());
+        this.ordertype.time = KaleidoFunctions.convertMilliISO8601(binanceOrder.getTime());
+        this.ordertype.btcUsdRate = btcUsdRate;
+    }
+    public KaleidoOrder(CryptopiaTradeHistory binanceOrder, Double btcUsdRate) {
         ordertype = new OrderType();
         this.primaryId=binanceOrder.getClientOrderId();
         this.ordertype.id = String.valueOf(binanceOrder.getClientOrderId());

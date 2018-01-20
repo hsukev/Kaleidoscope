@@ -1,6 +1,9 @@
 package urbanutility.design.kaleidoscope.exchange.cryptopia.client;
 
 import android.util.Log;
+import android.util.Pair;
+
+import com.google.gson.JsonElement;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -8,16 +11,22 @@ import java.util.concurrent.TimeUnit;
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
 import io.reactivex.Single;
+import io.reactivex.functions.BiFunction;
 import io.reactivex.functions.Function;
 import io.reactivex.functions.Predicate;
+import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import urbanutility.design.kaleidoscope.ChainRequestor;
 import urbanutility.design.kaleidoscope.HistoryFragment;
+import urbanutility.design.kaleidoscope.datatypes.OrderType;
 import urbanutility.design.kaleidoscope.exchange.cryptopia.model.CryptopiaTradeHistory;
 import urbanutility.design.kaleidoscope.exchange.cryptopia.model.CryptopiaTradeHistoryResponse;
+import urbanutility.design.kaleidoscope.exchange.gdax.client.GdaxService;
 import urbanutility.design.kaleidoscope.model.KaleidoBalance;
+import urbanutility.design.kaleidoscope.model.KaleidoOrder;
+import urbanutility.design.kaleidoscope.utility.KaleidoFunctions;
 import urbanutility.design.kaleidoscope.view.KaleidoViewModel;
 
 /**
@@ -30,6 +39,9 @@ public class CryptopiaChainRequestor implements ChainRequestor{
     private KaleidoViewModel kaleidoViewModel;
     private Retrofit.Builder retrofitBuilder;
     private CryptopiaService cryptopiaService;
+    private GdaxService gdaxService;
+    private String startTime_UTC;
+    private String endTime_UTC;
 
     public CryptopiaChainRequestor(HistoryFragment historyFragment){
         this.retrofitBuilder = historyFragment.retrofitBuilder;
@@ -62,27 +74,42 @@ public class CryptopiaChainRequestor implements ChainRequestor{
                         return cryptopiaTradeHistory;
                     }
                 })
-                .map(new Function<CryptopiaTradeHistory, KaleidoBalance>() {
+                .map(new Function<CryptopiaTradeHistory, CryptopiaTradeHistory>() {
                     @Override
-                    public KaleidoBalance apply(CryptopiaTradeHistory binanceBalance) throws Exception {
-                        BalanceType balanceType = new BalanceType(binanceBalance.getAsset(), "binance", Double.parseDouble(binanceBalance.getFree()));
-                        return new KaleidoBalance(String.valueOf(System.currentTimeMillis()), balanceType);
+                    public CryptopiaTradeHistory apply(CryptopiaTradeHistory cryptopiaTradeHistory) throws Exception {
+                        String orderTime = cryptopiaTradeHistory.getTime();
+                        startTime_UTC = KaleidoFunctions.addMilliISO8601(orderTime, -60);
+                        endTime_UTC = KaleidoFunctions.addMilliISO8601(orderTime, -45);
+                        return cryptopiaTradeHistory;
                     }
                 })
-                .subscribe(new DisposableObserver<KaleidoBalance>() {
+                .flatMap(new Function<CryptopiaTradeHistory, ObservableSource<JsonElement>>() {
                     @Override
-                    public void onNext(KaleidoBalance kaleidoBalance) {
-                        insertBalanceTable(kaleidoBalance);
+                    public ObservableSource<JsonElement> apply(CryptopiaTradeHistory cryptopiaTradeHistory) throws Exception {
+                        return gdaxService.getHistoricBtc2Usd(startTime_UTC, endTime_UTC, 60);
+                    }
+                }, new BiFunction<CryptopiaTradeHistory, JsonElement, Pair<CryptopiaTradeHistory, Double>>() {
+                    @Override
+                    public Pair<CryptopiaTradeHistory, Double> apply(CryptopiaTradeHistory cryptopiaTradeHistory, JsonElement jsonElement) throws Exception {
+                        Double btcUsdRate = jsonElement.getAsJsonArray().get(0).getAsJsonArray().get(4).getAsDouble();
+                        return new Pair<>(cryptopiaTradeHistory, btcUsdRate);
+                    }
+                })
+                .subscribe(new DisposableObserver<Pair<CryptopiaTradeHistory, Double>>() {
+                    @Override
+                    public void onNext(Pair<CryptopiaTradeHistory, Double> binanceOrderDoublePair) {
+                        Log.d(TAG, binanceOrderDoublePair.first.getSymbol() + binanceOrderDoublePair.first.getStatus() + " btcUsd: " + binanceOrderDoublePair.second);
+                        insertOrderTable(binanceOrderDoublePair);
                     }
 
                     @Override
                     public void onError(Throwable e) {
-                        Log.e("balance", e.getMessage());
+                        Log.e(TAG, e.getMessage());
                     }
 
                     @Override
                     public void onComplete() {
-
+                        Log.e(TAG, "complete");
                     }
                 });
 

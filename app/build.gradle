@@ -20,6 +20,8 @@ android {
     buildTypes.each {
         it.buildConfigField "String", "BINANCE_API_KEY", BinanceApiKey
         it.buildConfigField "String", "BINANCE_SECRET_KEY", BinanceSecretKey
+        it.buildConfigField "String", "CRYPTOPIA_API_KEY", CryptopiaApiKey
+        it.buildConfigField "String", "CRYPTOPIA_SECRET_KEY", CryptopiaSecretKey
     }
 }
 
