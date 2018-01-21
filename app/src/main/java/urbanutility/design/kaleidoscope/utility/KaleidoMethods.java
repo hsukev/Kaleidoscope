@@ -11,9 +11,9 @@ import urbanutility.design.kaleidoscope.datatypes.OrderType;
  * Created by Jason on 1/14/2018.
  */
 
-public abstract class KaleidoMethods {
+public class KaleidoMethods {
 
-    protected long Sum(List<OrderType> list, String type) {
+    protected static long Sum(List<OrderType> list, String type) {
         long sum = 0L;
         for (OrderType entry: list) {
             if (type.equals("Amount")) sum += entry.amount;
@@ -23,7 +23,7 @@ public abstract class KaleidoMethods {
         return sum;
     }
 
-    protected List<OrderType> FilterOrderType(List<OrderType> list, String symbol) {
+    protected static List<OrderType> FilterOrderType(List<OrderType> list, String symbol) {
         List<OrderType> outputList = new ArrayList<>();
         for (OrderType entry: list) {
             if (entry.side.equalsIgnoreCase(symbol)) {
@@ -32,7 +32,7 @@ public abstract class KaleidoMethods {
         }
         return outputList;
     }
-    protected BaseCurrencyType FilterBaseCurrency(List<BaseCurrencyType> list, String symbol) {
+    protected static BaseCurrencyType FilterBaseCurrency(List<BaseCurrencyType> list, String symbol) {
         BaseCurrencyType outputList = new BaseCurrencyType();
         for (BaseCurrencyType entry: list) {
             if (entry.type.equalsIgnoreCase(symbol)) {
@@ -41,7 +41,7 @@ public abstract class KaleidoMethods {
         }
         return outputList;
     }
-    protected LiveMarketType FilterLiveMarket(List<LiveMarketType> list, String symbol) {
+    protected static LiveMarketType FilterLiveMarket(List<LiveMarketType> list, String symbol) {
         LiveMarketType outputList = new LiveMarketType();
         for (LiveMarketType entry: list) {
             if (entry.symbol.equalsIgnoreCase(symbol)) {

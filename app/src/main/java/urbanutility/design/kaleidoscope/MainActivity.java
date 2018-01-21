@@ -55,11 +55,11 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public Fragment getItem(int position) {
             switch (position){
-                case 2:
+                case 0:
                     return CurrentPriceFragment.newInstance();
                 case 1:
                     return ComparisonFragment.newInstance();
-                case 0:
+                case 2:
                     return HistoryFragment.newInstance();
                 default:
                     return null;

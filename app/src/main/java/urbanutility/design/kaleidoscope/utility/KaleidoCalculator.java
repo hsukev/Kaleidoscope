@@ -9,32 +9,32 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import urbanutility.design.kaleidoscope.datatypes.BaseCurrencyType;
 import urbanutility.design.kaleidoscope.datatypes.LiveMarketType;
 import urbanutility.design.kaleidoscope.datatypes.OrderType;
 import urbanutility.design.kaleidoscope.datatypes.PositionType;
-import urbanutility.design.kaleidoscope.model.KaleidoOrder;
 import urbanutility.design.kaleidoscope.model.KaleidoBalance;
+import urbanutility.design.kaleidoscope.model.KaleidoBaseCurrency;
+import urbanutility.design.kaleidoscope.model.KaleidoOrder;
 
 /**
  * Created by Jason on 1/13/2018.
  */
 
 public class KaleidoCalculator extends KaleidoMethods {
-    public void CalculatePosition(
-            ArrayList<KaleidoBalance> inputBalance,
-            ArrayList<KaleidoOrder> inputOrder,
+    public static List<KaleidoBaseCurrency> CalculatePosition(
+            List<KaleidoBalance> inputBalance,
+            List<KaleidoOrder> inputOrder,
             /* Expect BaseCurrencyType.type defined by caller to "BTC" or "USD"
             *  BaseCurrencyType.position should be blank from caller
             *  */
-            ArrayList<BaseCurrencyType> baseCurrency,
+            List<KaleidoBaseCurrency> baseCurrency,
             /* Expect GDAX BTCUSD also be part of exchange Market data */
-            ArrayList<LiveMarketType> marketData
+            List<LiveMarketType> marketData
     ) {
-        ArrayList<KaleidoBalance> balanceList = inputBalance;
-        ArrayList<OrderType> orderList;
-        BaseCurrencyType BtcBase = new BaseCurrencyType();
-        BaseCurrencyType UsdBase = new BaseCurrencyType();
+        List<KaleidoBalance> balanceList = inputBalance;
+        List<OrderType> orderList;
+        KaleidoBaseCurrency BtcBase = new KaleidoBaseCurrency("BTC");
+        KaleidoBaseCurrency UsdBase = new KaleidoBaseCurrency("USD");
 
         /* Put orders into Hashmap by symbol */
         Map<String, ArrayList<OrderType>> orderDict = new HashMap<String, ArrayList<OrderType>>();
@@ -61,9 +61,9 @@ public class KaleidoCalculator extends KaleidoMethods {
 
             if (totalBuyAmount > totalSellAmount) {
                 /* Calculate realized gain */
-                this.calcRealizedGainLoss(buyList, sellList, BtcPosition, UsdPosition);
+                calcRealizedGainLoss(buyList, sellList, BtcPosition, UsdPosition);
                 /* Calculate unrealized gain */
-                this.calcUnrealizedGainLoss(key, buyList, BtcPosition, UsdPosition, marketData);
+                calcUnrealizedGainLoss(key, buyList, BtcPosition, UsdPosition, marketData);
             } else {
                 double BtcUsdPrice = FilterLiveMarket(marketData, "BTC").price;
                 txFee = Sum(buyList, "Fee") + Sum(sellList, "Fee");
@@ -74,19 +74,28 @@ public class KaleidoCalculator extends KaleidoMethods {
                     ((BtcPosition.currentVal / BtcPosition.cost) - 1) * 100 : 0;
             UsdPosition.changePercent = (UsdPosition.currentVal != 0) ?
                     ((UsdPosition.currentVal / UsdPosition.cost) - 1) * 100 : 0;
-            BtcBase.positions.add(BtcPosition);
-            UsdBase.positions.add(UsdPosition);
+            BtcPosition.symbol = key;
+            UsdPosition.symbol = key;
+            BtcBase.getBaseCurrencyType().positions.add(BtcPosition);
+            UsdBase.getBaseCurrencyType().positions.add(UsdPosition);
+
         }
-        if (baseCurrency.get(0).type.equals("BTC")) {
+        if (baseCurrency.get(0).getBaseCurrencyType().type.equals("BTC")) {
             baseCurrency.set(0, BtcBase);
             baseCurrency.set(1, UsdBase);
         } else {
             baseCurrency.set(1, BtcBase);
             baseCurrency.set(0, UsdBase);
         }
+
+        return baseCurrency;
+
+
+
+
     }
 
-    private void calcRealizedGainLoss(
+    private static void calcRealizedGainLoss(
             List<OrderType> buyList,
             List<OrderType> sellList,
             PositionType BtcPosition,
@@ -133,7 +142,7 @@ public class KaleidoCalculator extends KaleidoMethods {
         UsdPosition.realizedGain -= UsdTxFee;
     }
 
-    private void calcUnrealizedGainLoss(
+    private static void calcUnrealizedGainLoss(
             String key,
             List<OrderType> buyList,
             PositionType BtcPosition,
@@ -164,7 +173,7 @@ public class KaleidoCalculator extends KaleidoMethods {
         UsdPosition.amount = BtcTotalAmount;
     }
 
-    private ArrayList<OrderType> SortListByTime(ArrayList<OrderType> in) {
+    private static ArrayList<OrderType> SortListByTime(ArrayList<OrderType> in) {
         ArrayList<OrderType> list = new ArrayList<>(in);
         Collections.sort(list, new Comparator<OrderType>() {
             public int compare(OrderType o1, OrderType o2) {

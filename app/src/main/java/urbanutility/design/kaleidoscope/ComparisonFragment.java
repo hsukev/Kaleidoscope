@@ -33,7 +33,7 @@ public class ComparisonFragment extends Fragment{
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.exchange_comparison_page, container, false);
+        View view = inflater.inflate(R.layout.ecompare_page, container, false);
         ButterKnife.bind(this, view);
         return view;
     }

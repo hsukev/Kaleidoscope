@@ -112,7 +112,8 @@ public class BinanceChainRequestor implements ChainRequestor {
                 .filter(new Predicate<BinanceOrder>() {
                     @Override
                     public boolean test(BinanceOrder binanceOrder) throws Exception {
-                        return binanceOrder.getStatus().equals("FILLED");
+                        String status = binanceOrder.getStatus();
+                        return status.equals("FILLED") || status.equals("PARTIALLY_FILLED ");
                     }
                 })
                 .map(new Function<BinanceOrder, BinanceOrder>() {
