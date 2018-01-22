@@ -97,9 +97,9 @@ public class CryptopiaChainRequestor implements ChainRequestor{
                 })
                 .subscribe(new DisposableObserver<Pair<CryptopiaTradeHistory, Double>>() {
                     @Override
-                    public void onNext(Pair<CryptopiaTradeHistory, Double> binanceOrderDoublePair) {
-                        Log.d(TAG, binanceOrderDoublePair.first.getSymbol() + binanceOrderDoublePair.first.getStatus() + " btcUsd: " + binanceOrderDoublePair.second);
-                        insertOrderTable(binanceOrderDoublePair);
+                    public void onNext(Pair<CryptopiaTradeHistory, Double> cryptopiaDoublePair) {
+                        Log.d(TAG, cryptopiaDoublePair.first.getMarket() + cryptopiaDoublePair.first.getTotal() + " btcUsd: " + cryptopiaDoublePair.second);
+                        insertOrderTable(cryptopiaDoublePair);
                     }
 
                     @Override
@@ -113,5 +113,11 @@ public class CryptopiaChainRequestor implements ChainRequestor{
                     }
                 });
 
+    }
+
+    private void insertOrderTable(Pair<CryptopiaTradeHistory, Double> orderPair) {
+        KaleidoOrder kaleidoOrder = new KaleidoOrder(orderPair.first, orderPair.second);
+        Log.d(TAG, kaleidoOrder.toString());
+        kaleidoViewModel.insertOrder(kaleidoOrder);
     }
 }
