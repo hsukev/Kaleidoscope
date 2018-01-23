@@ -1,5 +1,7 @@
 package urbanutility.design.kaleidoscope.exchange.binance.client;
 
+import com.google.gson.JsonElement;
+
 import java.util.List;
 
 import io.reactivex.Observable;
@@ -38,4 +40,7 @@ public interface BinanceService {
     @Headers(BinanceApiConstants.ENDPOINT_SECURITY_TYPE_SIGNED_HEADER)
     @GET("/api/v3/account")
     Single<BinanceAccountInfo> getAccountInfo(@Query("timestamp") long timestamp, @Query("recvWindow") long receiveWindow);
+
+    @GET("/api/v1/kline")
+    Observable<JsonElement> getHistoricPrice(@Query("symbol") String symbol, @Query("limit") int limit, @Query("interval") String interval, @Query("startTime") String startTime);
 }

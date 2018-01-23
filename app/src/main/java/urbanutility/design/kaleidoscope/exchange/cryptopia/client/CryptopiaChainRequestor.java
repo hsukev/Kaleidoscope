@@ -1,31 +1,24 @@
 package urbanutility.design.kaleidoscope.exchange.cryptopia.client;
 
-import android.util.Log;
 import android.util.Pair;
 
 import com.google.gson.JsonElement;
 
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
-import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
 import io.reactivex.Single;
 import io.reactivex.functions.BiFunction;
 import io.reactivex.functions.Function;
-import io.reactivex.functions.Predicate;
 import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import urbanutility.design.kaleidoscope.ChainRequestor;
 import urbanutility.design.kaleidoscope.HistoryFragment;
-import urbanutility.design.kaleidoscope.datatypes.OrderType;
 import urbanutility.design.kaleidoscope.exchange.cryptopia.model.CryptopiaTradeHistory;
 import urbanutility.design.kaleidoscope.exchange.cryptopia.model.CryptopiaTradeHistoryResponse;
 import urbanutility.design.kaleidoscope.exchange.gdax.client.GdaxService;
-import urbanutility.design.kaleidoscope.model.KaleidoBalance;
-import urbanutility.design.kaleidoscope.model.KaleidoOrder;
 import urbanutility.design.kaleidoscope.utility.KaleidoFunctions;
 import urbanutility.design.kaleidoscope.view.KaleidoViewModel;
 
@@ -97,27 +90,20 @@ public class CryptopiaChainRequestor implements ChainRequestor{
                 })
                 .subscribe(new DisposableObserver<Pair<CryptopiaTradeHistory, Double>>() {
                     @Override
-                    public void onNext(Pair<CryptopiaTradeHistory, Double> cryptopiaDoublePair) {
-                        Log.d(TAG, cryptopiaDoublePair.first.getMarket() + cryptopiaDoublePair.first.getTotal() + " btcUsd: " + cryptopiaDoublePair.second);
-                        insertOrderTable(cryptopiaDoublePair);
+                    public void onNext(Pair<CryptopiaTradeHistory, Double> cryptopiaTradeHistoryDoublePair) {
+
                     }
 
                     @Override
                     public void onError(Throwable e) {
-                        Log.e(TAG, e.getMessage());
+
                     }
 
                     @Override
                     public void onComplete() {
-                        Log.e(TAG, "complete");
+
                     }
                 });
 
-    }
-
-    private void insertOrderTable(Pair<CryptopiaTradeHistory, Double> orderPair) {
-        KaleidoOrder kaleidoOrder = new KaleidoOrder(orderPair.first, orderPair.second);
-        Log.d(TAG, kaleidoOrder.toString());
-        kaleidoViewModel.insertOrder(kaleidoOrder);
     }
 }

@@ -1,7 +1,6 @@
 package urbanutility.design.kaleidoscope.exchange.binance.client;
 
 import android.util.Log;
-import android.util.Pair;
 
 import com.google.gson.JsonElement;
 
@@ -24,6 +23,7 @@ import urbanutility.design.kaleidoscope.HistoryFragment;
 import urbanutility.design.kaleidoscope.datatypes.BalanceType;
 import urbanutility.design.kaleidoscope.exchange.binance.model.BinanceAccountInfo;
 import urbanutility.design.kaleidoscope.exchange.binance.model.BinanceBalance;
+import urbanutility.design.kaleidoscope.exchange.binance.model.BinanceBaseAlts;
 import urbanutility.design.kaleidoscope.exchange.binance.model.BinanceOrder;
 import urbanutility.design.kaleidoscope.exchange.binance.model.BinancePriceTicker;
 import urbanutility.design.kaleidoscope.exchange.gdax.client.GdaxService;
@@ -125,33 +125,47 @@ public class BinanceChainRequestor implements ChainRequestor {
                         return binanceOrder;
                     }
                 })
-                .flatMap(new Function<BinanceOrder, ObservableSource<JsonElement>>() {
+                .flatMap(new Function<BinanceOrder, ObservableSource<Double>>() {
                     @Override
-                    public ObservableSource<JsonElement> apply(BinanceOrder binanceOrder) throws Exception {
-                        return gdaxService.getHistoricBtc2Usd(startTime, endTime, 60);
+                    public ObservableSource<Double> apply(BinanceOrder binanceOrder) throws Exception {
+                        String rawSymbol = binanceOrder.getSymbol();
+                        String guess = rawSymbol.substring(rawSymbol.length()-4);
+
+                        if(rawSymbol.contains("BTC")){
+                            return gdaxService.getHistoricBtc2Usd(startTime, endTime,60)
+                                    .map(mapGdaxBtcUsdRate());
+                        }else{
+                            String altBtcSymbol = "";
+                            for(String baseAlt : BinanceBaseAlts.supportedAlts){
+                                if(guess.contains(baseAlt)) altBtcSymbol = baseAlt + "BTC";
+                            }
+                            return gdaxService.getHistoricBtc2Usd(startTime,endTime,60)
+                                    .map(mapGdaxBtcUsdRate())
+                                    .zipWith(binanceService.getHistoricPrice(altBtcSymbol, 1, "1m", binanceOrder.getTime())
+                                                    .subscribeOn(Schedulers.io()),
+                                            bifuncGdaxBinanceRates());
+                        }
                     }
-                }, new BiFunction<BinanceOrder, JsonElement, Pair<BinanceOrder, Double>>() {
+                }, new BiFunction<BinanceOrder, Double, KaleidoOrder>() {
                     @Override
-                    public Pair<BinanceOrder, Double> apply(BinanceOrder binanceOrder, JsonElement jsonElement) throws Exception {
-                        Double btcUsdRate = jsonElement.getAsJsonArray().get(0).getAsJsonArray().get(4).getAsDouble();
-                        return new Pair<>(binanceOrder, btcUsdRate);
+                    public KaleidoOrder apply(BinanceOrder binanceOrder, Double coinBtcRate) throws Exception {
+                        return new KaleidoOrder(binanceOrder, coinBtcRate);
                     }
                 })
-                .subscribe(new DisposableObserver<Pair<BinanceOrder, Double>>() {
+                .subscribe(new DisposableObserver<KaleidoOrder>() {
                     @Override
-                    public void onNext(Pair<BinanceOrder, Double> binanceOrderDoublePair) {
-                        Log.d(TAG, binanceOrderDoublePair.first.getSymbol() + binanceOrderDoublePair.first.getStatus() + " btcUsd: " + binanceOrderDoublePair.second);
-                        insertOrderTable(binanceOrderDoublePair);
+                    public void onNext(KaleidoOrder kaleidoOrder) {
+                        kaleidoViewModel.insertOrder(kaleidoOrder);
                     }
 
                     @Override
                     public void onError(Throwable e) {
-                        Log.e(TAG, e.getMessage());
+
                     }
 
                     @Override
                     public void onComplete() {
-                        Log.e(TAG, "complete");
+
                     }
                 });
     }
@@ -204,14 +218,28 @@ public class BinanceChainRequestor implements ChainRequestor {
 
     }
 
-    private void insertOrderTable(Pair<BinanceOrder, Double> orderPair) {
-        KaleidoOrder kaleidoOrder = new KaleidoOrder(orderPair.first, orderPair.second);
-        Log.d(TAG, kaleidoOrder.toString());
-        kaleidoViewModel.insertOrder(kaleidoOrder);
-    }
 
     private void insertBalanceTable(KaleidoBalance kaleidoBalances) {
         kaleidoViewModel.insertBalance(kaleidoBalances);
+    }
+
+    private Function<JsonElement, Double> mapGdaxBtcUsdRate(){
+        return new Function<JsonElement, Double>() {
+            @Override
+            public Double apply(JsonElement jsonElement) throws Exception {
+                return jsonElement.getAsJsonArray().get(0).getAsJsonArray().get(4).getAsDouble();
+            }
+        };
+    }
+
+    private BiFunction<Double, JsonElement, Double> bifuncGdaxBinanceRates(){
+        return new BiFunction<Double, JsonElement, Double>() {
+            @Override
+            public Double apply(Double gdaxBtcUsdRate, JsonElement binanceCandle) throws Exception {
+                double coinBtcRate = binanceCandle.getAsJsonArray().get(0).getAsJsonArray().get(1).getAsDouble();
+                return gdaxBtcUsdRate*coinBtcRate;
+            }
+        };
     }
 
 
