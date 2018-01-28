@@ -41,6 +41,6 @@ public interface BinanceService {
     @GET("/api/v3/account")
     Single<BinanceAccountInfo> getAccountInfo(@Query("timestamp") long timestamp, @Query("recvWindow") long receiveWindow);
 
-    @GET("/api/v1/kline")
+    @GET("/api/v1/klines")
     Observable<JsonElement> getHistoricPrice(@Query("symbol") String symbol, @Query("limit") int limit, @Query("interval") String interval, @Query("startTime") String startTime);
 }

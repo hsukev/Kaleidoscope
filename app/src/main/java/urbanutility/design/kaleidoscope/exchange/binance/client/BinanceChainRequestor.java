@@ -23,7 +23,7 @@ import urbanutility.design.kaleidoscope.HistoryFragment;
 import urbanutility.design.kaleidoscope.datatypes.BalanceType;
 import urbanutility.design.kaleidoscope.exchange.binance.model.BinanceAccountInfo;
 import urbanutility.design.kaleidoscope.exchange.binance.model.BinanceBalance;
-import urbanutility.design.kaleidoscope.exchange.binance.model.BinanceBaseAlts;
+import urbanutility.design.kaleidoscope.model.BaseAlts;
 import urbanutility.design.kaleidoscope.exchange.binance.model.BinanceOrder;
 import urbanutility.design.kaleidoscope.exchange.binance.model.BinancePriceTicker;
 import urbanutility.design.kaleidoscope.exchange.gdax.client.GdaxService;
@@ -69,7 +69,7 @@ public class BinanceChainRequestor implements ChainRequestor {
     @Override
     public void requestAndInsert() {
         getRawOrders();
-//        getRawBalance();
+        getRawBalance();
 
     }
 
@@ -130,13 +130,14 @@ public class BinanceChainRequestor implements ChainRequestor {
                     public ObservableSource<Double> apply(BinanceOrder binanceOrder) throws Exception {
                         String rawSymbol = binanceOrder.getSymbol();
                         String guess = rawSymbol.substring(rawSymbol.length()-4);
-
-                        if(rawSymbol.contains("BTC")){
+                        if(rawSymbol.contains("USDT")) {
+                            return Observable.just(1d);
+                        }else if(rawSymbol.contains("BTC")){
                             return gdaxService.getHistoricBtc2Usd(startTime, endTime,60)
                                     .map(mapGdaxBtcUsdRate());
                         }else{
                             String altBtcSymbol = "";
-                            for(String baseAlt : BinanceBaseAlts.supportedAlts){
+                            for(String baseAlt : BaseAlts.supportedAlts){
                                 if(guess.contains(baseAlt)) altBtcSymbol = baseAlt + "BTC";
                             }
                             return gdaxService.getHistoricBtc2Usd(startTime,endTime,60)
@@ -160,7 +161,7 @@ public class BinanceChainRequestor implements ChainRequestor {
 
                     @Override
                     public void onError(Throwable e) {
-
+                        Log.e(TAG, e.getMessage());
                     }
 
                     @Override

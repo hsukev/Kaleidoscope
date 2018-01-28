@@ -1,10 +1,10 @@
-package urbanutility.design.kaleidoscope.exchange.binance.model;
+package urbanutility.design.kaleidoscope.model;
 
 /**
  * Created by jerye on 1/22/2018.
  */
 
-public class BinanceBaseAlts {
+public class BaseAlts {
     public static String[] supportedAlts = {
             "BNB",
             "ETH",

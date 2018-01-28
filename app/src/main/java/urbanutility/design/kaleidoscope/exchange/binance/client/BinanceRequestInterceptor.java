@@ -28,7 +28,10 @@ public class BinanceRequestInterceptor implements Interceptor {
     @Override
     public Response intercept(Chain chain) throws IOException {
         Request originalRequest = chain.request();
-        if(originalRequest.headers().size()==0) return chain.proceed(originalRequest);
+        if(originalRequest.headers().size()==0) {
+            Log.d("HttpInterceptorNoHeader", originalRequest.toString());
+            return chain.proceed(originalRequest)
+                ;}
 //        Log.d("HttpInterceptor", originalRequest.headers().toString() );
 //        Log.d("HttpInterceptor", originalRequest.headers().name(0));
         Request.Builder newBuilder = originalRequest.newBuilder();
@@ -43,7 +46,7 @@ public class BinanceRequestInterceptor implements Interceptor {
             if(isSignedRequired){
                 String query = originalRequest.url().query();
                 String signedKey = HmacSigner.signSHA256(query, mSecretKey);
-                Log.d(LOG, signedKey);
+//                Log.d(LOG, signedKey);
                 HttpUrl signedURL = originalRequest.url().newBuilder().addQueryParameter("signature", signedKey).build();
                 newBuilder.url(signedURL);
             }
@@ -51,7 +54,7 @@ public class BinanceRequestInterceptor implements Interceptor {
 
         Request request = newBuilder.build();
 //        Log.d(LOG, request.headers().toString());
-//        Log.d("HttpInterceptorNew", request.toString());
+        Log.d("HttpInterceptorNew", request.toString());
         return chain.proceed(request);
     }
 }

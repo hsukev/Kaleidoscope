@@ -131,7 +131,7 @@ public class KaleidoViewModel extends AndroidViewModel {
                 .repeatWhen(new io.reactivex.functions.Function<Flowable<Object>, Publisher<?>>() {
                     @Override
                     public Publisher<?> apply(Flowable<Object> objectFlowable) throws Exception {
-                        return objectFlowable.delay(5, TimeUnit.SECONDS);
+                        return objectFlowable.delay(1, TimeUnit.MINUTES);
                     }
                 }));
     }
