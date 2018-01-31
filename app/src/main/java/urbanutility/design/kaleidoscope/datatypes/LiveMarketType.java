@@ -6,6 +6,7 @@ package urbanutility.design.kaleidoscope.datatypes;
 
 public class LiveMarketType {
     public String symbol;
+    public String exchange;
     public double price;
 
 

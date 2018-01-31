@@ -41,14 +41,31 @@ public class KaleidoMethods {
         }
         return outputList;
     }
-    protected static LiveMarketType FilterLiveMarket(List<LiveMarketType> list, String symbol) {
-        LiveMarketType outputList = new LiveMarketType();
+    protected static List<LiveMarketType> FilterLiveMarketBySymbol(List<LiveMarketType> list, String symbol) {
+        List<LiveMarketType> outputList = new ArrayList<>();
         for (LiveMarketType entry: list) {
             if (entry.symbol.equalsIgnoreCase(symbol)) {
+                outputList.add(entry);
+            }
+        }
+        return outputList;
+    }
+    protected static LiveMarketType FilterLiveMarketByExchange(List<LiveMarketType> list, String exchange) {
+        LiveMarketType outputList = new LiveMarketType();
+        for (LiveMarketType entry: list) {
+            if (entry.exchange.equals(exchange)) {
                 outputList = entry;
             }
         }
         return outputList;
     }
-
+    protected static LiveMarketType FilterLiveMarket(List<LiveMarketType> list, String exchange, String symbol) {
+        LiveMarketType outputList = new LiveMarketType();
+        for (LiveMarketType entry: list) {
+            if (entry.symbol.equalsIgnoreCase(symbol) && entry.exchange.equals(exchange)) {
+                outputList = entry;
+            }
+        }
+        return outputList;
+    }
 }
