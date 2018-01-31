@@ -28,7 +28,7 @@ public class KaleidoCalculator extends KaleidoMethods {
             *  BaseCurrencyType.position should be blank from caller
             *  */
             List<KaleidoBaseCurrency> baseCurrency,
-            /* Expect GDAX BTCUSD also be part of exchange Market data */
+            /* Expect exchange: "Gdax", symbol: "BTCUSD" also be part of exchange Market data */
             List<LiveMarketType> marketData
     ) {
         List<KaleidoBalance> balanceList = inputBalance;
@@ -65,7 +65,7 @@ public class KaleidoCalculator extends KaleidoMethods {
                 /* Calculate unrealized gain */
                 calcUnrealizedGainLoss(key, buyList, BtcPosition, UsdPosition, marketData);
             } else {
-                double BtcUsdPrice = FilterLiveMarket(marketData, "BTC").price;
+                double BtcUsdPrice = FilterLiveMarket(marketData, "Gdax", "BTC").price;
                 txFee = Sum(buyList, "Fee") + Sum(sellList, "Fee");
                 BtcPosition.realizedGain = Sum(sellList, "Total") - Sum(buyList, "Fee");
                 UsdPosition.realizedGain = BtcPosition.realizedGain * BtcUsdPrice;
@@ -151,11 +151,13 @@ public class KaleidoCalculator extends KaleidoMethods {
     ) {
         double BtcTxFee = Sum(buyList, "Fee");
         double BtcTotalAmount = Sum(buyList, "Amount");
-        LiveMarketType coinMarketRate = FilterLiveMarket(marketData, key);
-        LiveMarketType btcUsdMarketRate = FilterLiveMarket(marketData, "BTC");
+        List<LiveMarketType> coinMarketRateList = FilterLiveMarketBySymbol(marketData, key);
+        LiveMarketType coinMarketRate = FilterLiveMarketByExchange(coinMarketRateList, buyList.get(buyList.size() - 1).exchange);
+        LiveMarketType btcUsdMarketRate = FilterLiveMarket(marketData, "Gdax", "BTC");
 
         while (!buyList.isEmpty()) {
             OrderType oldestBuy = buyList.get(buyList.size() - 1);
+            coinMarketRate = FilterLiveMarketByExchange(coinMarketRateList, oldestBuy.exchange);
             BtcPosition.unrealizedGain += oldestBuy.amount * (coinMarketRate.price - oldestBuy.price);
             UsdPosition.unrealizedGain += BtcPosition.unrealizedGain * oldestBuy.btcUsdRate;
             BtcPosition.cost += oldestBuy.amount * oldestBuy.price;
