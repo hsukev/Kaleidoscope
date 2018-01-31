@@ -78,7 +78,6 @@ public class KaleidoCalculator extends KaleidoMethods {
             UsdPosition.symbol = key;
             BtcBase.getBaseCurrencyType().positions.add(BtcPosition);
             UsdBase.getBaseCurrencyType().positions.add(UsdPosition);
-
         }
         if (baseCurrency.get(0).getBaseCurrencyType().type.equals("BTC")) {
             baseCurrency.set(0, BtcBase);

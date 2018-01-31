@@ -5,9 +5,11 @@ package urbanutility.design.kaleidoscope.model;
  */
 
 public class BaseAlts {
-    public static String[] supportedAlts = {
+    public static String[] binanceBaseAlts = {
             "BNB",
             "ETH",
             "USDT"
     };
+
+
 }

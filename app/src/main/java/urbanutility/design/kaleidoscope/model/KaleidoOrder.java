@@ -27,15 +27,17 @@ public class KaleidoOrder {
     }
 
     //Overload constructor for every exchange
-    public KaleidoOrder(BinanceOrder binanceOrder, Double btcUsdRate) {
+    public KaleidoOrder(BinanceOrder binanceOrder, Double btcUsdRate, Double altBtcRate) {
         ordertype = new OrderType();
         this.primaryId=binanceOrder.getClientOrderId();
         this.ordertype.exchange = "binance";
         this.ordertype.symbol = binanceOrder.getSymbol();
+        this.ordertype.convertedSymbol = KaleidoFunctions.convertSymbol(BaseAlts.binanceBaseAlts, this.ordertype.symbol);
         this.ordertype.amount = Double.parseDouble(binanceOrder.getExecutedQty());
         this.ordertype.side = binanceOrder.getSide();
         this.ordertype.txFee = 0.0d;
         this.ordertype.price = Double.parseDouble(binanceOrder.getPrice());
+        this.ordertype.btcAmount = altBtcRate * this.ordertype.price;
         this.ordertype.time = KaleidoFunctions.convertMilliISO8601(binanceOrder.getTime());
         this.ordertype.btcUsdRate = btcUsdRate;
     }

@@ -35,10 +35,15 @@ public class KaleidoFunctions {
         return sFormat.format(time);
     }
 
-    public static String createCoinBtcSymbol(String name){
-        StringBuilder sb = new StringBuilder();
-        sb.append(name.toUpperCase()).append("BTC");
-        return sb.toString();
+    public static String convertSymbol(String[] baseAlts, String originalSymbol){
+        int length = originalSymbol.length();
+        if(originalSymbol.contains("USDT")){
+            return "BTCUSDT";
+        }else if(originalSymbol.contains("BTC")){
+            return originalSymbol;
+        }else{
+            return originalSymbol.substring(0,length-3) + "BTC";
+        }
     }
 
 }
