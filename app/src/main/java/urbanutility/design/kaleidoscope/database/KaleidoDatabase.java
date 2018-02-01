@@ -12,7 +12,7 @@ import urbanutility.design.kaleidoscope.model.KaleidoOrder;
  * Created by jerye on 1/8/2018.
  */
 
-@Database(entities = {KaleidoOrder.class, KaleidoBalance.class}, version = 10, exportSchema = false)
+@Database(entities = {KaleidoOrder.class, KaleidoBalance.class}, version = 12, exportSchema = false)
 public abstract class KaleidoDatabase extends RoomDatabase {
 
     private static KaleidoDatabase INSTANCE;

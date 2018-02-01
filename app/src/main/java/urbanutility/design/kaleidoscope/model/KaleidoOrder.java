@@ -37,7 +37,7 @@ public class KaleidoOrder {
         this.ordertype.side = binanceOrder.getSide();
         this.ordertype.txFee = 0.0d;
         this.ordertype.price = Double.parseDouble(binanceOrder.getPrice());
-        this.ordertype.btcAmount = altBtcRate * this.ordertype.price;
+        this.ordertype.btcPrice = altBtcRate * this.ordertype.price;
         this.ordertype.time = KaleidoFunctions.convertMilliISO8601(binanceOrder.getTime());
         this.ordertype.btcUsdRate = btcUsdRate;
     }

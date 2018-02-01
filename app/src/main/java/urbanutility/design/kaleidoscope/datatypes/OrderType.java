@@ -12,7 +12,7 @@ public class OrderType {
     public double price;
     public double btcUsdRate;
     public double amount;
-    public double btcAmount;
+    public double btcPrice;
     public double txFee;
     public String time; /* ISO 8601 format: "yyyy-MM-dd'T'HH:mm:ssZ" */
 

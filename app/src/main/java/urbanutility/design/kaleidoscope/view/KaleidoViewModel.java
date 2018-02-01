@@ -121,6 +121,7 @@ public class KaleidoViewModel extends AndroidViewModel {
                         List<LiveMarketType> marketList = new ArrayList<>();
                         for(BinancePriceTicker ticker: binancePriceTickers){
                             LiveMarketType liveMarketType = new LiveMarketType();
+                            liveMarketType.exchange = "binance";
                             liveMarketType.symbol = ticker.getSymbol();
                             liveMarketType.price = Double.parseDouble(ticker.getPrice());
                             marketList.add(liveMarketType);

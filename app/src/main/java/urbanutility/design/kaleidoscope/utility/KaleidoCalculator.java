@@ -40,10 +40,10 @@ public class KaleidoCalculator extends KaleidoMethods {
         Map<String, ArrayList<OrderType>> orderDict = new HashMap<String, ArrayList<OrderType>>();
         for (KaleidoOrder entry : inputOrder) {
             OrderType orderType = entry.getOrdertype();
-            if (orderDict.containsKey(orderType.symbol)) {
-                orderDict.get(orderType.symbol).add(orderType);
+            if (orderDict.containsKey(orderType.convertedSymbol)) {
+                orderDict.get(orderType.convertedSymbol).add(orderType);
             } else {
-                orderDict.put(orderType.symbol, new ArrayList<OrderType>());
+                orderDict.put(orderType.convertedSymbol, new ArrayList<OrderType>());
             }
         }
 
@@ -74,8 +74,9 @@ public class KaleidoCalculator extends KaleidoMethods {
                     ((BtcPosition.currentVal / BtcPosition.cost) - 1) * 100 : 0;
             UsdPosition.changePercent = (UsdPosition.currentVal != 0) ?
                     ((UsdPosition.currentVal / UsdPosition.cost) - 1) * 100 : 0;
-            BtcPosition.symbol = key;
-            UsdPosition.symbol = key;
+            int symbolLength = key.length();
+            BtcPosition.symbol = key.substring(0,symbolLength-3);
+            UsdPosition.symbol = key.substring(0,symbolLength-3);
             BtcBase.getBaseCurrencyType().positions.add(BtcPosition);
             UsdBase.getBaseCurrencyType().positions.add(UsdPosition);
         }
@@ -109,17 +110,17 @@ public class KaleidoCalculator extends KaleidoMethods {
                 OrderType oldestBuy = buyList.get(buyList.size() - 1);
                 double amountBalance = oldestSell.txFee - oldestBuy.txFee;
                 if (amountBalance < 0) {
-                    BtcPosition.realizedGain += oldestSell.amount * (oldestSell.price - oldestBuy.price);
+                    BtcPosition.realizedGain += oldestSell.amount * (oldestSell.btcPrice - oldestBuy.btcPrice);
                     UsdPosition.realizedGain += BtcPosition.realizedGain * oldestSell.btcUsdRate;
                     oldestSell.amount = 0;
                     oldestBuy.amount = Math.abs(amountBalance);
                 } else if (amountBalance > 0) {
-                    BtcPosition.realizedGain += oldestBuy.amount * (oldestSell.price - oldestBuy.price);
+                    BtcPosition.realizedGain += oldestBuy.amount * (oldestSell.btcPrice - oldestBuy.btcPrice);
                     UsdPosition.realizedGain += BtcPosition.realizedGain * oldestBuy.btcUsdRate;
                     oldestSell.amount = Math.abs(amountBalance);
                     oldestBuy.amount = 0;
                 } else {
-                    BtcPosition.realizedGain += oldestBuy.amount * (oldestSell.price - oldestBuy.price);
+                    BtcPosition.realizedGain += oldestBuy.amount * (oldestSell.btcPrice - oldestBuy.btcPrice);
                     UsdPosition.realizedGain += BtcPosition.realizedGain * oldestBuy.btcUsdRate;
                     oldestSell.amount = 0;
                     oldestBuy.amount = 0;
@@ -157,9 +158,9 @@ public class KaleidoCalculator extends KaleidoMethods {
         while (!buyList.isEmpty()) {
             OrderType oldestBuy = buyList.get(buyList.size() - 1);
             coinMarketRate = FilterLiveMarketByExchange(coinMarketRateList, oldestBuy.exchange);
-            BtcPosition.unrealizedGain += oldestBuy.amount * (coinMarketRate.price - oldestBuy.price);
+            BtcPosition.unrealizedGain += oldestBuy.amount * (coinMarketRate.price - oldestBuy.btcPrice);
             UsdPosition.unrealizedGain += BtcPosition.unrealizedGain * oldestBuy.btcUsdRate;
-            BtcPosition.cost += oldestBuy.amount * oldestBuy.price;
+            BtcPosition.cost += oldestBuy.amount * oldestBuy.btcPrice;
             UsdPosition.cost += BtcPosition.cost * btcUsdMarketRate.price;
             buyList.remove(buyList.size() - 1);
         }

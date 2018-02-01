@@ -16,6 +16,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import urbanutility.design.kaleidoscope.R;
 import urbanutility.design.kaleidoscope.model.KaleidoBaseCurrency;
+import urbanutility.design.kaleidoscope.utility.KaleidoFunctions;
 
 /**
  * Created by jerye on 1/12/2018.
@@ -40,10 +41,10 @@ public class CurrentAdapter extends RecyclerView.Adapter<CurrentAdapter.BalanceV
         holder.symbol.setText(list.get(1).getBaseCurrencyType().positions.get(position).symbol);
         Log.d("currentadapter", list.get(1).getBaseCurrencyType().positions.get(position).symbol);
         holder.cost.setText(String.format(Locale.ENGLISH,"$%e", list.get(1).getBaseCurrencyType().positions.get(position).cost));
-        holder.costPerUnit.setText(String.format(Locale.ENGLISH,"$%e", list.get(1).getBaseCurrencyType().positions.get(position).costPerUnit));
+        holder.costPerUnit.setText(KaleidoFunctions.DoubleToFormatedString(list.get(1).getBaseCurrencyType().positions.get(position).costPerUnit));
         holder.currentValue.setText(String.format(Locale.ENGLISH,"$%e", list.get(1).getBaseCurrencyType().positions.get(position).currentVal));
-        holder.realizedGain.setText(String.format(Locale.ENGLISH,"$%e", list.get(1).getBaseCurrencyType().positions.get(position).realizedGain));
-        holder.unrealizedGain.setText(String.format(Locale.ENGLISH,"$%e", list.get(1).getBaseCurrencyType().positions.get(position).unrealizedGain));
+        holder.realizedGain.setText(String.format(Locale.ENGLISH,"$%.3f", list.get(1).getBaseCurrencyType().positions.get(position).realizedGain));
+        holder.unrealizedGain.setText(String.format(Locale.ENGLISH,"$%.3f", list.get(1).getBaseCurrencyType().positions.get(position).unrealizedGain));
         holder.amount.setText(String.format(Locale.ENGLISH,"%e", list.get(1).getBaseCurrencyType().positions.get(position).amount));
         holder.changedPercent.setText(String.format(Locale.ENGLISH,"%.2f", list.get(1).getBaseCurrencyType().positions.get(position).changePercent));
 
