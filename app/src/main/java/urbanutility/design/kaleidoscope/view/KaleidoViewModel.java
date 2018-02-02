@@ -16,12 +16,15 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Flowable;
+import io.reactivex.functions.BiFunction;
 import io.reactivex.schedulers.Schedulers;
 import retrofit2.Retrofit;
 import urbanutility.design.kaleidoscope.database.KaleidoDatabase;
 import urbanutility.design.kaleidoscope.datatypes.LiveMarketType;
 import urbanutility.design.kaleidoscope.exchange.binance.client.BinanceService;
 import urbanutility.design.kaleidoscope.exchange.binance.model.BinancePriceTicker;
+import urbanutility.design.kaleidoscope.exchange.gdax.client.GdaxService;
+import urbanutility.design.kaleidoscope.exchange.gdax.model.GdaxTicker;
 import urbanutility.design.kaleidoscope.model.KaleidoBalance;
 import urbanutility.design.kaleidoscope.model.KaleidoBaseCurrency;
 import urbanutility.design.kaleidoscope.model.KaleidoOrder;
@@ -40,8 +43,6 @@ public class KaleidoViewModel extends AndroidViewModel {
 
     public KaleidoViewModel(Application application){
         super(application);
-
-
 
         kaleidoDatabase = kaleidoDatabase.getAppDatabase(this.getApplication());
     }
@@ -111,7 +112,7 @@ public class KaleidoViewModel extends AndroidViewModel {
         });
     }
 
-    public LiveData<List<LiveMarketType>> getLiveMarkets(BinanceService binanceService){
+    public LiveData<List<LiveMarketType>> getLiveMarkets(BinanceService binanceService, GdaxService gdaxService){
         return LiveDataReactiveStreams.fromPublisher(binanceService.getPriceTickers()
                 .subscribeOn(Schedulers.io())
                 .toFlowable()
@@ -127,6 +128,17 @@ public class KaleidoViewModel extends AndroidViewModel {
                             marketList.add(liveMarketType);
                         }
                         return marketList;
+                    }
+                })
+                .zipWith(gdaxService.getGdaxLiveMarket().subscribeOn(Schedulers.io()), new BiFunction<List<LiveMarketType>, GdaxTicker, List<LiveMarketType>>() {
+                    @Override
+                    public List<LiveMarketType> apply(List<LiveMarketType> liveMarketTypes, GdaxTicker gdaxTicker) throws Exception {
+                        LiveMarketType gdaxLive = new LiveMarketType();
+                        gdaxLive.exchange = "gdax";
+                        gdaxLive.symbol = "BTCUSD";
+                        gdaxLive.price = Double.parseDouble(gdaxTicker.getPrice());
+                        liveMarketTypes.add(gdaxLive);
+                        return liveMarketTypes;
                     }
                 })
                 .repeatWhen(new io.reactivex.functions.Function<Flowable<Object>, Publisher<?>>() {

@@ -45,7 +45,7 @@ public class CurrentAdapter extends RecyclerView.Adapter<CurrentAdapter.BalanceV
         holder.currentValue.setText(String.format(Locale.ENGLISH,"$%e", list.get(1).getBaseCurrencyType().positions.get(position).currentVal));
         holder.realizedGain.setText(String.format(Locale.ENGLISH,"$%.3f", list.get(1).getBaseCurrencyType().positions.get(position).realizedGain));
         holder.unrealizedGain.setText(String.format(Locale.ENGLISH,"$%.3f", list.get(1).getBaseCurrencyType().positions.get(position).unrealizedGain));
-        holder.amount.setText(String.format(Locale.ENGLISH,"%e", list.get(1).getBaseCurrencyType().positions.get(position).amount));
+        holder.amount.setText(KaleidoFunctions.DoubleToFormatedString(list.get(1).getBaseCurrencyType().positions.get(position).amount));
         holder.changedPercent.setText(String.format(Locale.ENGLISH,"%.2f", list.get(1).getBaseCurrencyType().positions.get(position).changePercent));
 
     }

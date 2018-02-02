@@ -29,6 +29,7 @@ import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 import urbanutility.design.kaleidoscope.datatypes.LiveMarketType;
 import urbanutility.design.kaleidoscope.exchange.binance.client.BinanceService;
+import urbanutility.design.kaleidoscope.exchange.gdax.client.GdaxService;
 import urbanutility.design.kaleidoscope.model.KaleidoBalance;
 import urbanutility.design.kaleidoscope.model.KaleidoBaseCurrency;
 import urbanutility.design.kaleidoscope.model.KaleidoOrder;
@@ -49,6 +50,7 @@ public class CurrentPriceFragment extends Fragment {
     private KaleidoViewModel kaleidoViewModel;
     private Retrofit.Builder retrofitBuilder;
     private BinanceService binanceService;
+    private GdaxService gdaxService;
     private CurrentAdapter adapter;
 
     public CurrentPriceFragment() {
@@ -117,7 +119,7 @@ public class CurrentPriceFragment extends Fragment {
         MediatorLiveData mediator = new MediatorLiveData();
         mediator.addSource(kaleidoViewModel.getAllOrders(), orderObserver);
         mediator.addSource(kaleidoViewModel.getAllBalances(), balanceObserver);
-        mediator.addSource(kaleidoViewModel.getLiveMarkets(binanceService), marketObserver);
+        mediator.addSource(kaleidoViewModel.getLiveMarkets(binanceService, gdaxService), marketObserver);
         mediator.addSource(kaleidoViewModel.getBaseCurrency(), tripletObserver);
 
         mediator.observe(CurrentPriceFragment.this, mediatorObserver);
@@ -157,6 +159,9 @@ public class CurrentPriceFragment extends Fragment {
         binanceService = retrofitBuilder.baseUrl("https://api.binance.com")
                 .build()
                 .create(BinanceService.class);
+        gdaxService = retrofitBuilder.baseUrl("https://api.gdax.com")
+                .build()
+                .create(GdaxService.class);
     }
 
     private void setUpViewModelAndObserver() {

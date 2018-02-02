@@ -13,8 +13,8 @@ import urbanutility.design.kaleidoscope.datatypes.OrderType;
 
 public class KaleidoMethods {
 
-    protected static long Sum(List<OrderType> list, String type) {
-        long sum = 0L;
+    protected static double Sum(List<OrderType> list, String type) {
+        double sum = 0d;
         for (OrderType entry: list) {
             if (type.equals("Amount")) sum += entry.amount;
             if (type.equals("Fee")) sum += entry.txFee;

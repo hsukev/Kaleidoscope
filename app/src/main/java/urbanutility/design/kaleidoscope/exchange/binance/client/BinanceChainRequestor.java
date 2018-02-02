@@ -110,6 +110,12 @@ public class BinanceChainRequestor implements ChainRequestor {
                         return binanceOrders;
                     }
                 })
+                .concatMap(new Function<BinanceOrder, ObservableSource<BinanceOrder>>() {
+                    @Override
+                    public ObservableSource<BinanceOrder> apply(BinanceOrder binanceOrder) throws Exception {
+                        return Observable.just(binanceOrder).delay(1000, TimeUnit.MILLISECONDS);
+                    }
+                })
                 .filter(new Predicate<BinanceOrder>() {
                     @Override
                     public boolean test(BinanceOrder binanceOrder) throws Exception {
@@ -163,7 +169,7 @@ public class BinanceChainRequestor implements ChainRequestor {
                     @Override
                     public KaleidoBalance apply(BinanceBalance binanceBalance) throws Exception {
                         BalanceType balanceType = new BalanceType(binanceBalance.getAsset(), "binance", Double.parseDouble(binanceBalance.getFree()));
-                        return new KaleidoBalance(String.valueOf(System.currentTimeMillis()), balanceType);
+                        return new KaleidoBalance(balanceType);
                     }
                 })
                 .subscribe(new DisposableObserver<KaleidoBalance>() {
@@ -209,7 +215,7 @@ public class BinanceChainRequestor implements ChainRequestor {
 
 
     /*
-    * Observes: A BinanceOrder
+    * Observes: A BinanceOrderf
     * Emits:  1. Same BinanceOrder
     *         2. Pair<gdaxBtcUsdRate, binanceAltBtcRate> combination depends on symbol
     * */

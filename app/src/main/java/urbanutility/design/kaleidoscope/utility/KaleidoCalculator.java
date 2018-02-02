@@ -1,5 +1,7 @@
 package urbanutility.design.kaleidoscope.utility;
 
+import android.util.Log;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -21,6 +23,8 @@ import urbanutility.design.kaleidoscope.model.KaleidoOrder;
  */
 
 public class KaleidoCalculator extends KaleidoMethods {
+    private static String TAG = "Calculator";
+
     public static List<KaleidoBaseCurrency> CalculatePosition(
             List<KaleidoBalance> inputBalance,
             List<KaleidoOrder> inputOrder,
@@ -31,8 +35,8 @@ public class KaleidoCalculator extends KaleidoMethods {
             /* Expect exchange: "Gdax", symbol: "BTCUSD" also be part of exchange Market data */
             List<LiveMarketType> marketData
     ) {
+        Log.d(TAG, inputOrder.size() + "orderSize");
         List<KaleidoBalance> balanceList = inputBalance;
-        List<OrderType> orderList;
         KaleidoBaseCurrency BtcBase = new KaleidoBaseCurrency("BTC");
         KaleidoBaseCurrency UsdBase = new KaleidoBaseCurrency("USD");
 
@@ -40,11 +44,10 @@ public class KaleidoCalculator extends KaleidoMethods {
         Map<String, ArrayList<OrderType>> orderDict = new HashMap<String, ArrayList<OrderType>>();
         for (KaleidoOrder entry : inputOrder) {
             OrderType orderType = entry.getOrdertype();
-            if (orderDict.containsKey(orderType.convertedSymbol)) {
-                orderDict.get(orderType.convertedSymbol).add(orderType);
-            } else {
+            if (!orderDict.containsKey(orderType.convertedSymbol)) {
                 orderDict.put(orderType.convertedSymbol, new ArrayList<OrderType>());
             }
+            orderDict.get(orderType.convertedSymbol).add(orderType);
         }
 
         for (String key : orderDict.keySet()) {
@@ -55,6 +58,7 @@ public class KaleidoCalculator extends KaleidoMethods {
             double totalBuyAmount = Sum(buyList, "Amount");
             double totalSellAmount = Sum(sellList, "Amount");
             double txFee = 0L;
+            Log.d("Calculator", key + totalBuyAmount + " " + totalSellAmount + "buysize" + buyList.size());
 
             PositionType BtcPosition = new PositionType();
             PositionType UsdPosition = new PositionType();
@@ -65,7 +69,7 @@ public class KaleidoCalculator extends KaleidoMethods {
                 /* Calculate unrealized gain */
                 calcUnrealizedGainLoss(key, buyList, BtcPosition, UsdPosition, marketData);
             } else {
-                double BtcUsdPrice = FilterLiveMarket(marketData, "Gdax", "BTC").price;
+                double BtcUsdPrice = FilterLiveMarket(marketData, "gdax", "BTC").price;
                 txFee = Sum(buyList, "Fee") + Sum(sellList, "Fee");
                 BtcPosition.realizedGain = Sum(sellList, "Total") - Sum(buyList, "Fee");
                 UsdPosition.realizedGain = BtcPosition.realizedGain * BtcUsdPrice;
@@ -75,8 +79,8 @@ public class KaleidoCalculator extends KaleidoMethods {
             UsdPosition.changePercent = (UsdPosition.currentVal != 0) ?
                     ((UsdPosition.currentVal / UsdPosition.cost) - 1) * 100 : 0;
             int symbolLength = key.length();
-            BtcPosition.symbol = key.substring(0,symbolLength-3);
-            UsdPosition.symbol = key.substring(0,symbolLength-3);
+            BtcPosition.symbol = key.substring(0, symbolLength - 3);
+            UsdPosition.symbol = key.substring(0, symbolLength - 3);
             BtcBase.getBaseCurrencyType().positions.add(BtcPosition);
             UsdBase.getBaseCurrencyType().positions.add(UsdPosition);
         }
@@ -89,8 +93,6 @@ public class KaleidoCalculator extends KaleidoMethods {
         }
 
         return baseCurrency;
-
-
 
 
     }
@@ -153,7 +155,7 @@ public class KaleidoCalculator extends KaleidoMethods {
         double BtcTotalAmount = Sum(buyList, "Amount");
         List<LiveMarketType> coinMarketRateList = FilterLiveMarketBySymbol(marketData, key);
         LiveMarketType coinMarketRate = FilterLiveMarketByExchange(coinMarketRateList, buyList.get(buyList.size() - 1).exchange);
-        LiveMarketType btcUsdMarketRate = FilterLiveMarket(marketData, "Gdax", "BTC");
+        LiveMarketType btcUsdMarketRate = FilterLiveMarket(marketData, "gdax", "BTC");
 
         while (!buyList.isEmpty()) {
             OrderType oldestBuy = buyList.get(buyList.size() - 1);

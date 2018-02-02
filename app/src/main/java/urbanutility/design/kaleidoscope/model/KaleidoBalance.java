@@ -20,9 +20,9 @@ public class KaleidoBalance {
     @Embedded
     public BalanceType balanceType;
 
-    public KaleidoBalance(String id,BalanceType balance) {
-        this.id = id;
+    public KaleidoBalance(BalanceType balance) {
         this.balanceType = balance;
+        this.id = this.balanceType.exchange + "-" + this.balanceType.symbol;
     }
 
     public KaleidoBalance(String id){
