@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.data.Entry;
@@ -28,6 +29,7 @@ import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 import urbanutility.design.kaleidoscope.datatypes.LiveMarketType;
+import urbanutility.design.kaleidoscope.datatypes.PositionType;
 import urbanutility.design.kaleidoscope.exchange.binance.client.BinanceService;
 import urbanutility.design.kaleidoscope.exchange.gdax.client.GdaxService;
 import urbanutility.design.kaleidoscope.model.KaleidoBalance;
@@ -45,6 +47,11 @@ public class CurrentPriceFragment extends Fragment {
     LineChart lineChart;
     @BindView(R.id.current_recycler)
     RecyclerView recycler;
+    @BindView(R.id.base_total)
+    TextView btcTotalView;
+    @BindView(R.id.percent_growth_total)
+    TextView percentGrowthView;
+
     float[] totalHistory = {1000.00000f, 1254.1231f, 1134.8547f, 1549.987432f, 5475.102f, 5252.545f, 6666.666f, 6666.6604f, 6666.6123f, 12321.10f, 8080.51444f};
 
     private KaleidoViewModel kaleidoViewModel;
@@ -76,8 +83,6 @@ public class CurrentPriceFragment extends Fragment {
         setUpViewModelAndObserver();
 
 
-
-
         Observer<List<LiveMarketType>> marketObserver = new Observer<List<LiveMarketType>>() {
             @Override
             public void onChanged(@Nullable List<LiveMarketType> liveMarketTypes) {
@@ -102,9 +107,29 @@ public class CurrentPriceFragment extends Fragment {
         Observer<List<KaleidoBaseCurrency>> tripletObserver = new Observer<List<KaleidoBaseCurrency>>() {
             @Override
             public void onChanged(@Nullable List<KaleidoBaseCurrency> baseCurrencies) {
-                Log.d(TAG, baseCurrencies.get(1).getBaseCurrencyType().positions.size()+"");
+                Log.d(TAG, baseCurrencies.get(1).getBaseCurrencyType().positions.size() + "");
 
-                if(baseCurrencies.get(1).getBaseCurrencyType().positions.size()>0) adapter.refresh(baseCurrencies);
+                double baseTotal = 0.0d;
+                double btcTotal = 0.0d;
+                double percentTotal = 0.0d;
+
+                for(PositionType position : baseCurrencies.get(0).getBaseCurrencyType().positions){
+                    baseTotal += position.cost;
+                    percentTotal += position.cost * position.changePercent;
+                }
+
+                for(PositionType position : baseCurrencies.get(1).getBaseCurrencyType().positions){
+                    btcTotal += position.cost;
+                }
+
+                if(baseTotal==0.0d) baseTotal=1.0d;
+                btcTotalView.setText(btcTotal+" -- " + baseTotal);
+                percentGrowthView.setText(percentTotal/baseTotal+"");
+
+                if (baseCurrencies.get(1).getBaseCurrencyType().positions.size() > 0)
+                    adapter.refresh(baseCurrencies);
+
+
             }
         };
 
@@ -123,7 +148,6 @@ public class CurrentPriceFragment extends Fragment {
         mediator.addSource(kaleidoViewModel.getBaseCurrency(), tripletObserver);
 
         mediator.observe(CurrentPriceFragment.this, mediatorObserver);
-
 
 
 //        tickerLiveData.observe(CurrentPriceFragment.this, tickerObserver);

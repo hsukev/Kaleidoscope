@@ -4,7 +4,7 @@ package urbanutility.design.kaleidoscope;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.PagerTitleStrip;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -46,7 +46,8 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public class KaleidoFragmentStatePagerAdapter extends FragmentStatePagerAdapter {
+
+    public class KaleidoFragmentStatePagerAdapter extends FragmentPagerAdapter {
 
         KaleidoFragmentStatePagerAdapter(FragmentManager fm){
             super(fm);
@@ -61,6 +62,20 @@ public class MainActivity extends AppCompatActivity {
                     return ComparisonFragment.newInstance();
                 case 2:
                     return HistoryFragment.newInstance();
+                default:
+                    return null;
+            }
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            switch (position){
+                case 0:
+                    return "Current";
+                case 1:
+                    return "Analysis";
+                case 2:
+                    return "Import";
                 default:
                     return null;
             }
