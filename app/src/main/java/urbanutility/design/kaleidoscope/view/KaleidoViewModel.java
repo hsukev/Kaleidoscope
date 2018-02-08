@@ -43,8 +43,7 @@ public class KaleidoViewModel extends AndroidViewModel {
 
     public KaleidoViewModel(Application application){
         super(application);
-
-        kaleidoDatabase = kaleidoDatabase.getAppDatabase(this.getApplication());
+        kaleidoDatabase = KaleidoDatabase.getAppDatabase(this.getApplication());
     }
 
     //use async

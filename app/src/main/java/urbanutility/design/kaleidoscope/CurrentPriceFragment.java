@@ -47,7 +47,7 @@ public class CurrentPriceFragment extends Fragment {
     LineChart lineChart;
     @BindView(R.id.current_recycler)
     RecyclerView recycler;
-    @BindView(R.id.base_total)
+    @BindView(R.id.btc_total)
     TextView btcTotalView;
     @BindView(R.id.percent_growth_total)
     TextView percentGrowthView;

@@ -47,15 +47,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+
     public class KaleidoFragmentStatePagerAdapter extends FragmentPagerAdapter {
 
-        KaleidoFragmentStatePagerAdapter(FragmentManager fm){
+        KaleidoFragmentStatePagerAdapter(FragmentManager fm) {
             super(fm);
         }
 
         @Override
         public Fragment getItem(int position) {
-            switch (position){
+            switch (position) {
                 case 0:
                     return CurrentPriceFragment.newInstance();
                 case 1:
@@ -69,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public CharSequence getPageTitle(int position) {
-            switch (position){
+            switch (position) {
                 case 0:
                     return "Current";
                 case 1:

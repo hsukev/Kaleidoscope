@@ -54,8 +54,8 @@ public class HistoryFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.history_page,container,false);
-        ButterKnife.bind(this,view);
+        View view = inflater.inflate(R.layout.history_page, container, false);
+        ButterKnife.bind(this, view);
 
         setUpViewModelAndObserver();
         setUpUI();
@@ -63,7 +63,7 @@ public class HistoryFragment extends Fragment {
         return view;
     }
 
-    private void setUpRetrofitBuilder(){
+    private void setUpRetrofitBuilder() {
         retrofitBuilder = new Retrofit.Builder()
                 .addConverterFactory(GsonConverterFactory.create())
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create());
@@ -83,9 +83,9 @@ public class HistoryFragment extends Fragment {
         });
     }
 
-    private void setUpViewModelAndObserver(){
-        //move to main activity
+    private void setUpViewModelAndObserver() {
         kaleidoViewModel = ViewModelProviders.of(this).get(KaleidoViewModel.class);
+
         //remain in fragment custom
         final Observer<List<KaleidoOrder>> kaleidoObserver = new Observer<List<KaleidoOrder>>() {
             @Override
@@ -93,6 +93,6 @@ public class HistoryFragment extends Fragment {
                 adapter.addOrder(kaleidoOrders);
             }
         };
-        kaleidoViewModel.getAllOrders().observe(HistoryFragment.this,kaleidoObserver);
+        kaleidoViewModel.getAllOrders().observe(HistoryFragment.this, kaleidoObserver);
     }
 }
