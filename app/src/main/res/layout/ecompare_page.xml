@@ -1,13 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
 
     <com.github.mikephil.charting.charts.PieChart
-        android:id="@+id/pie_chart"
+        android:id="@+id/combined_pie_chart"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
     </com.github.mikephil.charting.charts.PieChart>
-</LinearLayout>
+
+    <com.github.mikephil.charting.charts.PieChart
+        android:id="@+id/exchange_pie_chart"
+        android:layout_centerInParent="true"
+        android:layout_width="300dp"
+        android:layout_height="300dp">
+
+    </com.github.mikephil.charting.charts.PieChart>
+</RelativeLayout>

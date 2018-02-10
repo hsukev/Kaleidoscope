@@ -5,7 +5,7 @@
 
 
     <com.github.mikephil.charting.charts.PieChart
-        android:id="@+id/pie_chart"
+        android:id="@+id/combined_pie_chart"
         android:layout_width="100dp"
         android:layout_height="100dp">
 

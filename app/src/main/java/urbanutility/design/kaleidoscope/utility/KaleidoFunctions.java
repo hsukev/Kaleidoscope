@@ -65,5 +65,10 @@ public class KaleidoFunctions {
         return liveMarketType.exchange + "-" + liveMarketType.symbol.substring(0,liveMarketType.symbol.length()-3);
     }
 
+    public static String[] decodeBalanceId(String balanceId){
+        int dashIndex = balanceId.indexOf('-');
+        return new String[]{balanceId.substring(0,dashIndex), balanceId.substring(dashIndex+1)};
+    }
+
 
 }

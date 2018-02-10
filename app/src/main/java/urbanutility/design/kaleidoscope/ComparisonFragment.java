@@ -5,15 +5,19 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.animation.FastOutSlowInInterpolator;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.github.mikephil.charting.charts.PieChart;
+import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
+import com.github.mikephil.charting.highlight.Highlight;
+import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.github.mikephil.charting.utils.ColorTemplate;
 
 import java.util.ArrayList;
@@ -38,9 +42,11 @@ import urbanutility.design.kaleidoscope.view.KaleidoViewModel;
  * Created by jerye on 1/11/2018.
  */
 
-public class ComparisonFragment extends Fragment {
-    @BindView(R.id.pie_chart)
-    PieChart pieChart;
+public class ComparisonFragment extends Fragment implements OnChartValueSelectedListener {
+    @BindView(R.id.combined_pie_chart)
+    PieChart combinedPieChart;
+    @BindView(R.id.exchange_pie_chart)
+    PieChart exchangePieChart;
 
     String LOG = "ComparisonFragment";
 
@@ -82,7 +88,7 @@ public class ComparisonFragment extends Fragment {
         Observer<List<LiveMarketType>> liveMarketObserver = new Observer<List<LiveMarketType>>() {
             @Override
             public void onChanged(@Nullable List<LiveMarketType> liveMarketTypes) {
-                loadPieChart(calculateExchangeDistribution(liveMarketTypes));
+                loadDistributionPieChart(calculateExchangeDistribution(liveMarketTypes));
             }
         };
 
@@ -98,10 +104,10 @@ public class ComparisonFragment extends Fragment {
             if (liveMarketType.symbol.contains("BTC")) {
                 String liveMarketId = KaleidoFunctions.createLiveMarketId(liveMarketType);
                 if (balanceMap.containsKey(liveMarketId)) {
-                    double exchangeSpecificBalance = balanceMap.get(liveMarketId)*liveMarketType.price;
+                    double exchangeSpecificBalance = balanceMap.get(liveMarketId) * liveMarketType.price;
                     if (exchangeSumsMap.containsKey(liveMarketType.exchange)) {
                         exchangeSpecificBalance += exchangeSumsMap.get(liveMarketType.exchange);
-                        Log.d(LOG, liveMarketType.price+"");
+                        Log.d(LOG, liveMarketType.price + "");
 
                     }
                     exchangeSumsMap.put(liveMarketType.exchange, exchangeSpecificBalance);
@@ -135,25 +141,69 @@ public class ComparisonFragment extends Fragment {
     }
 
 
-    private void loadPieChart(Map<String, Double> exchangeSumMap) {
+    private void loadDistributionPieChart(Map<String, Double> exchangeSumMap) {
         List<PieEntry> entries = new ArrayList<>();
         exchangeSumMap.put("cryptopia", 2.312);
 
         double totalAsset = 0.0d;
-        for(String key: exchangeSumMap.keySet()){
+        for (String key : exchangeSumMap.keySet()) {
             totalAsset += exchangeSumMap.get(key);
         }
 
-        for(String key: exchangeSumMap.keySet()){
-            double percent = exchangeSumMap.get(key)/totalAsset*100;
+        for (String key : exchangeSumMap.keySet()) {
+            double percent = exchangeSumMap.get(key) / totalAsset * 100;
             entries.add(new PieEntry((float) percent, key));
         }
         PieDataSet pieDataSet = new PieDataSet(entries, "Breakdown");
         pieDataSet.setColors(ColorTemplate.JOYFUL_COLORS);
         PieData pieData = new PieData(pieDataSet);
-        pieChart.setData(pieData);
-        pieChart.setRotationEnabled(false);
-        pieChart.invalidate();
+        combinedPieChart.setData(pieData);
+        combinedPieChart.setRotationEnabled(false);
+        combinedPieChart.setHoleRadius(65.0f);
+        combinedPieChart.setTransparentCircleRadius(70.0f);
+        combinedPieChart.setOnChartValueSelectedListener(this);
+        combinedPieChart.invalidate();
+
     }
 
+
+    @Override
+    public void onValueSelected(Entry e, Highlight h) {
+        String exchange = ((PieEntry) e).getLabel();
+        List<PieEntry> pieEntries = new ArrayList<>();
+        double exchangeSum = 0.0d;
+        for (String key : balanceMap.keySet()) {
+            if (key.contains(exchange)) {
+                exchangeSum += balanceMap.get(key);
+            }
+        }
+
+        for (String key : balanceMap.keySet()) {
+            if (key.contains(exchange)) {
+                String coin = KaleidoFunctions.decodeBalanceId(key)[1];
+                double percentage = balanceMap.get(key) / exchangeSum * 100;
+                pieEntries.add(new PieEntry((float) percentage, coin));
+            }
+        }
+
+        loadExchangePieChart(pieEntries, exchange);
+    }
+
+    @Override
+    public void onNothingSelected() {
+        exchangePieChart.animate().alpha(0.0f).setInterpolator(new FastOutSlowInInterpolator());
+
+    }
+
+    private void loadExchangePieChart(List<PieEntry> list, String exchange) {
+        PieDataSet pieDataSet = new PieDataSet(list, exchange);
+        pieDataSet.setColors(ColorTemplate.COLORFUL_COLORS);
+        PieData pieData = new PieData(pieDataSet);
+        exchangePieChart.setData(pieData);
+        exchangePieChart.setHoleRadius(0.0f);
+        exchangePieChart.setTransparentCircleRadius(5.0f);
+        exchangePieChart.invalidate();
+        exchangePieChart.animate().alpha(1.0f)
+        .setInterpolator(new FastOutSlowInInterpolator());
+    }
 }
