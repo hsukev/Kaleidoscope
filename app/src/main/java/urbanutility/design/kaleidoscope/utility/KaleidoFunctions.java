@@ -9,6 +9,8 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
+import urbanutility.design.kaleidoscope.datatypes.LiveMarketType;
+
 /**
  * Created by jerye on 1/17/2018.
  */
@@ -56,6 +58,11 @@ public class KaleidoFunctions {
         DFS.setDecimalSeparator('.');
         myFormatter.setDecimalFormatSymbols(DFS);
         return myFormatter.format(value);
+    }
+
+    public static String createLiveMarketId(LiveMarketType liveMarketType){
+
+        return liveMarketType.exchange + "-" + liveMarketType.symbol.substring(0,liveMarketType.symbol.length()-3);
     }
 
 
