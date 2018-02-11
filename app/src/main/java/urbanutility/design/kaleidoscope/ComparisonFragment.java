@@ -143,7 +143,7 @@ public class ComparisonFragment extends Fragment implements OnChartValueSelected
 
     private void loadDistributionPieChart(Map<String, Double> exchangeSumMap) {
         List<PieEntry> entries = new ArrayList<>();
-        exchangeSumMap.put("cryptopia", 2.312);
+//        exchangeSumMap.put("cryptopia", 2.312);
 
         double totalAsset = 0.0d;
         for (String key : exchangeSumMap.keySet()) {

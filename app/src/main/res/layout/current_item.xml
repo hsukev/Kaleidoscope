@@ -144,19 +144,19 @@
         android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="28dp"
         android:text="Quantity"
         android:textColor="@android:color/secondary_text_dark"
-        app:layout_constraintEnd_toEndOf="@+id/amount"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/symbol_image" />
 
     <TextView
         android:id="@+id/amount"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/textView"
         app:layout_constraintTop_toBottomOf="@+id/textView"
         tools:text="1.211BTC" />
 

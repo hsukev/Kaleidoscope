@@ -14,6 +14,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import urbanutility.design.kaleidoscope.R;
 import urbanutility.design.kaleidoscope.model.KaleidoOrder;
+import urbanutility.design.kaleidoscope.utility.KaleidoFunctions;
 
 /**
  * Created by jerye on 1/10/2018.
@@ -28,13 +29,18 @@ public class OrdersAdapter extends RecyclerView.Adapter<OrdersAdapter.OrdersView
 
     @Override
     public OrdersViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(mContext).inflate(R.layout.history_item, parent, false);
+        View view = LayoutInflater.from(mContext).inflate(R.layout.order_history_item, parent, false);
         return new OrdersViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(OrdersViewHolder holder, int position) {
         holder.orderSymbol.setText(list.get(position).getOrdertype().symbol);
+        holder.orderAmount.setText(KaleidoFunctions.doubleToFormatedString(list.get(position).getOrdertype().amount));
+        holder.orderExchange.setText(list.get(position).getOrdertype().exchange);
+        holder.orderPrice.setText(KaleidoFunctions.doubleToFormatedString(list.get(position).getOrdertype().price));
+        holder.orderSide.setText(list.get(position).getOrdertype().side);
+        holder.orderTime.setText(list.get(position).getOrdertype().time);
     }
 
     @Override
@@ -42,11 +48,22 @@ public class OrdersAdapter extends RecyclerView.Adapter<OrdersAdapter.OrdersView
         return list.size();
     }
 
-    public class OrdersViewHolder extends RecyclerView.ViewHolder {
+    class OrdersViewHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.order_symbol)
         TextView orderSymbol;
+        @BindView(R.id.order_amount)
+        TextView orderAmount;
+        @BindView(R.id.order_exchange)
+        TextView orderExchange;
+        @BindView(R.id.order_price)
+        TextView orderPrice;
+        @BindView(R.id.order_side)
+        TextView orderSide;
+        @BindView(R.id.order_time)
+        TextView orderTime;
 
-        public OrdersViewHolder(View view){
+
+         OrdersViewHolder(View view){
             super(view);
             ButterKnife.bind(this, view);
 

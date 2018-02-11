@@ -2,7 +2,8 @@ package urbanutility.design.kaleidoscope.utility;
 
 import android.util.Log;
 
-import java.text.DecimalFormat;
+import com.ibm.icu.text.DecimalFormat;
+
 import java.text.DecimalFormatSymbols;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -17,7 +18,8 @@ import urbanutility.design.kaleidoscope.datatypes.LiveMarketType;
 
 public class KaleidoFunctions {
     private static DecimalFormatSymbols DFS = new DecimalFormatSymbols();
-    private static DecimalFormat myFormatter = new DecimalFormat("0.##");
+    private static DecimalFormat myFormatter = new DecimalFormat();
+    private static final int maxSigFigUnder1 = 4;
 
     public static <T> String convertMilliISO8601(T t) {
         long milli = Long.parseLong(t.toString());
@@ -54,9 +56,13 @@ public class KaleidoFunctions {
     }
 
 
-    public static String DoubleToFormatedString(double value) {
-        DFS.setDecimalSeparator('.');
-        myFormatter.setDecimalFormatSymbols(DFS);
+    public static String doubleToFormatedString(double value) {
+        if(value>-1 && value <1){
+            myFormatter.setSignificantDigitsUsed(true);
+            myFormatter.setMaximumSignificantDigits(maxSigFigUnder1);
+        }else{
+            myFormatter.setMaximumFractionDigits(3);
+        }
         return myFormatter.format(value);
     }
 

@@ -24,7 +24,7 @@ public abstract class KaleidoDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     public abstract void insertBalance(KaleidoBalance... kaleidoBalances);
 
-    @Query("SELECT * FROM kaleido_orders")
+    @Query("SELECT * FROM kaleido_orders ORDER BY time DESC")
     public abstract LiveData<List<KaleidoOrder>> getAllOrders();
 
     @Query("SELECT * FROM kaleido_balances")
