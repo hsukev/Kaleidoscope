@@ -7,6 +7,7 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -14,6 +15,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.data.Entry;
@@ -25,13 +27,19 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.functions.BiFunction;
+import io.reactivex.functions.Function;
+import io.reactivex.observers.DisposableSingleObserver;
+import io.reactivex.schedulers.Schedulers;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 import urbanutility.design.kaleidoscope.datatypes.LiveMarketType;
 import urbanutility.design.kaleidoscope.datatypes.PositionType;
 import urbanutility.design.kaleidoscope.exchange.binance.client.BinanceService;
+import urbanutility.design.kaleidoscope.exchange.binance.model.BinancePriceTicker;
 import urbanutility.design.kaleidoscope.exchange.gdax.client.GdaxService;
+import urbanutility.design.kaleidoscope.exchange.gdax.model.GdaxTicker;
 import urbanutility.design.kaleidoscope.model.KaleidoBalance;
 import urbanutility.design.kaleidoscope.model.KaleidoBaseCurrency;
 import urbanutility.design.kaleidoscope.model.KaleidoOrder;
@@ -45,6 +53,8 @@ public class CurrentPriceFragment extends Fragment {
     private String TAG = "current";
     @BindView(R.id.line_chart)
     LineChart lineChart;
+    @BindView(R.id.current_swipe_refresh_layout)
+    SwipeRefreshLayout swipeRefreshLayout;
     @BindView(R.id.current_recycler)
     RecyclerView recycler;
     @BindView(R.id.btc_total)
@@ -82,14 +92,6 @@ public class CurrentPriceFragment extends Fragment {
         setUpRetrofitBuilder();
         setUpViewModelAndObserver();
 
-
-        Observer<List<LiveMarketType>> marketObserver = new Observer<List<LiveMarketType>>() {
-            @Override
-            public void onChanged(@Nullable List<LiveMarketType> liveMarketTypes) {
-                kaleidoViewModel.setTripletMarkets(liveMarketTypes);
-            }
-        };
-
         Observer<List<KaleidoOrder>> orderObserver = new Observer<List<KaleidoOrder>>() {
             @Override
             public void onChanged(@Nullable List<KaleidoOrder> kaleidoOrders) {
@@ -113,18 +115,18 @@ public class CurrentPriceFragment extends Fragment {
                 double btcTotal = 0.0d;
                 double percentTotal = 0.0d;
 
-                for(PositionType position : baseCurrencies.get(0).getBaseCurrencyType().positions){
+                for (PositionType position : baseCurrencies.get(0).getBaseCurrencyType().positions) {
                     baseTotal += position.cost;
                     percentTotal += position.cost * position.changePercent;
                 }
 
-                for(PositionType position : baseCurrencies.get(1).getBaseCurrencyType().positions){
+                for (PositionType position : baseCurrencies.get(1).getBaseCurrencyType().positions) {
                     btcTotal += position.cost;
                 }
 
-                if(baseTotal==0.0d) baseTotal=1.0d;
-                btcTotalView.setText(btcTotal+" -- " + baseTotal);
-                percentGrowthView.setText(percentTotal/baseTotal+"");
+                if (baseTotal == 0.0d) baseTotal = 1.0d;
+                btcTotalView.setText(btcTotal + " -- " + baseTotal);
+                percentGrowthView.setText(percentTotal / baseTotal + "");
 
                 if (baseCurrencies.get(1).getBaseCurrencyType().positions.size() > 0)
                     adapter.refresh(baseCurrencies);
@@ -144,7 +146,6 @@ public class CurrentPriceFragment extends Fragment {
         MediatorLiveData mediator = new MediatorLiveData();
         mediator.addSource(kaleidoViewModel.getAllOrders(), orderObserver);
         mediator.addSource(kaleidoViewModel.getAllBalances(), balanceObserver);
-        mediator.addSource(kaleidoViewModel.getLiveMarkets(binanceService, gdaxService), marketObserver);
         mediator.addSource(kaleidoViewModel.getBaseCurrency(), tripletObserver);
 
         mediator.observe(CurrentPriceFragment.this, mediatorObserver);
@@ -160,6 +161,12 @@ public class CurrentPriceFragment extends Fragment {
         recycler.setAdapter(adapter);
         recycler.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
 
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                requestLiveMarket();
+            }
+        });
     }
 
     private void setUpLineChart() {
@@ -194,5 +201,57 @@ public class CurrentPriceFragment extends Fragment {
 
     }
 
+    private void requestLiveMarket() {
+        gdaxService.getGdaxLiveMarket()
+                .subscribeOn(Schedulers.io())
+                .map(gdaxLiveMarketFunction())
+                .zipWith(binanceService.getPriceTickers().subscribeOn(Schedulers.io()), binanceLiveMarketBiFunction())
+                .subscribe(new DisposableSingleObserver<List<LiveMarketType>>() {
+                    @Override
+                    public void onSuccess(List<LiveMarketType> liveMarketTypes) {
+                        kaleidoViewModel.setTripletMarkets(liveMarketTypes);
+                    }
 
+                    @Override
+                    public void onError(Throwable e) {
+                        Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_LONG).show();
+                    }
+                });
+
+    }
+
+    private Function<GdaxTicker, List<LiveMarketType>> gdaxLiveMarketFunction() {
+        return new Function<GdaxTicker, List<LiveMarketType>>() {
+            @Override
+            public List<LiveMarketType> apply(GdaxTicker gdaxTicker) throws Exception {
+                List<LiveMarketType> liveMarketTypes = new ArrayList<>();
+                LiveMarketType gdaxLive = new LiveMarketType();
+                gdaxLive.exchange = "gdax";
+                gdaxLive.symbol = "BTCUSD";
+                gdaxLive.price = Double.parseDouble(gdaxTicker.getPrice());
+                liveMarketTypes.add(gdaxLive);
+                return liveMarketTypes;
+            }
+        };
+    }
+
+    private BiFunction<List<LiveMarketType>, List<BinancePriceTicker>, List<LiveMarketType>> binanceLiveMarketBiFunction() {
+        return new BiFunction<List<LiveMarketType>, List<BinancePriceTicker>, List<LiveMarketType>>() {
+            @Override
+            public List<LiveMarketType> apply(List<LiveMarketType> liveMarketTypes, List<BinancePriceTicker> binancePriceTickers) throws Exception {
+                for (BinancePriceTicker ticker : binancePriceTickers) {
+                    LiveMarketType liveMarketType = new LiveMarketType();
+                    liveMarketType.exchange = "binance";
+                    liveMarketType.symbol = ticker.getSymbol();
+                    liveMarketType.price = Double.parseDouble(ticker.getPrice());
+                    liveMarketTypes.add(liveMarketType);
+                }
+                return liveMarketTypes;
+            }
+        };
+    }
 }
+
+
+
+

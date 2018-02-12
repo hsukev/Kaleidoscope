@@ -2,6 +2,7 @@ package urbanutility.design.kaleidoscope.view;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,7 +31,9 @@ public class OrdersAdapter extends RecyclerView.Adapter<OrdersAdapter.OrdersView
     @Override
     public OrdersViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(mContext).inflate(R.layout.order_history_item, parent, false);
+        Log.d("Viewpager", "orders create view holder");
         return new OrdersViewHolder(view);
+
     }
 
     @Override

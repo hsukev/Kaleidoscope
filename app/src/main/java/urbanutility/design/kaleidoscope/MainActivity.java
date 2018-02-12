@@ -4,10 +4,12 @@ package urbanutility.design.kaleidoscope;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.PagerTitleStrip;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+import android.view.ViewGroup;
 
 import com.facebook.stetho.Stetho;
 
@@ -41,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
         Stetho.initializeWithDefaults(this);
 
         KaleidoFragmentStatePagerAdapter fragmentStatePagerAdapter = new KaleidoFragmentStatePagerAdapter(getSupportFragmentManager());
+        pager.setOffscreenPageLimit(2);
         pager.setAdapter(fragmentStatePagerAdapter);
 
 
@@ -48,10 +51,23 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-    public class KaleidoFragmentStatePagerAdapter extends FragmentPagerAdapter {
+    public class KaleidoFragmentStatePagerAdapter extends FragmentStatePagerAdapter {
 
         KaleidoFragmentStatePagerAdapter(FragmentManager fm) {
             super(fm);
+        }
+
+        @Override
+        public Object instantiateItem(ViewGroup container, int position) {
+            Log.d("Viewpager", "instantiate" + position);
+
+            return super.instantiateItem(container, position);
+        }
+
+        @Override
+        public void destroyItem(ViewGroup container, int position, Object object) {
+            Log.d("Viewpager", "destroy" + position);
+            super.destroyItem(container, position, object);
         }
 
         @Override

@@ -1,6 +1,5 @@
 package urbanutility.design.kaleidoscope;
 
-import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -85,16 +84,9 @@ public class ComparisonFragment extends Fragment implements OnChartValueSelected
         //move to main activity
         kaleidoViewModel = ViewModelProviders.of(this).get(KaleidoViewModel.class);
 
-        Observer<List<LiveMarketType>> liveMarketObserver = new Observer<List<LiveMarketType>>() {
-            @Override
-            public void onChanged(@Nullable List<LiveMarketType> liveMarketTypes) {
-                loadDistributionPieChart(calculateExchangeDistribution(liveMarketTypes));
-            }
-        };
-
-        kaleidoViewModel.getLiveMarkets(binanceService, gdaxService).observe(ComparisonFragment.this, liveMarketObserver);
 
     }
+
 
     private Map<String, Double> calculateExchangeDistribution(List<LiveMarketType> liveMarketTypes) {
         Map<String, Double> exchangeSumsMap = new HashMap<>();
@@ -169,6 +161,7 @@ public class ComparisonFragment extends Fragment implements OnChartValueSelected
 
     @Override
     public void onValueSelected(Entry e, Highlight h) {
+        Log.d(LOG, "clicked");
         String exchange = ((PieEntry) e).getLabel();
         List<PieEntry> pieEntries = new ArrayList<>();
         double exchangeSum = 0.0d;
@@ -191,6 +184,7 @@ public class ComparisonFragment extends Fragment implements OnChartValueSelected
 
     @Override
     public void onNothingSelected() {
+        Log.d(LOG, "unclicked");
         exchangePieChart.animate().alpha(0.0f).setInterpolator(new FastOutSlowInInterpolator());
 
     }

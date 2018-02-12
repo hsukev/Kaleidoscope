@@ -2,8 +2,8 @@ package urbanutility.design.kaleidoscope.exchange.gdax.client;
 
 import com.google.gson.JsonElement;
 
-import io.reactivex.Flowable;
 import io.reactivex.Observable;
+import io.reactivex.Single;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
 import urbanutility.design.kaleidoscope.exchange.gdax.model.GdaxTicker;
@@ -20,6 +20,6 @@ public interface GdaxService {
                                                @Query("granularity") int granularity);
 
     @GET("products/BTC-USD/ticker")
-    Flowable<GdaxTicker> getGdaxLiveMarket();
+    Single<GdaxTicker> getGdaxLiveMarket();
 
 }

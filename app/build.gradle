@@ -78,7 +78,7 @@ dependencies {
     // Test helpers for Room
     testImplementation "android.arch.persistence.room:testing:1.0.0"
 
-
+    implementation 'com.google.android.gms:play-services:11.8.0'
     implementation 'com.android.support:design:26.1.0'
     implementation 'com.github.PhilJay:MPAndroidChart:v3.0.3'
 }

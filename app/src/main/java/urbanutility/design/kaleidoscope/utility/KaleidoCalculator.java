@@ -35,7 +35,7 @@ public class KaleidoCalculator extends KaleidoMethods {
             /* Expect exchange: "Gdax", symbol: "BTCUSD" also be part of exchange Market data */
             List<LiveMarketType> marketData
     ) {
-        Log.d(TAG, inputOrder.size() + "orderSize");
+        Log.d("Viewpager", inputOrder.size() + "orderSize");
         List<KaleidoBalance> balanceList = inputBalance;
         KaleidoBaseCurrency BtcBase = new KaleidoBaseCurrency("BTC");
         KaleidoBaseCurrency UsdBase = new KaleidoBaseCurrency("USD");

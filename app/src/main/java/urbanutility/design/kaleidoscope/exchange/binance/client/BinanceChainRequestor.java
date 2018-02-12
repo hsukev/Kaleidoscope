@@ -30,6 +30,7 @@ import urbanutility.design.kaleidoscope.exchange.gdax.client.GdaxService;
 import urbanutility.design.kaleidoscope.model.BaseAlts;
 import urbanutility.design.kaleidoscope.model.KaleidoBalance;
 import urbanutility.design.kaleidoscope.model.KaleidoOrder;
+import urbanutility.design.kaleidoscope.security.CustomTrust;
 import urbanutility.design.kaleidoscope.utility.KaleidoFunctions;
 import urbanutility.design.kaleidoscope.view.KaleidoViewModel;
 
@@ -54,7 +55,9 @@ public class BinanceChainRequestor implements ChainRequestor {
         this.kaleidoViewModel = historyFragment.kaleidoViewModel;
 
         BinanceRequestInterceptor binanceRequestInterceptor = new BinanceRequestInterceptor(BuildConfig.BINANCE_API_KEY, BuildConfig.BINANCE_SECRET_KEY);
+        CustomTrust customTrust = new CustomTrust();
         httpClient.addInterceptor(binanceRequestInterceptor);
+        httpClient.sslSocketFactory(customTrust.getSslSocketFactory(), customTrust.getTrustManager());
 
         binanceService = retrofitBuilder.baseUrl("https://api.binance.com")
                 .client(httpClient.build())
@@ -133,7 +136,7 @@ public class BinanceChainRequestor implements ChainRequestor {
 
                     @Override
                     public void onError(Throwable e) {
-                        Log.e(TAG, e.getMessage());
+                        e.printStackTrace();
                     }
 
                     @Override
@@ -181,6 +184,7 @@ public class BinanceChainRequestor implements ChainRequestor {
                     @Override
                     public void onError(Throwable e) {
                         Log.e("balance", e.getMessage());
+                        e.printStackTrace();
                     }
 
                     @Override

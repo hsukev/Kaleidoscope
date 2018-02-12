@@ -1,4 +1,4 @@
-package urbanutility.design.kaleidoscope;
+package urbanutility.design.kaleidoscope.security;
 
 import org.apache.commons.codec.binary.Hex;
 

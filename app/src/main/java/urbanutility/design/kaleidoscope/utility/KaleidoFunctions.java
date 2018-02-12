@@ -23,7 +23,7 @@ public class KaleidoFunctions {
 
     public static <T> String convertMilliISO8601(T t) {
         long milli = Long.parseLong(t.toString());
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
         Date date = new Date(milli);
         return sdf.format(date);
     }
