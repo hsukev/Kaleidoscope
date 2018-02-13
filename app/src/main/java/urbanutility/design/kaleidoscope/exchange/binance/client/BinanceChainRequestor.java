@@ -16,11 +16,9 @@ import io.reactivex.functions.Function;
 import io.reactivex.functions.Predicate;
 import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
-import okhttp3.OkHttpClient;
-import retrofit2.Retrofit;
-import urbanutility.design.kaleidoscope.BuildConfig;
 import urbanutility.design.kaleidoscope.ChainRequestor;
 import urbanutility.design.kaleidoscope.HistoryFragment;
+import urbanutility.design.kaleidoscope.KaleidoActivity;
 import urbanutility.design.kaleidoscope.datatypes.BalanceType;
 import urbanutility.design.kaleidoscope.exchange.binance.model.BinanceAccountInfo;
 import urbanutility.design.kaleidoscope.exchange.binance.model.BinanceBalance;
@@ -30,7 +28,6 @@ import urbanutility.design.kaleidoscope.exchange.gdax.client.GdaxService;
 import urbanutility.design.kaleidoscope.model.BaseAlts;
 import urbanutility.design.kaleidoscope.model.KaleidoBalance;
 import urbanutility.design.kaleidoscope.model.KaleidoOrder;
-import urbanutility.design.kaleidoscope.security.CustomTrust;
 import urbanutility.design.kaleidoscope.utility.KaleidoFunctions;
 import urbanutility.design.kaleidoscope.view.KaleidoViewModel;
 
@@ -40,9 +37,7 @@ import urbanutility.design.kaleidoscope.view.KaleidoViewModel;
 
 public class BinanceChainRequestor implements ChainRequestor {
     private String TAG = getClass().getName();
-    private OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
     private KaleidoViewModel kaleidoViewModel;
-    private Retrofit.Builder retrofitBuilder;
     private BinanceService binanceService;
     private GdaxService gdaxService;
     private String startTime;
@@ -51,22 +46,10 @@ public class BinanceChainRequestor implements ChainRequestor {
 
 
     public BinanceChainRequestor(HistoryFragment historyFragment) {
-        this.retrofitBuilder = historyFragment.retrofitBuilder;
         this.kaleidoViewModel = historyFragment.kaleidoViewModel;
-
-        BinanceRequestInterceptor binanceRequestInterceptor = new BinanceRequestInterceptor(BuildConfig.BINANCE_API_KEY, BuildConfig.BINANCE_SECRET_KEY);
-        CustomTrust customTrust = new CustomTrust();
-        httpClient.addInterceptor(binanceRequestInterceptor);
-        httpClient.sslSocketFactory(customTrust.getSslSocketFactory(), customTrust.getTrustManager());
-
-        binanceService = retrofitBuilder.baseUrl("https://api.binance.com")
-                .client(httpClient.build())
-                .build()
-                .create(BinanceService.class);
-        gdaxService = retrofitBuilder.baseUrl("https://api.gdax.com/")
-                .build()
-                .create(GdaxService.class);
-
+        KaleidoActivity kaleidoActivity = (KaleidoActivity) historyFragment.getActivity();
+        binanceService = kaleidoActivity.getBinanceService();
+        gdaxService = kaleidoActivity.getGdaxService();
     }
 
 
@@ -74,8 +57,9 @@ public class BinanceChainRequestor implements ChainRequestor {
     public void requestAndInsert() {
         getRawOrders();
         getRawBalance();
-
     }
+
+
 
     private void getRawOrders() {
 

@@ -27,8 +27,6 @@ import java.util.Map;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import retrofit2.Retrofit;
-import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
-import retrofit2.converter.gson.GsonConverterFactory;
 import urbanutility.design.kaleidoscope.database.KaleidoDatabase;
 import urbanutility.design.kaleidoscope.datatypes.LiveMarketType;
 import urbanutility.design.kaleidoscope.exchange.binance.client.BinanceService;
@@ -54,6 +52,7 @@ public class ComparisonFragment extends Fragment implements OnChartValueSelected
     private BinanceService binanceService;
     private GdaxService gdaxService;
     private Map<String, Double> balanceMap;
+    private KaleidoActivity kaleidoActivity;
 
     public ComparisonFragment() {
         // Required empty public constructor
@@ -71,6 +70,7 @@ public class ComparisonFragment extends Fragment implements OnChartValueSelected
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.ecompare_page, container, false);
         ButterKnife.bind(this, view);
+        kaleidoActivity = (KaleidoActivity) getActivity();
         balanceMap = loadBalance();
         setUpRetrofitBuilder();
         loadBalance();
@@ -111,16 +111,8 @@ public class ComparisonFragment extends Fragment implements OnChartValueSelected
     }
 
     private void setUpRetrofitBuilder() {
-        retrofitBuilder = new Retrofit.Builder()
-                .addConverterFactory(GsonConverterFactory.create())
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create());
-
-        binanceService = retrofitBuilder.baseUrl("https://api.binance.com")
-                .build()
-                .create(BinanceService.class);
-        gdaxService = retrofitBuilder.baseUrl("https://api.gdax.com")
-                .build()
-                .create(GdaxService.class);
+        binanceService = kaleidoActivity.getBinanceService();
+        gdaxService = kaleidoActivity.getGdaxService();
     }
 
     private Map<String, Double> loadBalance() {

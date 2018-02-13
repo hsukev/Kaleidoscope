@@ -20,8 +20,6 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import retrofit2.Retrofit;
-import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
-import retrofit2.converter.gson.GsonConverterFactory;
 import urbanutility.design.kaleidoscope.model.KaleidoOrder;
 import urbanutility.design.kaleidoscope.view.KaleidoViewModel;
 import urbanutility.design.kaleidoscope.view.OrdersAdapter;
@@ -65,16 +63,13 @@ public class HistoryFragment extends Fragment {
     }
 
     private void setUpRetrofitBuilder() {
-        retrofitBuilder = new Retrofit.Builder()
-                .addConverterFactory(GsonConverterFactory.create())
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create());
+
     }
 
     private void setUpUI() {
         adapter = new OrdersAdapter(getContext());
         recycler.setAdapter(adapter);
         recycler.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
-
         importButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

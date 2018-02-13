@@ -31,9 +31,6 @@ import io.reactivex.functions.BiFunction;
 import io.reactivex.functions.Function;
 import io.reactivex.observers.DisposableSingleObserver;
 import io.reactivex.schedulers.Schedulers;
-import retrofit2.Retrofit;
-import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
-import retrofit2.converter.gson.GsonConverterFactory;
 import urbanutility.design.kaleidoscope.datatypes.LiveMarketType;
 import urbanutility.design.kaleidoscope.datatypes.PositionType;
 import urbanutility.design.kaleidoscope.exchange.binance.client.BinanceService;
@@ -64,8 +61,8 @@ public class CurrentPriceFragment extends Fragment {
 
     float[] totalHistory = {1000.00000f, 1254.1231f, 1134.8547f, 1549.987432f, 5475.102f, 5252.545f, 6666.666f, 6666.6604f, 6666.6123f, 12321.10f, 8080.51444f};
 
+    private KaleidoActivity kaleidoActivity;
     private KaleidoViewModel kaleidoViewModel;
-    private Retrofit.Builder retrofitBuilder;
     private BinanceService binanceService;
     private GdaxService gdaxService;
     private CurrentAdapter adapter;
@@ -86,6 +83,7 @@ public class CurrentPriceFragment extends Fragment {
     public View onCreateView(final LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.current_price_page, container, false);
+        kaleidoActivity = (KaleidoActivity) getActivity();
         ButterKnife.bind(this, view);
         setUpUI();
         setUpLineChart();
@@ -183,16 +181,9 @@ public class CurrentPriceFragment extends Fragment {
     }
 
     private void setUpRetrofitBuilder() {
-        retrofitBuilder = new Retrofit.Builder()
-                .addConverterFactory(GsonConverterFactory.create())
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create());
 
-        binanceService = retrofitBuilder.baseUrl("https://api.binance.com")
-                .build()
-                .create(BinanceService.class);
-        gdaxService = retrofitBuilder.baseUrl("https://api.gdax.com")
-                .build()
-                .create(GdaxService.class);
+        binanceService = kaleidoActivity.getBinanceService();
+        gdaxService = kaleidoActivity.getGdaxService();
     }
 
     private void setUpViewModelAndObserver() {
