@@ -26,11 +26,10 @@ import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import retrofit2.Retrofit;
+import io.reactivex.observers.DisposableSingleObserver;
+import urbanutility.design.kaleidoscope.client.KaleidoService;
 import urbanutility.design.kaleidoscope.database.KaleidoDatabase;
 import urbanutility.design.kaleidoscope.datatypes.LiveMarketType;
-import urbanutility.design.kaleidoscope.exchange.binance.client.BinanceService;
-import urbanutility.design.kaleidoscope.exchange.gdax.client.GdaxService;
 import urbanutility.design.kaleidoscope.model.KaleidoBalance;
 import urbanutility.design.kaleidoscope.utility.KaleidoFunctions;
 import urbanutility.design.kaleidoscope.view.KaleidoViewModel;
@@ -48,11 +47,10 @@ public class ComparisonFragment extends Fragment implements OnChartValueSelected
     String LOG = "ComparisonFragment";
 
     private KaleidoViewModel kaleidoViewModel;
-    private Retrofit.Builder retrofitBuilder;
-    private BinanceService binanceService;
-    private GdaxService gdaxService;
+
     private Map<String, Double> balanceMap;
     private KaleidoActivity kaleidoActivity;
+    private KaleidoService kaleidoService;
 
     public ComparisonFragment() {
         // Required empty public constructor
@@ -72,9 +70,11 @@ public class ComparisonFragment extends Fragment implements OnChartValueSelected
         ButterKnife.bind(this, view);
         kaleidoActivity = (KaleidoActivity) getActivity();
         balanceMap = loadBalance();
-        setUpRetrofitBuilder();
         loadBalance();
         setUpViewModelAndObserver();
+
+        kaleidoService = new KaleidoService(kaleidoActivity);
+        requestLiveMarket();
 
         return view;
     }
@@ -83,8 +83,21 @@ public class ComparisonFragment extends Fragment implements OnChartValueSelected
     private void setUpViewModelAndObserver() {
         //move to main activity
         kaleidoViewModel = ViewModelProviders.of(this).get(KaleidoViewModel.class);
+    }
 
+    private void requestLiveMarket() {
+        kaleidoService.getLiveData().subscribe(new DisposableSingleObserver<List<LiveMarketType>>() {
+            @Override
+            public void onSuccess(List<LiveMarketType> liveMarketTypes) {
+                Log.d(LOG, "livemarketsize" + liveMarketTypes.size());
+                loadDistributionPieChart(calculateExchangeDistribution(liveMarketTypes));
+            }
 
+            @Override
+            public void onError(Throwable e) {
+                e.printStackTrace();
+            }
+        });
     }
 
 
@@ -108,11 +121,6 @@ public class ComparisonFragment extends Fragment implements OnChartValueSelected
 
         }
         return exchangeSumsMap;
-    }
-
-    private void setUpRetrofitBuilder() {
-        binanceService = kaleidoActivity.getBinanceService();
-        gdaxService = kaleidoActivity.getGdaxService();
     }
 
     private Map<String, Double> loadBalance() {
@@ -186,10 +194,11 @@ public class ComparisonFragment extends Fragment implements OnChartValueSelected
         pieDataSet.setColors(ColorTemplate.COLORFUL_COLORS);
         PieData pieData = new PieData(pieDataSet);
         exchangePieChart.setData(pieData);
+        exchangePieChart.setRotationEnabled(false);
         exchangePieChart.setHoleRadius(0.0f);
         exchangePieChart.setTransparentCircleRadius(5.0f);
         exchangePieChart.invalidate();
         exchangePieChart.animate().alpha(1.0f)
-        .setInterpolator(new FastOutSlowInInterpolator());
+                .setInterpolator(new FastOutSlowInInterpolator());
     }
 }
