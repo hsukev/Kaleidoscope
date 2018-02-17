@@ -17,6 +17,7 @@ import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
+import urbanutility.design.kaleidoscope.client.KaleidoService;
 import urbanutility.design.kaleidoscope.exchange.binance.client.BinanceRequestInterceptor;
 import urbanutility.design.kaleidoscope.exchange.binance.client.BinanceService;
 import urbanutility.design.kaleidoscope.exchange.gdax.client.GdaxService;
@@ -42,6 +43,8 @@ public class KaleidoActivity extends AppCompatActivity implements KaleidoInterfa
     String TAG = "MainActivity";
     private Retrofit.Builder retrofitBuilder;
     private OkHttpClient.Builder httpClient;
+    private KaleidoService kaleidoService;
+
 
 
 
@@ -52,10 +55,14 @@ public class KaleidoActivity extends AppCompatActivity implements KaleidoInterfa
         ButterKnife.bind(this);
         Stetho.initializeWithDefaults(this);
         buildRetrofitServices();
+        kaleidoService = new KaleidoService(this);
 
         KaleidoFragmentStatePagerAdapter fragmentStatePagerAdapter = new KaleidoFragmentStatePagerAdapter(getSupportFragmentManager());
         pager.setOffscreenPageLimit(2);
         pager.setAdapter(fragmentStatePagerAdapter);
+
+
+
     }
 
     public class KaleidoFragmentStatePagerAdapter extends FragmentStatePagerAdapter {
@@ -123,5 +130,9 @@ public class KaleidoActivity extends AppCompatActivity implements KaleidoInterfa
                 .client(httpClient.build())
                 .build()
                 .create(BinanceService.class);
+    }
+
+    public KaleidoService getKaleidoService(){
+        return kaleidoService;
     }
 }

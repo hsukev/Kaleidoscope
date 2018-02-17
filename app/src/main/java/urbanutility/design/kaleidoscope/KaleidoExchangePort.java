@@ -36,8 +36,6 @@ public class KaleidoExchangePort {
         }
     }
 
-
-
     public void UpdateAll(){
         PreferenceManager.getDefaultSharedPreferences(historyFragment.getContext());
     }

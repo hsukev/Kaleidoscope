@@ -68,12 +68,10 @@ public class ComparisonFragment extends Fragment implements OnChartValueSelected
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.ecompare_page, container, false);
         ButterKnife.bind(this, view);
-        kaleidoActivity = (KaleidoActivity) getActivity();
+        kaleidoService = ((KaleidoActivity)getActivity()).getKaleidoService();
         balanceMap = loadBalance();
         loadBalance();
         setUpViewModelAndObserver();
-
-        kaleidoService = new KaleidoService(kaleidoActivity);
         requestLiveMarket();
 
         return view;
@@ -86,7 +84,7 @@ public class ComparisonFragment extends Fragment implements OnChartValueSelected
     }
 
     private void requestLiveMarket() {
-        kaleidoService.getLiveData().subscribe(new DisposableSingleObserver<List<LiveMarketType>>() {
+        kaleidoService.requestLiveMarkets().subscribe(new DisposableSingleObserver<List<LiveMarketType>>() {
             @Override
             public void onSuccess(List<LiveMarketType> liveMarketTypes) {
                 Log.d(LOG, "livemarketsize" + liveMarketTypes.size());
