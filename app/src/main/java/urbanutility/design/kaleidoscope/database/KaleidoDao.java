@@ -19,7 +19,7 @@ import urbanutility.design.kaleidoscope.model.KaleidoOrder;
 public abstract class KaleidoDao {
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    public abstract void insertOrder(KaleidoOrder... kaleidoOrders);
+    public abstract void insertOrder(List<KaleidoOrder> kaleidoOrders);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     public abstract void insertBalance(KaleidoBalance... kaleidoBalances);

@@ -50,7 +50,7 @@ public class KaleidoViewModel extends AndroidViewModel {
         return kaleidoDatabase.kaleidoDao().getBalance(symbol);
     }
 
-    public void insertOrder(KaleidoOrder... kaleidoOrder){
+    public void insertOrder(List<KaleidoOrder> kaleidoOrder){
         kaleidoDatabase.kaleidoDao().insertOrder(kaleidoOrder);
     }
 

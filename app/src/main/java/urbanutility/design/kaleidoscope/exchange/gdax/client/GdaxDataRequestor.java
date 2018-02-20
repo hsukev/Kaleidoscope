@@ -7,7 +7,7 @@ import io.reactivex.Single;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 import urbanutility.design.kaleidoscope.DataRequestor;
-import urbanutility.design.kaleidoscope.KaleidoActivity;
+import urbanutility.design.kaleidoscope.client.KaleidoClients;
 import urbanutility.design.kaleidoscope.datatypes.LiveMarketType;
 import urbanutility.design.kaleidoscope.exchange.gdax.model.GdaxTicker;
 import urbanutility.design.kaleidoscope.model.KaleidoBalance;
@@ -22,8 +22,8 @@ public class GdaxDataRequestor implements DataRequestor {
     GdaxService gdaxService;
 
 
-    public GdaxDataRequestor(KaleidoActivity kaleidoActivity) {
-        this.gdaxService = kaleidoActivity.getGdaxService();
+    public GdaxDataRequestor(KaleidoClients kaleidoClients) {
+        this.gdaxService = kaleidoClients.getGdaxService();
     }
 
     @Override

@@ -2,7 +2,6 @@ package urbanutility.design.kaleidoscope.client;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -14,7 +13,6 @@ import java.util.prefs.PreferenceChangeListener;
 
 import io.reactivex.Single;
 import io.reactivex.functions.Function;
-import urbanutility.design.kaleidoscope.ExchangePort;
 import urbanutility.design.kaleidoscope.KaleidoActivity;
 import urbanutility.design.kaleidoscope.datatypes.LiveMarketType;
 import urbanutility.design.kaleidoscope.model.KaleidoBalance;
@@ -32,10 +30,9 @@ public class KaleidoService implements PreferenceChangeListener{
 
 
     public KaleidoService(KaleidoActivity kaleidoActivity) {
-
         exchangeSet = kaleidoActivity.getPreferences(Context.MODE_PRIVATE).getStringSet("exchange",null );
-        Log.d("Kaleidoservice",exchangeSet.size() + "set size");
-        exchangePort = new ExchangePort(kaleidoActivity);
+        KaleidoClients kaleidoClients = new KaleidoClients();
+        exchangePort = new ExchangePort(kaleidoClients);
     }
 
     public Single<List<LiveMarketType>> requestLiveMarkets() {
@@ -52,7 +49,16 @@ public class KaleidoService implements PreferenceChangeListener{
     }
 
     public Single<List<KaleidoOrder>> requestOrders(){
-        return null;
+        return Single.zip(getOrderSingles(), new Function<Object[], List<KaleidoOrder>>() {
+            @Override
+            public List<KaleidoOrder> apply(Object[] objects) throws Exception {
+                List<KaleidoOrder> list = new ArrayList<>();
+                for (Object object : objects) {
+                    list.addAll((List<KaleidoOrder>) object);
+                }
+                return list;
+            }
+        });
     }
 
     public Single<List<KaleidoBalance>> requestBalances(){
@@ -67,12 +73,9 @@ public class KaleidoService implements PreferenceChangeListener{
     private List<Single<List<LiveMarketType>>> getLiveMarketSingles() {
         List<Single<List<LiveMarketType>>> list = new ArrayList<>();
         Map<String, Single<List<LiveMarketType>>> map = exchangePort.getLiveMarketMap();
-        Log.d("Kaleidoservice",exchangeSet.size() + "set size");
         for(String exchange : exchangeSet){
-            Log.d("Kaleidoservice",exchange );
             list.add(map.get(exchange));
         }
-        Log.d("KaleidoService", map.size() + "map size" + list.size()+ "listsize");
         return list;
     }
 
@@ -88,7 +91,7 @@ public class KaleidoService implements PreferenceChangeListener{
     @Override
     public void preferenceChange(PreferenceChangeEvent preferenceChangeEvent) {
         if(preferenceChangeEvent.getKey().equals("exchange")){
-            exchangeSet = sharedPreferences.getStringSet("exchange", exchangeSet );
+//            exchangeSet = kaleidoActivity.getPreferences(Context.MODE_PRIVATE).getStringSet("exchange",null );
         }
     }
 }

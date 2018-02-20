@@ -1,10 +1,12 @@
-package urbanutility.design.kaleidoscope;
+package urbanutility.design.kaleidoscope.client;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import io.reactivex.Single;
+import urbanutility.design.kaleidoscope.DataRequestor;
+import urbanutility.design.kaleidoscope.KaleidoActivity;
 import urbanutility.design.kaleidoscope.datatypes.LiveMarketType;
 import urbanutility.design.kaleidoscope.exchange.binance.client.BinanceDataRequestor;
 import urbanutility.design.kaleidoscope.exchange.gdax.client.GdaxDataRequestor;
@@ -24,9 +26,9 @@ public class ExchangePort {
     private Map<String, Single<List<KaleidoDeposits>>> depositsMap = new HashMap<>();
 
     // Add more supportExchanges as necessary
-    public ExchangePort(KaleidoActivity kaleidoActivity){
-        supportExchange("binance", new BinanceDataRequestor(kaleidoActivity));
-        supportExchange("gdax", new GdaxDataRequestor(kaleidoActivity));
+    public ExchangePort(KaleidoClients kaleidoClients){
+        supportExchange("binance", new BinanceDataRequestor(kaleidoClients));
+        supportExchange("gdax", new GdaxDataRequestor(kaleidoClients));
         //cryptopia
         //kucoin
         //bittrex
