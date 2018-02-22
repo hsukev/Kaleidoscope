@@ -8,6 +8,7 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.PagerTitleStrip;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 
 import com.facebook.stetho.Stetho;
 
@@ -41,6 +42,7 @@ public class KaleidoActivity extends AppCompatActivity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Log.d("current", "main created");
         ButterKnife.bind(this);
         Stetho.initializeWithDefaults(this);
         kaleidoService = new KaleidoService(this);

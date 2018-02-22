@@ -82,7 +82,7 @@ public class HistoryFragment extends Fragment implements ExchangeListAdapter.Exc
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.history_page, container, false);
         ButterKnife.bind(this, view);
-        sharedPreferences = getActivity().getPreferences(Context.MODE_PRIVATE);
+        sharedPreferences = getActivity().getSharedPreferences("exchange",Context.MODE_PRIVATE);
         kaleidoService = ((KaleidoActivity) getActivity()).getKaleidoService();
         setUpViewModelAndObserver();
         setUpUI();

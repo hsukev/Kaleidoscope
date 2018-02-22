@@ -4,9 +4,12 @@ package urbanutility.design.kaleidoscope;
 import android.arch.lifecycle.MediatorLiveData;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -38,6 +41,7 @@ import urbanutility.design.kaleidoscope.model.KaleidoBaseCurrency;
 import urbanutility.design.kaleidoscope.model.KaleidoOrder;
 import urbanutility.design.kaleidoscope.view.CurrentAdapter;
 import urbanutility.design.kaleidoscope.view.KaleidoViewModel;
+import urbanutility.design.kaleidoscope.view.SplashDialogFragment;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -75,6 +79,13 @@ public class CurrentPriceFragment extends Fragment {
         return fragment;
     }
 
+
+    @Override
+    public void onAttach(Context context) {
+        Log.d(TAG, "show dialog");
+        showDialog();
+        super.onAttach(context);
+    }
 
     @Override
     public View onCreateView(final LayoutInflater inflater, ViewGroup container,
@@ -145,15 +156,14 @@ public class CurrentPriceFragment extends Fragment {
         mediator.observe(CurrentPriceFragment.this, mediatorObserver);
 
 
-//        tickerLiveData.observe(CurrentPriceFragment.this, tickerObserver);
-
+        requestLiveMarket();
         return view;
     }
 
     private void setUpUI() {
-        adapter = new CurrentAdapter(getContext());
+        adapter = new CurrentAdapter(getActivity());
         recycler.setAdapter(adapter);
-        recycler.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
+        recycler.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
 
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -176,6 +186,35 @@ public class CurrentPriceFragment extends Fragment {
         lineChart.invalidate();
     }
 
+    private void showDialog(){
+        FragmentManager fragmentManager = getFragmentManager();
+        SplashDialogFragment splashFragment = new SplashDialogFragment();
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+        transaction.add(android.R.id.content, splashFragment, null)
+                .addToBackStack(null).commit();
+        Thread thead = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try{
+                    Thread.sleep(7000);
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+
+        });
+        thead.start();
+
+
+    }
+
+    private void dismissDialog(){
+        FragmentManager fm = getFragmentManager();
+        FragmentTransaction transaction = fm.beginTransaction();
+        transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE).commit();
+    }
+
 
     private void setUpViewModelAndObserver() {
         //move to main activity
@@ -189,6 +228,7 @@ public class CurrentPriceFragment extends Fragment {
             public void onSuccess(List<LiveMarketType> liveMarketTypes) {
                 kaleidoViewModel.setTripletMarkets(liveMarketTypes);
                 swipeRefreshLayout.setRefreshing(false);
+                Log.d(TAG, "finished request");
             }
 
             @Override
