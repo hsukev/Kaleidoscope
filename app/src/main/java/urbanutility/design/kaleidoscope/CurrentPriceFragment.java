@@ -41,7 +41,6 @@ import urbanutility.design.kaleidoscope.model.KaleidoBaseCurrency;
 import urbanutility.design.kaleidoscope.model.KaleidoOrder;
 import urbanutility.design.kaleidoscope.view.CurrentAdapter;
 import urbanutility.design.kaleidoscope.view.KaleidoViewModel;
-import urbanutility.design.kaleidoscope.view.SplashDialogFragment;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -83,7 +82,6 @@ public class CurrentPriceFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         Log.d(TAG, "show dialog");
-        showDialog();
         super.onAttach(context);
     }
 
@@ -186,28 +184,7 @@ public class CurrentPriceFragment extends Fragment {
         lineChart.invalidate();
     }
 
-    private void showDialog(){
-        FragmentManager fragmentManager = getFragmentManager();
-        SplashDialogFragment splashFragment = new SplashDialogFragment();
-        FragmentTransaction transaction = fragmentManager.beginTransaction();
-        transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-        transaction.add(android.R.id.content, splashFragment, null)
-                .addToBackStack(null).commit();
-        Thread thead = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try{
-                    Thread.sleep(7000);
-                }catch (Exception e){
-                    e.printStackTrace();
-                }
-            }
 
-        });
-        thead.start();
-
-
-    }
 
     private void dismissDialog(){
         FragmentManager fm = getFragmentManager();

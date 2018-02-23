@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.PagerTitleStrip;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -15,6 +16,7 @@ import com.facebook.stetho.Stetho;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import urbanutility.design.kaleidoscope.client.KaleidoService;
+import urbanutility.design.kaleidoscope.view.SplashDialogFragment;
 
 /**
  * Created by jerye on 1/4/2018.
@@ -26,7 +28,7 @@ import urbanutility.design.kaleidoscope.client.KaleidoService;
  * http://www.vogella.com/tutorials/RxJava/article.html
  */
 
-public class KaleidoActivity extends AppCompatActivity{
+public class KaleidoActivity extends AppCompatActivity {
     @BindView(R.id.pager)
     ViewPager pager;
     @BindView(R.id.pager_title_strip)
@@ -34,8 +36,6 @@ public class KaleidoActivity extends AppCompatActivity{
 
     String TAG = "MainActivity";
     private KaleidoService kaleidoService;
-
-
 
 
     @Override
@@ -50,6 +50,16 @@ public class KaleidoActivity extends AppCompatActivity{
         KaleidoFragmentStatePagerAdapter fragmentStatePagerAdapter = new KaleidoFragmentStatePagerAdapter(getSupportFragmentManager());
         pager.setOffscreenPageLimit(2);
         pager.setAdapter(fragmentStatePagerAdapter);
+    }
+
+    private void showDialog() {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        SplashDialogFragment splashFragment = new SplashDialogFragment();
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+        transaction.add(android.R.id.content, splashFragment, null)
+                .addToBackStack(null).commit();
+
     }
 
     public class KaleidoFragmentStatePagerAdapter extends FragmentStatePagerAdapter {
@@ -91,7 +101,7 @@ public class KaleidoActivity extends AppCompatActivity{
         }
     }
 
-    public KaleidoService getKaleidoService(){
+    public KaleidoService getKaleidoService() {
         return kaleidoService;
     }
 }
