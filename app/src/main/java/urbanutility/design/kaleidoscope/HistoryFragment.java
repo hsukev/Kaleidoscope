@@ -27,6 +27,8 @@ import butterknife.ButterKnife;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.observers.DisposableSingleObserver;
 import urbanutility.design.kaleidoscope.client.KaleidoService;
+import urbanutility.design.kaleidoscope.model.KaleidoBalance;
+import urbanutility.design.kaleidoscope.model.KaleidoDeposits;
 import urbanutility.design.kaleidoscope.model.KaleidoOrder;
 import urbanutility.design.kaleidoscope.view.ExchangeListAdapter;
 import urbanutility.design.kaleidoscope.view.KaleidoViewModel;
@@ -57,18 +59,6 @@ public class HistoryFragment extends Fragment implements ExchangeListAdapter.Exc
     public HistoryFragment() {// Required empty public constructor
     }
 
-    @Override
-    public void update(String exchangeName) {
-
-    }
-
-    @Override
-    public void delete(String exchangeName) {
-        Set<String> exchangeSet = sharedPreferences.getStringSet("exchange",new HashSet<String>());
-        if(exchangeSet.contains(exchangeName)) exchangeSet.remove(exchangeName);
-        sharedPreferences.edit().putStringSet("exchange",exchangeSet).apply();
-    }
-
     public static HistoryFragment newInstance() {
         Bundle args = new Bundle();
         HistoryFragment fragment = new HistoryFragment();
@@ -76,13 +66,12 @@ public class HistoryFragment extends Fragment implements ExchangeListAdapter.Exc
         return fragment;
     }
 
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.history_page, container, false);
         ButterKnife.bind(this, view);
-        sharedPreferences = getActivity().getSharedPreferences("exchange",Context.MODE_PRIVATE);
+        sharedPreferences = getActivity().getSharedPreferences("exchange", Context.MODE_PRIVATE);
         kaleidoService = ((KaleidoActivity) getActivity()).getKaleidoService();
         setUpViewModelAndObserver();
         setUpUI();
@@ -96,27 +85,17 @@ public class HistoryFragment extends Fragment implements ExchangeListAdapter.Exc
         importButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                update(spinner.getSelectedItem().toString());
             }
         });
         syncAllButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                kaleidoService.requestOrders().observeOn(AndroidSchedulers.mainThread()).subscribe(new DisposableSingleObserver<List<KaleidoOrder>>() {
-                    @Override
-                    public void onSuccess(List<KaleidoOrder> kaleidoOrders) {
-                        Log.d(TAG, "orderSize: " + kaleidoOrders);
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        Toast.makeText(getActivity(), "One of your linked exchanges is currently unavailable", Toast.LENGTH_SHORT).show();
-                        e.printStackTrace();
-                    }
-                });
+                kaleidoService.requestOrders().observeOn(AndroidSchedulers.mainThread()).subscribe(disposableOrdersSingleObserver());
             }
         });
         exchangeListAdapter = new ExchangeListAdapter(this);
+        
         recyclerExchangeList.setAdapter(exchangeListAdapter);
         recyclerExchangeList.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
         Set<String> exchangeSet = getActivity().getPreferences(Context.MODE_PRIVATE).getStringSet("exchange", null);
@@ -124,7 +103,6 @@ public class HistoryFragment extends Fragment implements ExchangeListAdapter.Exc
             exchangeListAdapter.addExchange(exchange);
         }
     }
-
 
     private void setUpViewModelAndObserver() {
         kaleidoViewModel = ViewModelProviders.of(this).get(KaleidoViewModel.class);
@@ -139,4 +117,63 @@ public class HistoryFragment extends Fragment implements ExchangeListAdapter.Exc
 
         kaleidoViewModel.getAllOrders().observe(HistoryFragment.this, kaleidoObserver);
     }
+
+    @Override
+    public void update(String exchangeName) {
+        kaleidoService.requestSingularOrders(exchangeName)
+                .subscribe(disposableOrdersSingleObserver());
+        kaleidoService.requestSingularBalances(exchangeName)
+                .subscribe(disposableBalancesSingleObserver());
+        kaleidoService.requestSingularDeposits(exchangeName)
+                .subscribe(disposableDepositsSingleObserver());
+    }
+
+    @Override
+    public void delete(String exchangeName) {
+        Set<String> exchangeSet = sharedPreferences.getStringSet("exchange", new HashSet<String>());
+        if (exchangeSet.contains(exchangeName)) exchangeSet.remove(exchangeName);
+        sharedPreferences.edit().putStringSet("exchange", exchangeSet).apply();
+    }
+
+    private DisposableSingleObserver<List<KaleidoOrder>> disposableOrdersSingleObserver() {
+        return new DisposableSingleObserver<List<KaleidoOrder>>() {
+            @Override
+            public void onSuccess(List<KaleidoOrder> kaleidoOrders) {
+                Log.d(TAG, "orderSize: " + kaleidoOrders);
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                Toast.makeText(getActivity(), "One of your linked exchanges is currently unavailable", Toast.LENGTH_SHORT).show();
+                e.printStackTrace();
+            }
+        };
+    }
+    private DisposableSingleObserver<List<KaleidoBalance>> disposableBalancesSingleObserver() {
+        return new DisposableSingleObserver<List<KaleidoBalance>>() {
+            @Override
+            public void onSuccess(List<KaleidoBalance> kaleidoBalances) {
+
+            }
+
+            @Override
+            public void onError(Throwable e) {
+
+            }
+        };
+    }
+    private DisposableSingleObserver<List<KaleidoDeposits>> disposableDepositsSingleObserver() {
+        return new DisposableSingleObserver<List<KaleidoDeposits>>() {
+            @Override
+            public void onSuccess(List<KaleidoDeposits> kaleidoDeposits) {
+
+            }
+
+            @Override
+            public void onError(Throwable e) {
+
+            }
+        };
+    }
 }
+

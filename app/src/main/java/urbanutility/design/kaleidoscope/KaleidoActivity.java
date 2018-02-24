@@ -71,7 +71,7 @@ public class KaleidoActivity extends AppCompatActivity {
         public Fragment getItem(int position) {
             switch (position) {
                 case 0:
-                    return CurrentPriceFragment.newInstance();
+                    return CurrentFragment.newInstance();
                 case 1:
                     return ComparisonFragment.newInstance();
                 case 2:

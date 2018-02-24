@@ -8,8 +8,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -45,7 +43,7 @@ import urbanutility.design.kaleidoscope.view.KaleidoViewModel;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class CurrentPriceFragment extends Fragment {
+public class CurrentFragment extends Fragment {
     private String TAG = "current";
     @BindView(R.id.line_chart)
     LineChart lineChart;
@@ -67,13 +65,13 @@ public class CurrentPriceFragment extends Fragment {
     private CurrentAdapter adapter;
     private KaleidoService kaleidoService;
 
-    public CurrentPriceFragment() {
+    public CurrentFragment() {
         // Required empty public constructor
     }
 
-    public static CurrentPriceFragment newInstance() {
+    public static CurrentFragment newInstance() {
         Bundle args = new Bundle();
-        CurrentPriceFragment fragment = new CurrentPriceFragment();
+        CurrentFragment fragment = new CurrentFragment();
         fragment.setArguments(args);
         return fragment;
     }
@@ -145,14 +143,12 @@ public class CurrentPriceFragment extends Fragment {
             }
         };
 
-
         MediatorLiveData mediator = new MediatorLiveData();
         mediator.addSource(kaleidoViewModel.getAllOrders(), orderObserver);
         mediator.addSource(kaleidoViewModel.getAllBalances(), balanceObserver);
         mediator.addSource(kaleidoViewModel.getBaseCurrency(), tripletObserver);
 
-        mediator.observe(CurrentPriceFragment.this, mediatorObserver);
-
+        mediator.observe(CurrentFragment.this, mediatorObserver);
 
         requestLiveMarket();
         return view;
@@ -184,15 +180,6 @@ public class CurrentPriceFragment extends Fragment {
         lineChart.invalidate();
     }
 
-
-
-    private void dismissDialog(){
-        FragmentManager fm = getFragmentManager();
-        FragmentTransaction transaction = fm.beginTransaction();
-        transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE).commit();
-    }
-
-
     private void setUpViewModelAndObserver() {
         //move to main activity
         kaleidoViewModel = ViewModelProviders.of(this).get(KaleidoViewModel.class);
@@ -200,6 +187,7 @@ public class CurrentPriceFragment extends Fragment {
     }
 
     private void requestLiveMarket() {
+        swipeRefreshLayout.setRefreshing(true);
         kaleidoService.requestLiveMarkets().observeOn(AndroidSchedulers.mainThread()).subscribe(new DisposableSingleObserver<List<LiveMarketType>>() {
             @Override
             public void onSuccess(List<LiveMarketType> liveMarketTypes) {

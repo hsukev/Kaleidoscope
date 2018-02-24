@@ -35,6 +35,19 @@ public class KaleidoService implements PreferenceChangeListener{
         exchangePort = new ExchangePort(kaleidoClients);
     }
 
+    public Single<List<LiveMarketType>> requestSingularLiveMarkets(String exchange){
+        return exchangePort.getLiveMarketMap().get(exchange);
+    }
+    public Single<List<KaleidoOrder>> requestSingularOrders(String exchange){
+        return exchangePort.getOrdersMap().get(exchange);
+    }
+    public Single<List<KaleidoBalance>> requestSingularBalances(String exchange){
+        return exchangePort.getBalancesMap().get(exchange);
+    }
+    public Single<List<KaleidoDeposits>> requestSingularDeposits(String exchange){
+        return exchangePort.getDepositsMap().get(exchange);
+    }
+
     public Single<List<LiveMarketType>> requestLiveMarkets() {
         return Single.zip(getLiveMarketSingles(), new Function<Object[], List<LiveMarketType>>() {
             @Override
@@ -47,7 +60,6 @@ public class KaleidoService implements PreferenceChangeListener{
             }
         });
     }
-
     public Single<List<KaleidoOrder>> requestOrders(){
         return Single.zip(getOrderSingles(), new Function<Object[], List<KaleidoOrder>>() {
             @Override
@@ -60,11 +72,9 @@ public class KaleidoService implements PreferenceChangeListener{
             }
         });
     }
-
     public Single<List<KaleidoBalance>> requestBalances(){
         return null;
     }
-
     public Single<List<KaleidoDeposits>> requestDeposits(){
         return null;
     }
