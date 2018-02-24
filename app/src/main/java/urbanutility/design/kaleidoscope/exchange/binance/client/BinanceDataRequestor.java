@@ -18,7 +18,10 @@ import io.reactivex.functions.Predicate;
 import io.reactivex.schedulers.Schedulers;
 import urbanutility.design.kaleidoscope.DataRequestor;
 import urbanutility.design.kaleidoscope.client.KaleidoClients;
+import urbanutility.design.kaleidoscope.datatypes.BalanceType;
 import urbanutility.design.kaleidoscope.datatypes.LiveMarketType;
+import urbanutility.design.kaleidoscope.exchange.binance.model.BinanceAccountInfo;
+import urbanutility.design.kaleidoscope.exchange.binance.model.BinanceBalance;
 import urbanutility.design.kaleidoscope.exchange.binance.model.BinanceOrder;
 import urbanutility.design.kaleidoscope.exchange.binance.model.BinancePriceTicker;
 import urbanutility.design.kaleidoscope.exchange.gdax.client.GdaxService;
@@ -49,7 +52,12 @@ public class BinanceDataRequestor implements DataRequestor {
 
     @Override
     public Single<List<KaleidoBalance>> requestBalances() {
-        return null;
+        return binanceService.getAccountInfo(System.currentTimeMillis() - 10000, 300000)
+                .map(accountToBalanceMapper())
+                .flattenAsObservable(flattenBalances())
+                .filter(filterFreedBalances())
+                .map(createKaleidoBalance())
+                .toList();
     }
 
     @Override
@@ -181,10 +189,6 @@ public class BinanceDataRequestor implements DataRequestor {
             }
         };
     }
-    /*
-* Observes: Emission from conversionRatesFunction()
-* Emits: new KaleidoOrder
-* */
     private BiFunction<BinanceOrder, Pair<Double, Double>, KaleidoOrder> createKaleidoOrder(){
         return new BiFunction<BinanceOrder, Pair<Double, Double>, KaleidoOrder>() {
             @Override
@@ -193,7 +197,6 @@ public class BinanceDataRequestor implements DataRequestor {
             }
         };
     }
-
     private Function<JsonElement, Pair<Double, Double>> mapCoinBtcInverseRate(){
         return new Function<JsonElement, Pair<Double, Double>>() {
             @Override
@@ -203,7 +206,6 @@ public class BinanceDataRequestor implements DataRequestor {
             }
         };
     }
-
     private Function<JsonElement, Pair<Double, Double>> mapGdaxBtcUsdRate(){
         return new Function<JsonElement, Pair<Double, Double>>() {
             @Override
@@ -212,7 +214,6 @@ public class BinanceDataRequestor implements DataRequestor {
             }
         };
     }
-
     private BiFunction<JsonElement, JsonElement, Pair<Double, Double>> bifuncGdaxBinanceRates(){
         return new BiFunction<JsonElement, JsonElement, Pair<Double, Double>>() {
             @Override
@@ -223,4 +224,41 @@ public class BinanceDataRequestor implements DataRequestor {
             }
         };
     }
+
+    // requestBalance functions
+    private Function<BinanceAccountInfo, List<BinanceBalance>> accountToBalanceMapper(){
+        return new Function<BinanceAccountInfo, List<BinanceBalance>>() {
+            @Override
+            public List<BinanceBalance> apply(BinanceAccountInfo binanceAccountInfo) throws Exception {
+                return binanceAccountInfo.getBalances();
+            }
+        };
+    }
+    private Function<List<BinanceBalance>, Iterable<BinanceBalance>> flattenBalances(){
+        return new Function<List<BinanceBalance>, Iterable<BinanceBalance>>() {
+            @Override
+            public Iterable<BinanceBalance> apply(List<BinanceBalance> binanceBalances) throws Exception {
+                return binanceBalances;
+            }
+        };
+    }
+    private Predicate<BinanceBalance> filterFreedBalances(){
+        return new Predicate<BinanceBalance>() {
+            @Override
+            public boolean test(BinanceBalance binanceBalance) throws Exception {
+                return Double.parseDouble(binanceBalance.getFree()) > 0;
+            }
+        };
+    }
+    private Function<BinanceBalance, KaleidoBalance> createKaleidoBalance(){
+        return new Function<BinanceBalance, KaleidoBalance>() {
+            @Override
+            public KaleidoBalance apply(BinanceBalance binanceBalance) throws Exception {
+                BalanceType balanceType = new BalanceType(binanceBalance.getAsset(), "binance", Double.parseDouble(binanceBalance.getFree()));
+                return new KaleidoBalance(balanceType);
+            }
+        };
+    }
+
+
 }

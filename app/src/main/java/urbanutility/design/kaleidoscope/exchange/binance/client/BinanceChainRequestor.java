@@ -134,12 +134,7 @@
 //        Single<BinanceAccountInfo> binanceBalanceSingle = binanceService.getAccountInfo(System.currentTimeMillis() - 10000, 300000);
 //        binanceBalanceSingle
 //                .subscribeOn(Schedulers.io())
-//                .map(new Function<BinanceAccountInfo, List<BinanceBalance>>() {
-//                    @Override
-//                    public List<BinanceBalance> apply(BinanceAccountInfo binanceAccountInfo) throws Exception {
-//                        return binanceAccountInfo.getBalances();
-//                    }
-//                })
+//                .map()
 //                .flattenAsObservable(new Function<List<BinanceBalance>, Iterable<BinanceBalance>>() {
 //                    @Override
 //                    public Iterable<BinanceBalance> apply(List<BinanceBalance> binanceBalances) throws Exception {

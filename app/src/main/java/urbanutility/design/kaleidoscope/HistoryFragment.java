@@ -95,7 +95,7 @@ public class HistoryFragment extends Fragment implements ExchangeListAdapter.Exc
             }
         });
         exchangeListAdapter = new ExchangeListAdapter(this);
-        
+
         recyclerExchangeList.setAdapter(exchangeListAdapter);
         recyclerExchangeList.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
         Set<String> exchangeSet = getActivity().getPreferences(Context.MODE_PRIVATE).getStringSet("exchange", null);
@@ -124,8 +124,8 @@ public class HistoryFragment extends Fragment implements ExchangeListAdapter.Exc
                 .subscribe(disposableOrdersSingleObserver());
         kaleidoService.requestSingularBalances(exchangeName)
                 .subscribe(disposableBalancesSingleObserver());
-        kaleidoService.requestSingularDeposits(exchangeName)
-                .subscribe(disposableDepositsSingleObserver());
+//        kaleidoService.requestSingularDeposits(exchangeName)
+//                .subscribe(disposableDepositsSingleObserver());
     }
 
     @Override
