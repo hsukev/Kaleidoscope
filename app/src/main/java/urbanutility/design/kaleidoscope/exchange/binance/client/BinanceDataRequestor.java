@@ -26,6 +26,8 @@ import urbanutility.design.kaleidoscope.exchange.binance.model.BinanceDeposit;
 import urbanutility.design.kaleidoscope.exchange.binance.model.BinanceDepositList;
 import urbanutility.design.kaleidoscope.exchange.binance.model.BinanceOrder;
 import urbanutility.design.kaleidoscope.exchange.binance.model.BinancePriceTicker;
+import urbanutility.design.kaleidoscope.exchange.binance.model.BinanceWithdrawList;
+import urbanutility.design.kaleidoscope.exchange.binance.model.BinanceWithdrawal;
 import urbanutility.design.kaleidoscope.exchange.gdax.client.GdaxService;
 import urbanutility.design.kaleidoscope.model.BaseAlts;
 import urbanutility.design.kaleidoscope.model.KaleidoBalance;
@@ -51,6 +53,7 @@ public class BinanceDataRequestor implements DataRequestor {
         return binanceService.getPriceTickers().subscribeOn(Schedulers.io())
                 .map(binanceLiveMarketMapper());
     }
+
 
     @Override
     public Single<List<KaleidoBalance>> requestBalances() {
@@ -79,7 +82,7 @@ public class BinanceDataRequestor implements DataRequestor {
 
     @Override
     public Single<List<KaleidoDeposits>> requestDeposits() {
-        return binanceService.getBinanceDeposits(System.currentTimeMillis() - 10000)
+         Observable<KaleidoDeposits> deposits = binanceService.getBinanceDeposits(System.currentTimeMillis() - 10000)
                 .map(new Function<BinanceDeposit, List<BinanceDepositList>>() {
                     @Override
                     public List<BinanceDepositList> apply(BinanceDeposit binanceDeposit) throws Exception {
@@ -95,14 +98,44 @@ public class BinanceDataRequestor implements DataRequestor {
                 .map(new Function<BinanceDepositList, KaleidoDeposits>() {
                     @Override
                     public KaleidoDeposits apply(BinanceDepositList binanceDepositList) throws Exception {
-                        return new KaleidoDeposits("buy",
+                        return new KaleidoDeposits(binanceDepositList.getTxId(),
+                                "deposit",
                                 "binance",
                                 binanceDepositList.getAmount(),
                                 binanceDepositList.getAsset(),
-                                binanceDepositList.getAmount()*0.01);
+                                binanceDepositList.getAmount()*0.001
+                        );
                     }
-                })
-                .toList();
+                });
+
+         Observable<KaleidoDeposits> withdrawals = binanceService.getBinanceWithdrawals(System.currentTimeMillis() - 10000)
+                 .map(new Function<BinanceWithdrawal, List<BinanceWithdrawList>>() {
+                     @Override
+                     public List<BinanceWithdrawList> apply(BinanceWithdrawal binanceWithdrawal) throws Exception {
+                         return binanceWithdrawal.getWithdrawList();
+                     }
+                 })
+                 .flattenAsObservable(new Function<List<BinanceWithdrawList>, Iterable<BinanceWithdrawList>>() {
+                     @Override
+                     public Iterable<BinanceWithdrawList> apply(List<BinanceWithdrawList> binanceWithdrawLists) throws Exception {
+                         return binanceWithdrawLists;
+                     }
+                 })
+                 .map(new Function<BinanceWithdrawList, KaleidoDeposits>() {
+                     @Override
+                     public KaleidoDeposits apply(BinanceWithdrawList binanceWithdrawList) throws Exception {
+                         return new KaleidoDeposits(
+                                 binanceWithdrawList.getId(),
+                                 "withdraw",
+                                 "binance",
+                                 binanceWithdrawList.getAmount(),
+                                 binanceWithdrawList.getAsset(),
+                                 binanceWithdrawList.getAmount()*0.001
+                         );
+                     }
+                 });
+
+         return Observable.concat(deposits, withdrawals).toList();
     }
 
     // requestLiveMarkets functions

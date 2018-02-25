@@ -1,22 +1,41 @@
 package urbanutility.design.kaleidoscope.model;
 
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.PrimaryKey;
+
+import io.reactivex.annotations.NonNull;
+
 /**
  * Created by jerye on 2/16/2018.
  */
 
+@Entity(tableName = "kaleido_deposits")
 public class KaleidoDeposits {
+    @PrimaryKey
+    @NonNull
+    String id;
+
     String side;
     String exchange;
     double amount;
     String symbol;
     double commission;
 
-    public KaleidoDeposits(String side, String exchange, double amount, String symbol, double commission) {
+    public KaleidoDeposits(String id,String side, String exchange, double amount, String symbol, double commission) {
+        this.id = id;
         this.side = side;
         this.exchange = exchange;
         this.amount = amount;
         this.symbol = symbol;
         this.commission = commission;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getSide() {

@@ -16,6 +16,7 @@ import urbanutility.design.kaleidoscope.database.KaleidoDatabase;
 import urbanutility.design.kaleidoscope.datatypes.LiveMarketType;
 import urbanutility.design.kaleidoscope.model.KaleidoBalance;
 import urbanutility.design.kaleidoscope.model.KaleidoBaseCurrency;
+import urbanutility.design.kaleidoscope.model.KaleidoDeposits;
 import urbanutility.design.kaleidoscope.model.KaleidoOrder;
 import urbanutility.design.kaleidoscope.utility.KaleidoCalculator;
 import urbanutility.design.kaleidoscope.utility.Triplet;
@@ -46,16 +47,20 @@ public class KaleidoViewModel extends AndroidViewModel {
         return kaleidoDatabase.kaleidoDao().getAllBalances();
     }
 
-    public KaleidoBalance getBalance(String symbol){
-        return kaleidoDatabase.kaleidoDao().getBalance(symbol);
+    public LiveData<List<KaleidoDeposits>> getAllDeposits(){
+        return kaleidoDatabase.kaleidoDao().getAllDeposits();
     }
 
-    public void insertOrder(List<KaleidoOrder> kaleidoOrder){
-        kaleidoDatabase.kaleidoDao().insertOrder(kaleidoOrder);
+    public void insertOrder(List<KaleidoOrder> kaleidoOrders){
+        kaleidoDatabase.kaleidoDao().insertOrder(kaleidoOrders);
     }
 
-    public void insertBalance(KaleidoBalance... kaleidoBalance){
-        kaleidoDatabase.kaleidoDao().insertBalance(kaleidoBalance);
+    public void insertBalance(List<KaleidoBalance> kaleidoBalances){
+        kaleidoDatabase.kaleidoDao().insertBalance(kaleidoBalances);
+    }
+
+    public void insertDeposit(List<KaleidoDeposits> kaleidoDeposit){
+        kaleidoDatabase.kaleidoDao().insertDeposit(kaleidoDeposit);
     }
 
     public MutableLiveData<Triplet<List<KaleidoBalance>, List<KaleidoOrder>, List<LiveMarketType>>> getTripletMutableLiveData(){

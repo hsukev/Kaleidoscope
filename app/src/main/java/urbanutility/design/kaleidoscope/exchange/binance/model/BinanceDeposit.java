@@ -23,7 +23,7 @@ public class BinanceDeposit {
         this.binanceDepositList = binanceDepositList;
     }
 
-    public BinanceWithdrawal withDepositList(List<BinanceDepositList> binanceDepositList) {
+    public BinanceDeposit getBinanceDepositList(List<BinanceDepositList> binanceDepositList) {
         this.binanceDepositList = binanceDepositList;
         return this;
     }
@@ -36,7 +36,7 @@ public class BinanceDeposit {
         this.success = success;
     }
 
-    public BinanceWithdrawal withSuccess(Boolean success) {
+    public BinanceDeposit withSuccess(Boolean success) {
         this.success = success;
         return this;
     }

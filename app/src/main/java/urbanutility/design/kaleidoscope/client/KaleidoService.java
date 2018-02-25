@@ -85,7 +85,16 @@ public class KaleidoService implements PreferenceChangeListener{
         });
     }
     public Single<List<KaleidoDeposits>> requestDeposits(){
-        return null;
+        return Single.zip(getDepositSingles(), new Function<Object[], List<KaleidoDeposits>>() {
+            @Override
+            public List<KaleidoDeposits> apply(Object[] objects) throws Exception {
+                List<KaleidoDeposits> list = new ArrayList<>();
+                for(Object object: objects){
+                    list.addAll((List<KaleidoDeposits>) object);
+                }
+                return list;
+            }
+        });
     }
 
     // Build list of preferred exchanges from map of all support exchanges (filter by sharedpreferences)
@@ -108,6 +117,14 @@ public class KaleidoService implements PreferenceChangeListener{
     private List<Single<List<KaleidoBalance>>> getBalanceSingles(){
         List<Single<List<KaleidoBalance>>> list = new ArrayList<>();
         Map<String, Single<List<KaleidoBalance>>> map = exchangePort.getBalancesMap();
+        for(String exchange: exchangeSet){
+            list.add(map.get(exchange));
+        }
+        return list;
+    }
+    private List<Single<List<KaleidoDeposits>>> getDepositSingles(){
+        List<Single<List<KaleidoDeposits>>> list = new ArrayList<>();
+        Map<String, Single<List<KaleidoDeposits>>> map = exchangePort.getDepositsMap();
         for(String exchange: exchangeSet){
             list.add(map.get(exchange));
         }

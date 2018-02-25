@@ -124,8 +124,8 @@ public class HistoryFragment extends Fragment implements ExchangeListAdapter.Exc
                 .subscribe(disposableOrdersSingleObserver());
         kaleidoService.requestSingularBalances(exchangeName)
                 .subscribe(disposableBalancesSingleObserver());
-//        kaleidoService.requestSingularDeposits(exchangeName)
-//                .subscribe(disposableDepositsSingleObserver());
+        kaleidoService.requestSingularDeposits(exchangeName)
+                .subscribe(disposableDepositsSingleObserver());
     }
 
     @Override

@@ -9,6 +9,7 @@ import android.arch.persistence.room.Query;
 import java.util.List;
 
 import urbanutility.design.kaleidoscope.model.KaleidoBalance;
+import urbanutility.design.kaleidoscope.model.KaleidoDeposits;
 import urbanutility.design.kaleidoscope.model.KaleidoOrder;
 
 /**
@@ -22,7 +23,10 @@ public abstract class KaleidoDao {
     public abstract void insertOrder(List<KaleidoOrder> kaleidoOrders);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    public abstract void insertBalance(KaleidoBalance... kaleidoBalances);
+    public abstract void insertBalance(List<KaleidoBalance> kaleidoBalances);
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    public abstract void insertDeposit(List<KaleidoDeposits> kaleidoDeposits);
 
     @Query("SELECT * FROM kaleido_orders ORDER BY time DESC")
     public abstract LiveData<List<KaleidoOrder>> getAllOrders();
@@ -30,6 +34,8 @@ public abstract class KaleidoDao {
     @Query("SELECT * FROM kaleido_balances")
     public abstract LiveData<List<KaleidoBalance>> getAllBalances();
 
+    @Query("SELECT * FROM kaleido_deposits")
+    public abstract LiveData<List<KaleidoDeposits>> getAllDeposits();
     //by exchange name order
     @Query("SELECT * FROM kaleido_balances")
     public abstract KaleidoBalance[] getAllBalancesStatic();
