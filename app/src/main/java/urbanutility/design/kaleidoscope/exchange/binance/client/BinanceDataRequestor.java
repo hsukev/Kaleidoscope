@@ -22,6 +22,8 @@ import urbanutility.design.kaleidoscope.datatypes.BalanceType;
 import urbanutility.design.kaleidoscope.datatypes.LiveMarketType;
 import urbanutility.design.kaleidoscope.exchange.binance.model.BinanceAccountInfo;
 import urbanutility.design.kaleidoscope.exchange.binance.model.BinanceBalance;
+import urbanutility.design.kaleidoscope.exchange.binance.model.BinanceDeposit;
+import urbanutility.design.kaleidoscope.exchange.binance.model.BinanceDepositList;
 import urbanutility.design.kaleidoscope.exchange.binance.model.BinanceOrder;
 import urbanutility.design.kaleidoscope.exchange.binance.model.BinancePriceTicker;
 import urbanutility.design.kaleidoscope.exchange.gdax.client.GdaxService;
@@ -77,7 +79,30 @@ public class BinanceDataRequestor implements DataRequestor {
 
     @Override
     public Single<List<KaleidoDeposits>> requestDeposits() {
-        return null;
+        return binanceService.getBinanceDeposits(System.currentTimeMillis() - 10000)
+                .map(new Function<BinanceDeposit, List<BinanceDepositList>>() {
+                    @Override
+                    public List<BinanceDepositList> apply(BinanceDeposit binanceDeposit) throws Exception {
+                        return binanceDeposit.getBinanceDepositList();
+                    }
+                })
+                .flattenAsObservable(new Function<List<BinanceDepositList>, Iterable<BinanceDepositList>>() {
+                    @Override
+                    public Iterable<BinanceDepositList> apply(List<BinanceDepositList> binanceDepositLists) throws Exception {
+                        return binanceDepositLists;
+                    }
+                })
+                .map(new Function<BinanceDepositList, KaleidoDeposits>() {
+                    @Override
+                    public KaleidoDeposits apply(BinanceDepositList binanceDepositList) throws Exception {
+                        return new KaleidoDeposits("buy",
+                                "binance",
+                                binanceDepositList.getAmount(),
+                                binanceDepositList.getAsset(),
+                                binanceDepositList.getAmount()*0.01);
+                    }
+                })
+                .toList();
     }
 
     // requestLiveMarkets functions
@@ -171,7 +196,7 @@ public class BinanceDataRequestor implements DataRequestor {
                     return Observable.just(new Pair<>(1d,1d));
                 }else if(rawSymbol.contains("USDT")){
                     String altBtcSymbol = rawSymbol.substring(0,rawSymbol.length()-4) + "BTC";
-                    return binanceService.getHistoricPrice(altBtcSymbol, 1, "1m", binanceOrder.getTime())
+                    return binanceService.getHistoricPrice(altBtcSymbol, "1m", binanceOrder.getTime())
                             .map(mapCoinBtcInverseRate());
                 }else if(rawSymbol.contains("BTC")){
                     return gdaxService.getHistoricBtc2Usd(startTime, endTime,60)
@@ -182,7 +207,7 @@ public class BinanceDataRequestor implements DataRequestor {
                         if(guess.contains(baseAlt)) altBtcSymbol = baseAlt + "BTC";
                     }
                     return gdaxService.getHistoricBtc2Usd(startTime,endTime,60)
-                            .zipWith(binanceService.getHistoricPrice(altBtcSymbol, 1, "1m", binanceOrder.getTime())
+                            .zipWith(binanceService.getHistoricPrice(altBtcSymbol, "1m", binanceOrder.getTime())
                                             .subscribeOn(Schedulers.io()),
                                     bifuncGdaxBinanceRates());
                 }

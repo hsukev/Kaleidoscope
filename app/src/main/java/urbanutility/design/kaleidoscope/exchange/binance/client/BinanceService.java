@@ -11,9 +11,10 @@ import retrofit2.http.Headers;
 import retrofit2.http.Query;
 import urbanutility.design.kaleidoscope.exchange.binance.model.Binance24hTicker;
 import urbanutility.design.kaleidoscope.exchange.binance.model.BinanceAccountInfo;
+import urbanutility.design.kaleidoscope.exchange.binance.model.BinanceDeposit;
+import urbanutility.design.kaleidoscope.exchange.binance.model.BinanceWithdrawal;
 import urbanutility.design.kaleidoscope.exchange.binance.model.BinanceOrder;
 import urbanutility.design.kaleidoscope.exchange.binance.model.BinancePriceTicker;
-import urbanutility.design.kaleidoscope.exchange.binance.model.BinanceServerTime;
 
 /**
  * Created by jerye on 1/5/2018.
@@ -24,8 +25,11 @@ public interface BinanceService {
     @GET("/api/v1/ping")
     void ping();
 
-    @GET("/api/v1/time")
-    Single<BinanceServerTime> getServerTime();
+    @GET("/wapi/v3/depositHistory.html?status=1&recvWindoww=30000")
+    Single<BinanceDeposit> getBinanceDeposits(@Query("timestamp") long timestamp);
+
+    @GET("/wapi/v3/withdrawalHistory.html?status=6&recvWindoww=30000")
+    Single<BinanceWithdrawal> getBinanceWithdrawals(@Query("timestamp") long timestamp);
 
     @Headers(BinanceApiConstants.ENDPOINT_SECURITY_TYPE_SIGNED_HEADER)
     @GET("/api/v3/allOrders")
@@ -41,6 +45,6 @@ public interface BinanceService {
     @GET("/api/v3/account")
     Single<BinanceAccountInfo> getAccountInfo(@Query("timestamp") long timestamp, @Query("recvWindow") long receiveWindow);
 
-    @GET("/api/v1/klines")
-    Observable<JsonElement> getHistoricPrice(@Query("symbol") String symbol, @Query("limit") int limit, @Query("interval") String interval, @Query("startTime") String startTime);
+    @GET("/api/v1/klines?limit=1")
+    Observable<JsonElement> getHistoricPrice(@Query("symbol") String symbol, @Query("interval") String interval, @Query("startTime") String startTime);
 }
