@@ -2,8 +2,7 @@ package urbanutility.design.kaleidoscope.model;
 
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
-
-import io.reactivex.annotations.NonNull;
+import android.support.annotation.NonNull;
 
 /**
  * Created by jerye on 2/16/2018.
@@ -21,7 +20,7 @@ public class KaleidoDeposits {
     String symbol;
     double commission;
 
-    public KaleidoDeposits(String id,String side, String exchange, double amount, String symbol, double commission) {
+    public KaleidoDeposits(String id, String side, String exchange, double amount, String symbol, double commission) {
         this.id = id;
         this.side = side;
         this.exchange = exchange;

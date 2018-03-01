@@ -40,8 +40,12 @@ import urbanutility.design.kaleidoscope.utility.KaleidoFunctions;
  */
 
 public class BinanceDataRequestor implements DataRequestor {
-    BinanceService binanceService;
-    GdaxService gdaxService;
+    private BinanceService binanceService;
+    private GdaxService gdaxService;
+    private int BINANCE_WEIGHT_PER_SECOND = 10;
+    private int BINANCE_ALLORDERS_WEIGHT = 5;
+
+    final private int DELAY_MILLIS = BINANCE_ALLORDERS_WEIGHT/BINANCE_WEIGHT_PER_SECOND * 1000;
 
     public BinanceDataRequestor(KaleidoClients kaleidoClients) {
         this.binanceService = kaleidoClients.getBinanceService();
@@ -70,7 +74,6 @@ public class BinanceDataRequestor implements DataRequestor {
         return binanceService.getPriceTickers()
                 .subscribeOn(Schedulers.single())
                 .flattenAsObservable(iterableTickerFunction())
-                .concatMap(tickerDelayFunction())
                 .flatMap(tickerToOrderFlatMap())
                 .filter(orderSizeFilter())
                 .flatMapIterable(flattenOrderList())
@@ -171,7 +174,7 @@ public class BinanceDataRequestor implements DataRequestor {
         return new Function<BinancePriceTicker, ObservableSource<BinancePriceTicker>>() {
             @Override
             public ObservableSource<BinancePriceTicker> apply(BinancePriceTicker binancePriceTicker) throws Exception {
-                return Observable.just(binancePriceTicker).delay(400, TimeUnit.MILLISECONDS);
+                return Observable.just(binancePriceTicker).delay(DELAY_MILLIS, TimeUnit.MILLISECONDS);
             }
         };
     }
@@ -203,7 +206,7 @@ public class BinanceDataRequestor implements DataRequestor {
         return new Function<BinanceOrder, ObservableSource<BinanceOrder>>() {
             @Override
             public ObservableSource<BinanceOrder> apply(BinanceOrder binanceOrder) throws Exception {
-                return Observable.just(binanceOrder).delay(400, TimeUnit.MILLISECONDS);
+                return Observable.just(binanceOrder).delay(DELAY_MILLIS, TimeUnit.MILLISECONDS);
             }
         };
     }

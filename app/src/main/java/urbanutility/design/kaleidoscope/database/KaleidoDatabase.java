@@ -6,13 +6,14 @@ import android.arch.persistence.room.RoomDatabase;
 import android.content.Context;
 
 import urbanutility.design.kaleidoscope.model.KaleidoBalance;
+import urbanutility.design.kaleidoscope.model.KaleidoDeposits;
 import urbanutility.design.kaleidoscope.model.KaleidoOrder;
 
 /**
  * Created by jerye on 1/8/2018.
  */
 
-@Database(entities = {KaleidoOrder.class, KaleidoBalance.class}, version = 13, exportSchema = false)
+@Database(entities = {KaleidoOrder.class, KaleidoBalance.class, KaleidoDeposits.class}, version = 15)
 public abstract class KaleidoDatabase extends RoomDatabase {
 
     private static KaleidoDatabase INSTANCE;
@@ -26,7 +27,7 @@ public abstract class KaleidoDatabase extends RoomDatabase {
                             // allow queries on the main thread.
                             // Don't do this on a real app! See PersistenceBasicSample for an example.
                             .allowMainThreadQueries()
-                            .fallbackToDestructiveMigration()
+                            .addMigrations(MigrationClasses.MIGRATION_14_15)
                             .build();
         }
         return INSTANCE;
