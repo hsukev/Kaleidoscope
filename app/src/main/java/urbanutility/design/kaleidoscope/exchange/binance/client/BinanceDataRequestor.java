@@ -42,10 +42,13 @@ import urbanutility.design.kaleidoscope.utility.KaleidoFunctions;
 public class BinanceDataRequestor implements DataRequestor {
     private BinanceService binanceService;
     private GdaxService gdaxService;
+    private int DELAY_BUFFER = 500;
     private int BINANCE_WEIGHT_PER_SECOND = 10;
     private int BINANCE_ALLORDERS_WEIGHT = 5;
+    private int RECVWINDOWLAG = 100000;
+    private int RECVWINDOW = 300000;
 
-    final private int DELAY_MILLIS = BINANCE_ALLORDERS_WEIGHT/BINANCE_WEIGHT_PER_SECOND * 1000;
+    final private int DELAY_MILLIS = BINANCE_ALLORDERS_WEIGHT/BINANCE_WEIGHT_PER_SECOND * 1000 + DELAY_BUFFER;
 
     public BinanceDataRequestor(KaleidoClients kaleidoClients) {
         this.binanceService = kaleidoClients.getBinanceService();
@@ -62,6 +65,7 @@ public class BinanceDataRequestor implements DataRequestor {
     @Override
     public Single<List<KaleidoBalance>> requestBalances() {
         return binanceService.getAccountInfo(System.currentTimeMillis() - 10000, 300000)
+                .subscribeOn(Schedulers.io())
                 .map(accountToBalanceMapper())
                 .flattenAsObservable(flattenBalances())
                 .filter(filterFreedBalances())
@@ -74,6 +78,7 @@ public class BinanceDataRequestor implements DataRequestor {
         return binanceService.getPriceTickers()
                 .subscribeOn(Schedulers.single())
                 .flattenAsObservable(iterableTickerFunction())
+                .concatMap(tickerDelayFunction())
                 .flatMap(tickerToOrderFlatMap())
                 .filter(orderSizeFilter())
                 .flatMapIterable(flattenOrderList())
@@ -85,7 +90,8 @@ public class BinanceDataRequestor implements DataRequestor {
 
     @Override
     public Single<List<KaleidoDeposits>> requestDeposits() {
-         Observable<KaleidoDeposits> deposits = binanceService.getBinanceDeposits(System.currentTimeMillis() - 10000)
+         Observable<KaleidoDeposits> deposits = binanceService.getBinanceDeposits(System.currentTimeMillis() - RECVWINDOWLAG, RECVWINDOW)
+                 .subscribeOn(Schedulers.io())
                 .map(new Function<BinanceDeposit, List<BinanceDepositList>>() {
                     @Override
                     public List<BinanceDepositList> apply(BinanceDeposit binanceDeposit) throws Exception {
@@ -111,7 +117,7 @@ public class BinanceDataRequestor implements DataRequestor {
                     }
                 });
 
-         Observable<KaleidoDeposits> withdrawals = binanceService.getBinanceWithdrawals(System.currentTimeMillis() - 10000)
+         Observable<KaleidoDeposits> withdrawals = binanceService.getBinanceWithdrawals(System.currentTimeMillis() - RECVWINDOWLAG, RECVWINDOW)
                  .map(new Function<BinanceWithdrawal, List<BinanceWithdrawList>>() {
                      @Override
                      public List<BinanceWithdrawList> apply(BinanceWithdrawal binanceWithdrawal) throws Exception {
@@ -182,7 +188,7 @@ public class BinanceDataRequestor implements DataRequestor {
         return new Function<BinancePriceTicker, ObservableSource<List<BinanceOrder>>>() {
             @Override
             public ObservableSource<List<BinanceOrder>> apply(BinancePriceTicker binancePriceTicker) throws Exception {
-                return binanceService.getAllOrders(binancePriceTicker.getSymbol(), System.currentTimeMillis() - 10000, 300000);
+                return binanceService.getAllOrders(binancePriceTicker.getSymbol(), System.currentTimeMillis() - RECVWINDOWLAG, RECVWINDOW);
             }
         };
     }

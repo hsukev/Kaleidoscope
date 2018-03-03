@@ -10,7 +10,7 @@ public class BinanceDepositList {
     private Long insertTime;
     @SerializedName("amount")
     @Expose
-    private Long amount;
+    private Double amount;
     @SerializedName("asset")
     @Expose
     private String asset;
@@ -40,15 +40,15 @@ public class BinanceDepositList {
         return this;
     }
 
-    public Long getAmount() {
+    public Double getAmount() {
         return amount;
     }
 
-    public void setAmount(Long amount) {
+    public void setAmount(Double amount) {
         this.amount = amount;
     }
 
-    public BinanceDepositList withAmount(Long amount) {
+    public BinanceDepositList withAmount(Double amount) {
         this.amount = amount;
         return this;
     }

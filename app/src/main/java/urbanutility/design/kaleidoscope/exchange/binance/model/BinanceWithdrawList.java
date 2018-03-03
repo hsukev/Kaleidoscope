@@ -10,7 +10,7 @@ public class BinanceWithdrawList {
     private String id;
     @SerializedName("amount")
     @Expose
-    private Long amount;
+    private Double amount;
     @SerializedName("address")
     @Expose
     private String address;
@@ -43,15 +43,15 @@ public class BinanceWithdrawList {
         return this;
     }
 
-    public Long getAmount() {
+    public Double getAmount() {
         return amount;
     }
 
-    public void setAmount(Long amount) {
+    public void setAmount(Double amount) {
         this.amount = amount;
     }
 
-    public BinanceWithdrawList withAmount(Long amount) {
+    public BinanceWithdrawList withAmount(Double amount) {
         this.amount = amount;
         return this;
     }

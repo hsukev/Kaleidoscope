@@ -102,7 +102,7 @@ public class ComparisonFragment extends Fragment implements OnChartValueSelected
     private Map<String, Double> calculateExchangeDistribution(List<LiveMarketType> liveMarketTypes) {
         Map<String, Double> exchangeSumsMap = new HashMap<>();
         for (LiveMarketType liveMarketType : liveMarketTypes) {
-            Log.d(LOG, liveMarketType.symbol);
+//            Log.d(LOG, liveMarketType.symbol);
 
             if (liveMarketType.symbol.contains("BTC")) {
                 String liveMarketId = KaleidoFunctions.createLiveMarketId(liveMarketType);

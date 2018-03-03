@@ -25,11 +25,13 @@ public interface BinanceService {
     @GET("/api/v1/ping")
     void ping();
 
-    @GET("/wapi/v3/depositHistory.html?status=1&recvWindoww=30000")
-    Single<BinanceDeposit> getBinanceDeposits(@Query("timestamp") long timestamp);
+    @Headers(BinanceApiConstants.ENDPOINT_SECURITY_TYPE_SIGNED_HEADER)
+    @GET("/wapi/v3/depositHistory.html?status=1")
+    Single<BinanceDeposit> getBinanceDeposits(@Query("timestamp") long timestamp, @Query("recvWindow") long receiveWindow);
 
-    @GET("/wapi/v3/withdrawalHistory.html?status=6&recvWindoww=30000")
-    Single<BinanceWithdrawal> getBinanceWithdrawals(@Query("timestamp") long timestamp);
+    @Headers(BinanceApiConstants.ENDPOINT_SECURITY_TYPE_SIGNED_HEADER)
+    @GET("/wapi/v3/withdrawHistory.html?status=6")
+    Single<BinanceWithdrawal> getBinanceWithdrawals(@Query("timestamp") long timestamp, @Query("recvWindow") long receiveWindow);
 
     @Headers(BinanceApiConstants.ENDPOINT_SECURITY_TYPE_SIGNED_HEADER)
     @GET("/api/v3/allOrders")

@@ -16,7 +16,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.HashSet;
 import java.util.List;
@@ -139,12 +138,12 @@ public class HistoryFragment extends Fragment implements ExchangeListAdapter.Exc
         return new DisposableSingleObserver<List<KaleidoOrder>>() {
             @Override
             public void onSuccess(List<KaleidoOrder> kaleidoOrders) {
-                Log.d(TAG, "orderSize: " + kaleidoOrders);
+                Log.d(TAG, "orderSize: " + kaleidoOrders.size());
             }
 
             @Override
             public void onError(Throwable e) {
-                Toast.makeText(getActivity(), "One of your linked exchanges is currently unavailable", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(getActivity(), "One of your linked exchanges is currently unavailable", Toast.LENGTH_SHORT).show();
                 e.printStackTrace();
             }
         };
@@ -153,12 +152,12 @@ public class HistoryFragment extends Fragment implements ExchangeListAdapter.Exc
         return new DisposableSingleObserver<List<KaleidoBalance>>() {
             @Override
             public void onSuccess(List<KaleidoBalance> kaleidoBalances) {
-
+                Log.d(TAG, "balanceSize: " + kaleidoBalances.size());
             }
 
             @Override
             public void onError(Throwable e) {
-
+                e.printStackTrace();
             }
         };
     }
@@ -166,12 +165,12 @@ public class HistoryFragment extends Fragment implements ExchangeListAdapter.Exc
         return new DisposableSingleObserver<List<KaleidoDeposits>>() {
             @Override
             public void onSuccess(List<KaleidoDeposits> kaleidoDeposits) {
-
+                Log.d(TAG, "depositSize:" + kaleidoDeposits.size());
             }
 
             @Override
             public void onError(Throwable e) {
-
+                e.printStackTrace();
             }
         };
     }
