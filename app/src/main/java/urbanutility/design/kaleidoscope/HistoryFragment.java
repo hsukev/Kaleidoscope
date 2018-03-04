@@ -17,9 +17,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ViewSwitcher;
 
 import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.vision.barcode.Barcode;
@@ -63,6 +65,10 @@ public class HistoryFragment extends Fragment implements ExchangeListAdapter.Exc
     ImageButton public_key_camera;
     @BindView(R.id.private_key_camera)
     ImageButton private_key_camera;
+    @BindView(R.id.include_history_help)
+    LinearLayout includeHistoryHelp;
+    @BindView(R.id.help_button)
+    ImageButton helpButton;
 
     public KaleidoViewModel kaleidoViewModel;
     private OrdersAdapter ordersAdapter;
@@ -125,6 +131,20 @@ public class HistoryFragment extends Fragment implements ExchangeListAdapter.Exc
                 exchangeListAdapter.addExchange(exchange);
             }
         }
+        helpButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                    includeHistoryHelp.setVisibility(View.VISIBLE);
+            }
+        });
+        TextView nextButton = includeHistoryHelp.findViewById(R.id.history_helper_next);
+        final ViewSwitcher viewSwitcher = includeHistoryHelp.findViewById(R.id.view_switcher);
+        nextButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                viewSwitcher.showNext();
+            }
+        });
         public_key_camera.setOnClickListener(new CameraOnClickListner(false));
         private_key_camera.setOnClickListener(new CameraOnClickListner(true));
 
@@ -194,6 +214,7 @@ public class HistoryFragment extends Fragment implements ExchangeListAdapter.Exc
             @Override
             public void onSuccess(List<KaleidoOrder> kaleidoOrders) {
                 Log.d(TAG, "orderSize: " + kaleidoOrders.size());
+                kaleidoViewModel.insertOrder(kaleidoOrders);
             }
 
             @Override
@@ -209,6 +230,7 @@ public class HistoryFragment extends Fragment implements ExchangeListAdapter.Exc
             @Override
             public void onSuccess(List<KaleidoBalance> kaleidoBalances) {
                 Log.d(TAG, "balanceSize: " + kaleidoBalances.size());
+                kaleidoViewModel.insertBalance(kaleidoBalances);
             }
 
             @Override
@@ -223,6 +245,7 @@ public class HistoryFragment extends Fragment implements ExchangeListAdapter.Exc
             @Override
             public void onSuccess(List<KaleidoDeposits> kaleidoDeposits) {
                 Log.d(TAG, "depositSize:" + kaleidoDeposits.size());
+                kaleidoViewModel.insertDeposit(kaleidoDeposits);
             }
 
             @Override

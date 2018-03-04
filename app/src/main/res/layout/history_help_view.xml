@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/darkTransparent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:layout_weight="1">
+
+    <ViewSwitcher
+        android:id="@+id/view_switcher"
+        android:layout_weight="1"
+        android:layout_width="match_parent"
+        android:layout_height="0dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="help page" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="help page view 2"/>
+    </ViewSwitcher>
+
+    <TextView
+        android:id="@+id/history_helper_next"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Next" />
+</LinearLayout>
