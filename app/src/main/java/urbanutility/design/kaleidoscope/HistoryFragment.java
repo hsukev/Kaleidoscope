@@ -9,7 +9,6 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.PagerAdapter;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -17,6 +16,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -59,7 +59,10 @@ public class HistoryFragment extends Fragment implements ExchangeListAdapter.Exc
     EditText publicKeyBox;
     @BindView(R.id.secret_key_box)
     EditText secretKeyBox;
-    @BindView(R.id.)
+    @BindView(R.id.public_key_camera)
+    ImageButton public_key_camera;
+    @BindView(R.id.private_key_camera)
+    ImageButton private_key_camera;
 
     public KaleidoViewModel kaleidoViewModel;
     private OrdersAdapter ordersAdapter;
@@ -79,6 +82,7 @@ public class HistoryFragment extends Fragment implements ExchangeListAdapter.Exc
         fragment.setArguments(args);
         return fragment;
     }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -115,6 +119,28 @@ public class HistoryFragment extends Fragment implements ExchangeListAdapter.Exc
         Set<String> exchangeSet = getActivity().getPreferences(Context.MODE_PRIVATE).getStringSet("exchange", null);
         for (String exchange : exchangeSet) {
             exchangeListAdapter.addExchange(exchange);
+        }
+        public_key_camera.setOnClickListener(new CameraOnClickListner(true));
+        private_key_camera.setOnClickListener(new CameraOnClickListner(false));
+
+    }
+
+    public class CameraOnClickListner implements View.OnClickListener {
+        boolean isPublic;
+
+        CameraOnClickListner(boolean isPublic) {
+            this.isPublic = isPublic;
+        }
+
+        @Override
+        public void onClick(View view) {
+            // launch barcode activity.
+            Intent intent = new Intent(getContext(), BarcodeCaptureActivity.class);
+//            intent.putExtra(BarcodeCaptureActivity.AutoFocus, autoFocus.isChecked());
+//            intent.putExtra(BarcodeCaptureActivity.UseFlash, useFlash.isChecked());
+
+            startActivityForResult(intent, RC_BARCODE_CAPTURE);
+
         }
     }
 
@@ -212,21 +238,5 @@ public class HistoryFragment extends Fragment implements ExchangeListAdapter.Exc
         }
     }
 
-    public class ViewPagerAdapter extends PagerAdapter{
-        @Override
-        public boolean isViewFromObject(View view, Object object) {
-            return false;
-        }
-
-        @Override
-        public int getCount() {
-            return 0;
-        }
-
-        @Override
-        public Object instantiateItem(ViewGroup container, int position) {
-            return super.instantiateItem(container, position);
-        }
-    }
 }
 

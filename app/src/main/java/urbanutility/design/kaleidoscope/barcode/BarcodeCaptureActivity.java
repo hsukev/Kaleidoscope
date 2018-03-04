@@ -48,6 +48,8 @@ import com.google.android.gms.vision.barcode.BarcodeDetector;
 
 import java.io.IOException;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import urbanutility.design.kaleidoscope.R;
 import urbanutility.design.kaleidoscope.barcode.camera.CameraSource;
 import urbanutility.design.kaleidoscope.barcode.camera.CameraSourcePreview;
@@ -73,8 +75,12 @@ public final class BarcodeCaptureActivity extends AppCompatActivity implements B
     public static final String BarcodeObject = "Barcode";
 
     private CameraSource mCameraSource;
-    private CameraSourcePreview mPreview;
-    private GraphicOverlay<BarcodeGraphic> mGraphicOverlay;
+
+    @BindView(R.id.preview)
+    CameraSourcePreview mPreview;
+
+    @BindView(R.id.graphicOverlay)
+    GraphicOverlay<BarcodeGraphic> mGraphicOverlay;
 
     // helper objects for detecting taps and pinches.
     private ScaleGestureDetector scaleGestureDetector;
@@ -87,9 +93,7 @@ public final class BarcodeCaptureActivity extends AppCompatActivity implements B
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
         setContentView(R.layout.barcode_capture);
-
-        mPreview = (CameraSourcePreview) findViewById(R.id.preview);
-        mGraphicOverlay = (GraphicOverlay<BarcodeGraphic>) findViewById(R.id.graphicOverlay);
+        ButterKnife.bind(this);
 
         // read parameters from the intent used to launch the activity.
         boolean autoFocus = getIntent().getBooleanExtra(AutoFocus, false);
