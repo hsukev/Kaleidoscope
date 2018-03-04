@@ -50,6 +50,7 @@ import java.io.IOException;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import urbanutility.design.kaleidoscope.HistoryFragment;
 import urbanutility.design.kaleidoscope.R;
 import urbanutility.design.kaleidoscope.barcode.camera.CameraSource;
 import urbanutility.design.kaleidoscope.barcode.camera.CameraSourcePreview;
@@ -364,8 +365,11 @@ public final class BarcodeCaptureActivity extends AppCompatActivity implements B
         }
 
         if (best != null) {
+            int securityLevel = getIntent().getIntExtra(HistoryFragment.KEY_SECURITY_LEVEL, -1);
+
             Intent data = new Intent();
             data.putExtra(BarcodeObject, best);
+            data.putExtra(HistoryFragment.KEY_SECURITY_LEVEL, securityLevel);
             setResult(CommonStatusCodes.SUCCESS, data);
             finish();
             return true;

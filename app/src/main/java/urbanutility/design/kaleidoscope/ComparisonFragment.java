@@ -1,6 +1,8 @@
 package urbanutility.design.kaleidoscope;
 
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -23,6 +25,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -51,6 +54,7 @@ public class ComparisonFragment extends Fragment implements OnChartValueSelected
     private Map<String, Double> balanceMap;
     private KaleidoActivity kaleidoActivity;
     private KaleidoService kaleidoService;
+    private SharedPreferences sharedPreferences;
 
     public ComparisonFragment() {
         // Required empty public constructor
@@ -68,11 +72,13 @@ public class ComparisonFragment extends Fragment implements OnChartValueSelected
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.ecompare_page, container, false);
         ButterKnife.bind(this, view);
+        sharedPreferences = getActivity().getSharedPreferences("exchange", Context.MODE_PRIVATE);
         kaleidoService = ((KaleidoActivity)getActivity()).getKaleidoService();
         balanceMap = loadBalance();
         loadBalance();
         setUpViewModelAndObserver();
-        requestLiveMarket();
+
+        populateView();
 
         return view;
     }
@@ -81,6 +87,14 @@ public class ComparisonFragment extends Fragment implements OnChartValueSelected
     private void setUpViewModelAndObserver() {
         //move to main activity
         kaleidoViewModel = ViewModelProviders.of(this).get(KaleidoViewModel.class);
+    }
+
+    private void populateView(){
+        Set<String> exchangeMap = sharedPreferences.getStringSet("exchange", null);
+        if (exchangeMap == null) {
+        } else {
+            requestLiveMarket();
+        }
     }
 
     private void requestLiveMarket() {

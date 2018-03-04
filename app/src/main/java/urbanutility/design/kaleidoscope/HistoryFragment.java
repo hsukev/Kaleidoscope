@@ -57,8 +57,8 @@ public class HistoryFragment extends Fragment implements ExchangeListAdapter.Exc
     RecyclerView recyclerExchangeList;
     @BindView(R.id.public_key_box)
     EditText publicKeyBox;
-    @BindView(R.id.secret_key_box)
-    EditText secretKeyBox;
+    @BindView(R.id.private_key_box)
+    EditText privateKeyBox;
     @BindView(R.id.public_key_camera)
     ImageButton public_key_camera;
     @BindView(R.id.private_key_camera)
@@ -72,6 +72,7 @@ public class HistoryFragment extends Fragment implements ExchangeListAdapter.Exc
     private ExchangeListAdapter exchangeListAdapter;
 
     private static final int RC_BARCODE_CAPTURE = 9001;
+    public static final String KEY_SECURITY_LEVEL = "key_security";
 
     public HistoryFragment() {// Required empty public constructor
     }
@@ -116,30 +117,43 @@ public class HistoryFragment extends Fragment implements ExchangeListAdapter.Exc
 
         recyclerExchangeList.setAdapter(exchangeListAdapter);
         recyclerExchangeList.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
-        Set<String> exchangeSet = getActivity().getPreferences(Context.MODE_PRIVATE).getStringSet("exchange", null);
-        for (String exchange : exchangeSet) {
-            exchangeListAdapter.addExchange(exchange);
+        Set<String> exchangeSet = sharedPreferences.getStringSet("exchange", null);
+        if (exchangeSet == null) {
+
+        } else {
+            for (String exchange : exchangeSet) {
+                exchangeListAdapter.addExchange(exchange);
+            }
         }
-        public_key_camera.setOnClickListener(new CameraOnClickListner(true));
-        private_key_camera.setOnClickListener(new CameraOnClickListner(false));
+        public_key_camera.setOnClickListener(new CameraOnClickListner(false));
+        private_key_camera.setOnClickListener(new CameraOnClickListner(true));
+
 
     }
 
     public class CameraOnClickListner implements View.OnClickListener {
-        boolean isPublic;
+        boolean isPrivate;
 
-        CameraOnClickListner(boolean isPublic) {
-            this.isPublic = isPublic;
+        CameraOnClickListner(boolean isPrivate) {
+            this.isPrivate = isPrivate;
         }
 
         @Override
         public void onClick(View view) {
             // launch barcode activity.
             Intent intent = new Intent(getContext(), BarcodeCaptureActivity.class);
+            intent.putExtra(KEY_SECURITY_LEVEL, isPrivate ? 1 : 0);
 //            intent.putExtra(BarcodeCaptureActivity.AutoFocus, autoFocus.isChecked());
 //            intent.putExtra(BarcodeCaptureActivity.UseFlash, useFlash.isChecked());
 
             startActivityForResult(intent, RC_BARCODE_CAPTURE);
+        }
+    }
+
+    public class EditTextOnClickListener implements View.OnClickListener {
+
+        @Override
+        public void onClick(View view) {
 
         }
     }
@@ -224,7 +238,19 @@ public class HistoryFragment extends Fragment implements ExchangeListAdapter.Exc
             if (resultCode == CommonStatusCodes.SUCCESS) {
                 if (data != null) {
                     Barcode barcode = data.getParcelableExtra(BarcodeCaptureActivity.BarcodeObject);
-                    publicKeyBox.setText(barcode.displayValue);
+                    int securityLevel = data.getIntExtra(KEY_SECURITY_LEVEL, -1);
+                    switch (securityLevel) {
+                        case 0:
+                            publicKeyBox.setText(barcode.displayValue);
+                            break;
+                        case 1:
+                            privateKeyBox.setText(barcode.displayValue);
+                            break;
+                        default:
+                            // save to clipboard
+                            break;
+
+                    }
                     Log.d(TAG, "Barcode read: " + barcode.displayValue);
                 } else {
                     Toast.makeText(getContext(), "No barcode captured, intent data is null", Toast.LENGTH_SHORT).show();

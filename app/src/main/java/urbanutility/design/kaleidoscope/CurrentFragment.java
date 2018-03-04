@@ -5,6 +5,7 @@ import android.arch.lifecycle.MediatorLiveData;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -15,6 +16,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.LineChart;
@@ -24,6 +26,7 @@ import com.github.mikephil.charting.data.LineDataSet;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -55,6 +58,8 @@ public class CurrentFragment extends Fragment {
     TextView btcTotalView;
     @BindView(R.id.percent_growth_total)
     TextView percentGrowthView;
+    @BindView(R.id.no_exchange_view)
+    LinearLayout linearLayout;
 
     float[] totalHistory = {1000.00000f, 1254.1231f, 1134.8547f, 1549.987432f, 5475.102f, 5252.545f, 6666.666f, 6666.6604f, 6666.6123f, 12321.10f, 8080.51444f};
 
@@ -64,6 +69,7 @@ public class CurrentFragment extends Fragment {
     private GdaxService gdaxService;
     private CurrentAdapter adapter;
     private KaleidoService kaleidoService;
+    private SharedPreferences sharedPreferences;
 
     public CurrentFragment() {
         // Required empty public constructor
@@ -88,7 +94,8 @@ public class CurrentFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.current_price_page, container, false);
         setUpViewModelAndObserver();
-        kaleidoService = ((KaleidoActivity)getActivity()).getKaleidoService();
+        sharedPreferences = getActivity().getSharedPreferences("exchange", Context.MODE_PRIVATE);
+        kaleidoService = ((KaleidoActivity) getActivity()).getKaleidoService();
         ButterKnife.bind(this, view);
         setUpUI();
         setUpLineChart();
@@ -149,9 +156,21 @@ public class CurrentFragment extends Fragment {
         mediator.addSource(kaleidoViewModel.getBaseCurrency(), tripletObserver);
 
         mediator.observe(CurrentFragment.this, mediatorObserver);
+        populateView();
 
-        requestLiveMarket();
         return view;
+    }
+
+    private void populateView(){
+        Set<String> exchangeMap = sharedPreferences.getStringSet("exchange", null);
+        if (exchangeMap == null) {
+            linearLayout.setVisibility(View.VISIBLE);
+            recycler.setVisibility(View.GONE);
+        } else {
+            linearLayout.setVisibility(View.GONE);
+            recycler.setVisibility(View.VISIBLE);
+            requestLiveMarket();
+        }
     }
 
     private void setUpUI() {
