@@ -7,6 +7,7 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -25,6 +26,7 @@ import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -70,6 +72,8 @@ public class CurrentFragment extends Fragment {
     private CurrentAdapter adapter;
     private KaleidoService kaleidoService;
     private SharedPreferences sharedPreferences;
+    private static Set<String> newSet = new HashSet<>();
+
 
     public CurrentFragment() {
         // Required empty public constructor
@@ -94,7 +98,7 @@ public class CurrentFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.current_price_page, container, false);
         setUpViewModelAndObserver();
-        sharedPreferences = getActivity().getSharedPreferences("exchange", Context.MODE_PRIVATE);
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
         kaleidoService = ((KaleidoActivity) getActivity()).getKaleidoService();
         ButterKnife.bind(this, view);
         setUpUI();
@@ -117,7 +121,7 @@ public class CurrentFragment extends Fragment {
         Observer<List<KaleidoBaseCurrency>> tripletObserver = new Observer<List<KaleidoBaseCurrency>>() {
             @Override
             public void onChanged(@Nullable List<KaleidoBaseCurrency> baseCurrencies) {
-                Log.d(TAG, baseCurrencies.get(1).getBaseCurrencyType().positions.size() + "");
+                Log.d(TAG,"positionSize"+ baseCurrencies.get(1).getBaseCurrencyType().positions.size());
 
                 double baseTotal = 0.0d;
                 double btcTotal = 0.0d;
@@ -138,8 +142,6 @@ public class CurrentFragment extends Fragment {
 
                 if (baseCurrencies.get(1).getBaseCurrencyType().positions.size() > 0)
                     adapter.refresh(baseCurrencies);
-
-
             }
         };
 
@@ -161,9 +163,10 @@ public class CurrentFragment extends Fragment {
         return view;
     }
 
-    private void populateView(){
-        Set<String> exchangeMap = sharedPreferences.getStringSet("exchange", null);
-        if (exchangeMap == null) {
+    private void populateView() {
+        Set<String> exchangeSet = sharedPreferences.getStringSet("exchange", newSet);
+        Log.d("CurrentFragment", exchangeSet.size() + "");
+        if (exchangeSet.size() == 0) {
             linearLayout.setVisibility(View.VISIBLE);
             recycler.setVisibility(View.GONE);
         } else {

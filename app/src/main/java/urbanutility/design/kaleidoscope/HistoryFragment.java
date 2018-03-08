@@ -3,10 +3,10 @@ package urbanutility.design.kaleidoscope;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -79,6 +79,7 @@ public class HistoryFragment extends Fragment implements ExchangeListAdapter.Exc
 
     private static final int RC_BARCODE_CAPTURE = 9001;
     public static final String KEY_SECURITY_LEVEL = "key_security";
+    private static Set<String> newSet = new HashSet<>();
 
     public HistoryFragment() {// Required empty public constructor
     }
@@ -96,7 +97,7 @@ public class HistoryFragment extends Fragment implements ExchangeListAdapter.Exc
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.history_page, container, false);
         ButterKnife.bind(this, view);
-        sharedPreferences = getActivity().getSharedPreferences("exchange", Context.MODE_PRIVATE);
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
         kaleidoService = ((KaleidoActivity) getActivity()).getKaleidoService();
         setUpViewModelAndObserver();
         setUpUI();
@@ -111,6 +112,11 @@ public class HistoryFragment extends Fragment implements ExchangeListAdapter.Exc
             @Override
             public void onClick(View view) {
                 update(spinner.getSelectedItem().toString());
+
+                Set<String> oldSet = sharedPreferences.getStringSet("exchange", newSet);
+                oldSet.add(spinner.getSelectedItem().toString());
+                oldSet.add("gdax");
+                sharedPreferences.edit().putStringSet("exchange", oldSet).apply();
             }
         });
         syncAllButton.setOnClickListener(new View.OnClickListener() {
@@ -123,8 +129,8 @@ public class HistoryFragment extends Fragment implements ExchangeListAdapter.Exc
 
         recyclerExchangeList.setAdapter(exchangeListAdapter);
         recyclerExchangeList.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
-        Set<String> exchangeSet = sharedPreferences.getStringSet("exchange", null);
-        if (exchangeSet == null) {
+        Set<String> exchangeSet = sharedPreferences.getStringSet("exchange", newSet);
+        if (exchangeSet.size()==0) {
 
         } else {
             for (String exchange : exchangeSet) {

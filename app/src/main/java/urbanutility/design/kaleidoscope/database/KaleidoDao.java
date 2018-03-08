@@ -34,6 +34,9 @@ public abstract class KaleidoDao {
     @Query("SELECT * FROM kaleido_balances")
     public abstract LiveData<List<KaleidoBalance>> getAllBalances();
 
+    @Query("SELECT * FROM kaleido_balances")
+    public abstract KaleidoBalance[] getAllBalancesAsync();
+
     @Query("SELECT * FROM kaleido_deposits")
     public abstract LiveData<List<KaleidoDeposits>> getAllDeposits();
     //by exchange name order

@@ -1,5 +1,7 @@
 package urbanutility.design.kaleidoscope;
 
+import android.arch.lifecycle.MediatorLiveData;
+import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -22,16 +24,14 @@ import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.github.mikephil.charting.utils.ColorTemplate;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import io.reactivex.observers.DisposableSingleObserver;
 import urbanutility.design.kaleidoscope.client.KaleidoService;
-import urbanutility.design.kaleidoscope.database.KaleidoDatabase;
 import urbanutility.design.kaleidoscope.datatypes.LiveMarketType;
 import urbanutility.design.kaleidoscope.model.KaleidoBalance;
 import urbanutility.design.kaleidoscope.utility.KaleidoFunctions;
@@ -52,9 +52,10 @@ public class ComparisonFragment extends Fragment implements OnChartValueSelected
     private KaleidoViewModel kaleidoViewModel;
 
     private Map<String, Double> balanceMap;
-    private KaleidoActivity kaleidoActivity;
     private KaleidoService kaleidoService;
     private SharedPreferences sharedPreferences;
+    private static Set<String> newSet = new HashSet<>();
+
 
     public ComparisonFragment() {
         // Required empty public constructor
@@ -70,81 +71,121 @@ public class ComparisonFragment extends Fragment implements OnChartValueSelected
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.ecompare_page, container, false);
+        View view = inflater.inflate(R.layout.exchange_compare_page, container, false);
         ButterKnife.bind(this, view);
         sharedPreferences = getActivity().getSharedPreferences("exchange", Context.MODE_PRIVATE);
-        kaleidoService = ((KaleidoActivity)getActivity()).getKaleidoService();
-        balanceMap = loadBalance();
-        loadBalance();
-        setUpViewModelAndObserver();
+        kaleidoService = ((KaleidoActivity) getActivity()).getKaleidoService();
+//        balanceMap = loadBalance();
+//        loadBalance();
+        setUpViewModel();
+        observeLiveData();
 
-        populateView();
+//        populateView();
 
         return view;
     }
 
 
-    private void setUpViewModelAndObserver() {
+    private void setUpViewModel() {
         //move to main activity
         kaleidoViewModel = ViewModelProviders.of(this).get(KaleidoViewModel.class);
     }
 
-    private void populateView(){
-        Set<String> exchangeMap = sharedPreferences.getStringSet("exchange", null);
-        if (exchangeMap == null) {
-        } else {
-            requestLiveMarket();
-        }
-    }
-
-    private void requestLiveMarket() {
-        kaleidoService.requestLiveMarkets().subscribe(new DisposableSingleObserver<List<LiveMarketType>>() {
+    private void observeLiveData() {
+        Observer<List<KaleidoBalance>> balanceObserver = new Observer<List<KaleidoBalance>>() {
             @Override
-            public void onSuccess(List<LiveMarketType> liveMarketTypes) {
-                Log.d(LOG, "livemarketsize" + liveMarketTypes.size());
-                loadDistributionPieChart(calculateExchangeDistribution(liveMarketTypes));
+            public void onChanged(@Nullable List<KaleidoBalance> kaleidoBalances) {
+                kaleidoViewModel.setTripletBalances(kaleidoBalances);
             }
+        };
 
+        Observer<List<LiveMarketType>> liveMarketObserver = new Observer<List<LiveMarketType>>() {
             @Override
-            public void onError(Throwable e) {
-                e.printStackTrace();
+            public void onChanged(@Nullable List<LiveMarketType> liveMarketTypes) {
+                kaleidoViewModel.setPairMarkets(liveMarketTypes);
             }
-        });
-    }
+        };
 
-
-    private Map<String, Double> calculateExchangeDistribution(List<LiveMarketType> liveMarketTypes) {
-        Map<String, Double> exchangeSumsMap = new HashMap<>();
-        for (LiveMarketType liveMarketType : liveMarketTypes) {
-//            Log.d(LOG, liveMarketType.symbol);
-
-            if (liveMarketType.symbol.contains("BTC")) {
-                String liveMarketId = KaleidoFunctions.createLiveMarketId(liveMarketType);
-                if (balanceMap.containsKey(liveMarketId)) {
-                    double exchangeSpecificBalance = balanceMap.get(liveMarketId) * liveMarketType.price;
-                    if (exchangeSumsMap.containsKey(liveMarketType.exchange)) {
-                        exchangeSpecificBalance += exchangeSumsMap.get(liveMarketType.exchange);
-                        Log.d(LOG, liveMarketType.price + "");
-
-                    }
-                    exchangeSumsMap.put(liveMarketType.exchange, exchangeSpecificBalance);
-                }
+        Observer<Map<String, Double>> distributedMapObserver = new Observer<Map<String, Double>>() {
+            @Override
+            public void onChanged(@Nullable Map<String, Double> stringDoubleMap) {
+                loadDistributionPieChart(stringDoubleMap);
             }
+        };
 
-        }
-        return exchangeSumsMap;
+        Observer dummyObserver = new Observer() {
+            @Override
+            public void onChanged(@Nullable Object o) {
+
+            }
+        };
+
+        MediatorLiveData mediatorLiveData = new MediatorLiveData();
+        mediatorLiveData.addSource(kaleidoViewModel.getAllBalances(), balanceObserver);
+        mediatorLiveData.addSource(kaleidoViewModel.getAllLiveMarkets(kaleidoService), liveMarketObserver);
+        mediatorLiveData.addSource(kaleidoViewModel.getBalanceMapInBtc(), distributedMapObserver);
+
+        mediatorLiveData.observe(ComparisonFragment.this, dummyObserver);
     }
 
-    private Map<String, Double> loadBalance() {
-        KaleidoBalance[] balancesSortedByExchange = KaleidoDatabase.getAppDatabase(getContext()).kaleidoDao().getAllBalancesStatic();
-        Map<String, Double> map = new HashMap<>();
-        for (KaleidoBalance kaleidoBalance : balancesSortedByExchange) {
-            map.put(kaleidoBalance.getId(), kaleidoBalance.balanceType.amount);
-        }
-        return map;
-    }
+//    private void populateView() {
+//        Set<String> exchangeSet = sharedPreferences.getStringSet("exchange", newSet);
+//        if (exchangeSet.size() == 0) {
+//        } else {
+//            requestLiveMarket();
+//        }
+//    }
+
+//    private void requestLiveMarket() {
+//        kaleidoService.requestLiveMarkets().subscribe(new DisposableSingleObserver<List<LiveMarketType>>() {
+//            @Override
+//            public void onSuccess(List<LiveMarketType> liveMarketTypes) {
+//                Log.d(LOG, "livemarketsize" + liveMarketTypes.size());
+//                loadDistributionPieChart(calculateExchangeDistribution(liveMarketTypes));
+//            }
+//
+//            @Override
+//            public void onError(Throwable e) {
+//                e.printStackTrace();
+//            }
+//        });
+//    }
+
+//    // assign livemarket type to hash map of coin ** exchange specific
+//    private Map<String, Double> calculateExchangeDistribution(List<LiveMarketType> liveMarketTypes) {
+//        Map<String, Double> exchangeSumsMap = new HashMap<>();
+//        for (LiveMarketType liveMarketType : liveMarketTypes) {
+////            Log.d(LOG, liveMarketType.symbol);
+//
+//            if (liveMarketType.symbol.contains("BTC")) {
+//                String liveMarketId = KaleidoFunctions.createLiveMarketId(liveMarketType);
+//                if (balanceMap.containsKey(liveMarketId)) {
+//                    double exchangeSpecificBalance = balanceMap.get(liveMarketId) * liveMarketType.price;
+//                    if (exchangeSumsMap.containsKey(liveMarketType.exchange)) {
+//                        exchangeSpecificBalance += exchangeSumsMap.get(liveMarketType.exchange);
+//                        Log.d(LOG, liveMarketType.price + "");
+//
+//                    }
+//                    exchangeSumsMap.put(liveMarketType.exchange, exchangeSpecificBalance);
+//                }
+//            }
+//
+//        }
+//        return exchangeSumsMap;
+//    }
 
 
+//    // get raw map from db
+//    private Map<String, Double> loadBalance() {
+//        KaleidoBalance[] balancesSortedByExchange = KaleidoDatabase.getAppDatabase(getContext()).kaleidoDao().getAllBalancesStatic();
+//        Map<String, Double> map = new HashMap<>();
+//        for (KaleidoBalance kaleidoBalance : balancesSortedByExchange) {
+//            map.put(kaleidoBalance.getId(), kaleidoBalance.balanceType.amount);
+//        }
+//        return map;
+//    }
+
+    // create pie chart from exchangeSumMap
     private void loadDistributionPieChart(Map<String, Double> exchangeSumMap) {
         List<PieEntry> entries = new ArrayList<>();
 //        exchangeSumMap.put("cryptopia", 2.312);
