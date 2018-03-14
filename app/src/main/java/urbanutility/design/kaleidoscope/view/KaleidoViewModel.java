@@ -32,6 +32,7 @@ import urbanutility.design.kaleidoscope.utility.Triplet;
  */
 
 public class KaleidoViewModel extends AndroidViewModel {
+    private String TAG = getClass().getName();
     private MutableLiveData<Triplet<List<KaleidoBalance>, List<KaleidoOrder>, List<LiveMarketType>>> tripletMutableLiveData;
     private MutableLiveData<Doublet<List<KaleidoBalance>, List<LiveMarketType>>> doubletMutableLiveData;
     private KaleidoDatabase kaleidoDatabase;
@@ -52,6 +53,9 @@ public class KaleidoViewModel extends AndroidViewModel {
         return kaleidoDatabase.kaleidoDao().getAllBalances();
     }
 
+    public LiveData<List<KaleidoBalance>> getFilteredBalances(String exchange){
+        return kaleidoDatabase.kaleidoDao().getFilteredBalances(exchange);
+    }
 
     public LiveData<List<KaleidoDeposits>> getAllDeposits() {
         return kaleidoDatabase.kaleidoDao().getAllDeposits();
@@ -145,7 +149,7 @@ public class KaleidoViewModel extends AndroidViewModel {
     }
 
     // Transformation of Balance and LiveMarket data into Map of Exchanges and each of their total asset
-    public LiveData<Map<String, Double>> getBalanceMapInBtc() {
+    public LiveData<Map<String, Double>> getBalanceMapInBtc(final boolean isSummed) {
         return Transformations.map(getDoubletMutableLiveData(), new Function<Doublet<List<KaleidoBalance>, List<LiveMarketType>>, Map<String, Double>>() {
             @Override
             public Map<String, Double> apply(Doublet<List<KaleidoBalance>, List<LiveMarketType>> input) {
@@ -167,11 +171,14 @@ public class KaleidoViewModel extends AndroidViewModel {
                     if (symbolPair.contains("BTC")) {
                         String matchBalanceId = KaleidoFunctions.createLiveMarketId(liveMarket);
 
-                        //convert only of map contains
+                        //convert only if map contains
                         if (balanceMap.containsKey(matchBalanceId)) {
                             double btcPrice = balanceMap.get(matchBalanceId) * liveMarket.price;
                             String exchangeName = liveMarket.exchange;
 
+                            // return this if requested
+                            balanceMap.put(matchBalanceId, btcPrice);
+                            Log.d(TAG, "isSummed: " + isSummed + " balanceMapSize: " + balanceMap.size());
                             // sum up balance by exchange name
                             if (exchangeBalanceMap.containsKey(exchangeName)) {
                                 btcPrice += exchangeBalanceMap.get(exchangeName);
@@ -181,8 +188,13 @@ public class KaleidoViewModel extends AndroidViewModel {
                     }
                 }
 
-                // return map of exchanges with corresponding total asset
-                return exchangeBalanceMap;
+                if(!isSummed){
+                    // map of balances
+                    return balanceMap;
+                }else{
+                    // return map of exchanges with corresponding total asset
+                    return exchangeBalanceMap;
+                }
             }
         });
     }

@@ -18,4 +18,11 @@ public class MigrationClasses {
 //                    "`commission' DOUBLE, PRIMARY KEY(`id`))");
         }
     };
+
+   public static Migration MIGRATION_15_16 = new Migration(15,16) {
+       @Override
+       public void migrate(@NonNull SupportSQLiteDatabase database) {
+           database.execSQL("ALTER TABLE kaleido_deposits ADD COLUMN time TEXT");
+       }
+   };
 }

@@ -112,7 +112,8 @@ public class BinanceDataRequestor implements DataRequestor {
                                 "binance",
                                 binanceDepositList.getAmount(),
                                 binanceDepositList.getAsset(),
-                                binanceDepositList.getAmount()*0.001
+                                binanceDepositList.getAmount()*0.001,
+                                KaleidoFunctions.convertMilliISO8601(binanceDepositList.getInsertTime())
                         );
                     }
                 });
@@ -139,7 +140,8 @@ public class BinanceDataRequestor implements DataRequestor {
                                  "binance",
                                  binanceWithdrawList.getAmount(),
                                  binanceWithdrawList.getAsset(),
-                                 binanceWithdrawList.getAmount()*0.001
+                                 binanceWithdrawList.getAmount()*0.001,
+                                 KaleidoFunctions.convertMilliISO8601(binanceWithdrawList.getApplyTime())
                          );
                      }
                  });

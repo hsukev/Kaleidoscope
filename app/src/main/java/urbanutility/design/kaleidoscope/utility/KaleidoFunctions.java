@@ -22,6 +22,7 @@ public class KaleidoFunctions {
     private static final int maxSigFigUnder1 = 4;
 
     public static <T> String convertMilliISO8601(T t) {
+        if(t==null) return "";
         long milli = Long.parseLong(t.toString());
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
         Date date = new Date(milli);
@@ -71,10 +72,14 @@ public class KaleidoFunctions {
         return liveMarketType.exchange + "-" + liveMarketType.symbol.substring(0,liveMarketType.symbol.length()-3);
     }
 
-    public static String[] decodeBalanceId(String balanceId){
+    public static String decodeBalanceIdCoin(String balanceId){
         int dashIndex = balanceId.indexOf('-');
-        return new String[]{balanceId.substring(0,dashIndex), balanceId.substring(dashIndex+1)};
+        return balanceId.substring(dashIndex+1);
     }
 
+    public static String decodeBalanceIdExchange(String balanceId) {
+        int dashIndex = balanceId.indexOf('-');
+        return balanceId.substring(0, dashIndex);
+    }
 
 }

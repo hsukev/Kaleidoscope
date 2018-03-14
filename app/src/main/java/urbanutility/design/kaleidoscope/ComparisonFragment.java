@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.data.Entry;
@@ -50,11 +51,10 @@ public class ComparisonFragment extends Fragment implements OnChartValueSelected
     String LOG = "ComparisonFragment";
 
     private KaleidoViewModel kaleidoViewModel;
-
-    private Map<String, Double> balanceMap;
     private KaleidoService kaleidoService;
     private SharedPreferences sharedPreferences;
     private static Set<String> newSet = new HashSet<>();
+    private Map<String, Double> balanceMap;
 
 
     public ComparisonFragment() {
@@ -75,16 +75,10 @@ public class ComparisonFragment extends Fragment implements OnChartValueSelected
         ButterKnife.bind(this, view);
         sharedPreferences = getActivity().getSharedPreferences("exchange", Context.MODE_PRIVATE);
         kaleidoService = ((KaleidoActivity) getActivity()).getKaleidoService();
-//        balanceMap = loadBalance();
-//        loadBalance();
         setUpViewModel();
         observeLiveData();
-
-//        populateView();
-
         return view;
     }
-
 
     private void setUpViewModel() {
         //move to main activity
@@ -95,7 +89,7 @@ public class ComparisonFragment extends Fragment implements OnChartValueSelected
         Observer<List<KaleidoBalance>> balanceObserver = new Observer<List<KaleidoBalance>>() {
             @Override
             public void onChanged(@Nullable List<KaleidoBalance> kaleidoBalances) {
-                kaleidoViewModel.setTripletBalances(kaleidoBalances);
+                kaleidoViewModel.setPairBalances(kaleidoBalances);
             }
         };
 
@@ -108,8 +102,14 @@ public class ComparisonFragment extends Fragment implements OnChartValueSelected
 
         Observer<Map<String, Double>> distributedMapObserver = new Observer<Map<String, Double>>() {
             @Override
-            public void onChanged(@Nullable Map<String, Double> stringDoubleMap) {
-                loadDistributionPieChart(stringDoubleMap);
+            public void onChanged(@Nullable Map<String, Double> distributedMap) {
+                loadDistributionPieChart(distributedMap);
+            }
+        };
+        Observer<Map<String, Double>> balanceMapObserver = new Observer<Map<String, Double>>() {
+            @Override
+            public void onChanged(@Nullable Map<String, Double> balanceMapObserver) {
+                balanceMap = balanceMapObserver;
             }
         };
 
@@ -123,72 +123,17 @@ public class ComparisonFragment extends Fragment implements OnChartValueSelected
         MediatorLiveData mediatorLiveData = new MediatorLiveData();
         mediatorLiveData.addSource(kaleidoViewModel.getAllBalances(), balanceObserver);
         mediatorLiveData.addSource(kaleidoViewModel.getAllLiveMarkets(kaleidoService), liveMarketObserver);
-        mediatorLiveData.addSource(kaleidoViewModel.getBalanceMapInBtc(), distributedMapObserver);
+        mediatorLiveData.addSource(kaleidoViewModel.getBalanceMapInBtc(true), distributedMapObserver);
+        mediatorLiveData.addSource(kaleidoViewModel.getBalanceMapInBtc(false), balanceMapObserver);
 
         mediatorLiveData.observe(ComparisonFragment.this, dummyObserver);
     }
 
-//    private void populateView() {
-//        Set<String> exchangeSet = sharedPreferences.getStringSet("exchange", newSet);
-//        if (exchangeSet.size() == 0) {
-//        } else {
-//            requestLiveMarket();
-//        }
-//    }
-
-//    private void requestLiveMarket() {
-//        kaleidoService.requestLiveMarkets().subscribe(new DisposableSingleObserver<List<LiveMarketType>>() {
-//            @Override
-//            public void onSuccess(List<LiveMarketType> liveMarketTypes) {
-//                Log.d(LOG, "livemarketsize" + liveMarketTypes.size());
-//                loadDistributionPieChart(calculateExchangeDistribution(liveMarketTypes));
-//            }
-//
-//            @Override
-//            public void onError(Throwable e) {
-//                e.printStackTrace();
-//            }
-//        });
-//    }
-
-//    // assign livemarket type to hash map of coin ** exchange specific
-//    private Map<String, Double> calculateExchangeDistribution(List<LiveMarketType> liveMarketTypes) {
-//        Map<String, Double> exchangeSumsMap = new HashMap<>();
-//        for (LiveMarketType liveMarketType : liveMarketTypes) {
-////            Log.d(LOG, liveMarketType.symbol);
-//
-//            if (liveMarketType.symbol.contains("BTC")) {
-//                String liveMarketId = KaleidoFunctions.createLiveMarketId(liveMarketType);
-//                if (balanceMap.containsKey(liveMarketId)) {
-//                    double exchangeSpecificBalance = balanceMap.get(liveMarketId) * liveMarketType.price;
-//                    if (exchangeSumsMap.containsKey(liveMarketType.exchange)) {
-//                        exchangeSpecificBalance += exchangeSumsMap.get(liveMarketType.exchange);
-//                        Log.d(LOG, liveMarketType.price + "");
-//
-//                    }
-//                    exchangeSumsMap.put(liveMarketType.exchange, exchangeSpecificBalance);
-//                }
-//            }
-//
-//        }
-//        return exchangeSumsMap;
-//    }
-
-
-//    // get raw map from db
-//    private Map<String, Double> loadBalance() {
-//        KaleidoBalance[] balancesSortedByExchange = KaleidoDatabase.getAppDatabase(getContext()).kaleidoDao().getAllBalancesStatic();
-//        Map<String, Double> map = new HashMap<>();
-//        for (KaleidoBalance kaleidoBalance : balancesSortedByExchange) {
-//            map.put(kaleidoBalance.getId(), kaleidoBalance.balanceType.amount);
-//        }
-//        return map;
-//    }
-
     // create pie chart from exchangeSumMap
     private void loadDistributionPieChart(Map<String, Double> exchangeSumMap) {
+        Log.d("exchange map", "binance"+exchangeSumMap.get("binance"));
         List<PieEntry> entries = new ArrayList<>();
-//        exchangeSumMap.put("cryptopia", 2.312);
+        exchangeSumMap.put("cryptopia", 2.312);
 
         double totalAsset = 0.0d;
         for (String key : exchangeSumMap.keySet()) {
@@ -211,25 +156,22 @@ public class ComparisonFragment extends Fragment implements OnChartValueSelected
 
     }
 
-
     @Override
     public void onValueSelected(Entry e, Highlight h) {
         Log.d(LOG, "clicked");
         String exchange = ((PieEntry) e).getLabel();
         List<PieEntry> pieEntries = new ArrayList<>();
         double exchangeSum = 0.0d;
-        for (String key : balanceMap.keySet()) {
-            if (key.contains(exchange)) {
-                exchangeSum += balanceMap.get(key);
-            }
-        }
 
-        for (String key : balanceMap.keySet()) {
-            if (key.contains(exchange)) {
-                String coin = KaleidoFunctions.decodeBalanceId(key)[1];
-                double percentage = balanceMap.get(key) / exchangeSum * 100;
-                pieEntries.add(new PieEntry((float) percentage, coin));
+        if(balanceMap != null){
+            for(String key: balanceMap.keySet()){
+                Log.d(LOG, "balanceKey: " + key);
+                if(KaleidoFunctions.decodeBalanceIdExchange(key).equals(exchange)){
+                    pieEntries.add(new PieEntry(balanceMap.get(key).floatValue()));
+                }
             }
+        }else{
+            Toast.makeText(getContext(), "Unable to load exchange data", Toast.LENGTH_SHORT).show();
         }
 
         loadExchangePieChart(pieEntries, exchange);

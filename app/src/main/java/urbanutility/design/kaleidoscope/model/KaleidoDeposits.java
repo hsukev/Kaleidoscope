@@ -14,19 +14,21 @@ public class KaleidoDeposits {
     @NonNull
     String id;
 
-    String side;
-    String exchange;
-    double amount;
-    String symbol;
-    double commission;
+    private String side;
+    private String exchange;
+    private double amount;
+    private String symbol;
+    private double commission;
+    private String time;
 
-    public KaleidoDeposits(String id, String side, String exchange, double amount, String symbol, double commission) {
+    public KaleidoDeposits(String id, String side, String exchange, double amount, String symbol, double commission, String time) {
         this.id = id;
         this.side = side;
         this.exchange = exchange;
         this.amount = amount;
         this.symbol = symbol;
         this.commission = commission;
+        this.time = time;
     }
 
     public String getId() {
@@ -75,5 +77,13 @@ public class KaleidoDeposits {
 
     public void setCommission(double commission) {
         this.commission = commission;
+    }
+
+    public String getTime() {
+        return time;
+    }
+
+    public void setTime(String time) {
+        this.time = time;
     }
 }

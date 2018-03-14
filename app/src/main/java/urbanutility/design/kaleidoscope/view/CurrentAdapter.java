@@ -40,7 +40,7 @@ public class CurrentAdapter extends RecyclerView.Adapter<CurrentAdapter.BalanceV
     public void onBindViewHolder(BalanceViewHolder holder, int position) {
         holder.symbol.setText(list.get(1).getBaseCurrencyType().positions.get(position).symbol);
         Log.d("currentadapter", list.get(1).getBaseCurrencyType().positions.get(position).symbol);
-        holder.cost.setText(KaleidoFunctions.doubleToFormatedString(list.get(1).getBaseCurrencyType().positions.get(position).cost));
+        holder.totalGain.setText(KaleidoFunctions.doubleToFormatedString(list.get(1).getBaseCurrencyType().positions.get(position).cost));
         holder.costPerUnit.setText(KaleidoFunctions.doubleToFormatedString(list.get(1).getBaseCurrencyType().positions.get(position).costPerUnit));
         holder.currentValue.setText(KaleidoFunctions.doubleToFormatedString(list.get(1).getBaseCurrencyType().positions.get(position).currentVal));
         holder.realizedGain.setText(KaleidoFunctions.doubleToFormatedString(list.get(1).getBaseCurrencyType().positions.get(position).realizedGain));
@@ -68,8 +68,8 @@ public class CurrentAdapter extends RecyclerView.Adapter<CurrentAdapter.BalanceV
     public class BalanceViewHolder extends RecyclerView.ViewHolder{
         @BindView(R.id.symbol)
         TextView symbol;
-        @BindView(R.id.cost)
-        TextView cost;
+        @BindView(R.id.totalGain)
+        TextView totalGain;
         @BindView(R.id.cost_per_unit)
         TextView costPerUnit;
         @BindView(R.id.current_val)
