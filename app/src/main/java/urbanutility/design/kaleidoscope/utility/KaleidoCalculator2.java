@@ -1,5 +1,7 @@
 package urbanutility.design.kaleidoscope.utility;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -9,6 +11,7 @@ import urbanutility.design.kaleidoscope.datatypes.LiveMarketType;
 import urbanutility.design.kaleidoscope.model.KaleidoDeposits;
 import urbanutility.design.kaleidoscope.model.KaleidoOrder;
 import urbanutility.design.kaleidoscope.model.KaleidoPosition;
+import urbanutility.design.kaleidoscope.model.OrderOrDeposit;
 
 /**
  * Created by jerye on 3/7/2018.
@@ -22,31 +25,38 @@ public class KaleidoCalculator2 {
             List<LiveMarketType> liveMarkets
     ) {
 
+        List<OrderOrDeposit> orderOrDepositsList = new ArrayList<>();
         Map<String, KaleidoPosition> positionMap = new HashMap<>();
 
-        new Comparator<Object>() {
-            @Override
-            public int compare(Object o, Object t1) {
-//                String date = o instanceof KaleidoOrder ? ((KaleidoOrder) o).getOrdertype().time : ((KaleidoDeposits) o);
+        // add all orders and deposits into mixed type list
+        for(KaleidoOrder order: orders){
+            orderOrDepositsList.add(new OrderOrDeposit(order));
+        }
+        for(KaleidoDeposits deposit: deposits){
+            orderOrDepositsList.add(new OrderOrDeposit(deposit));
+        }
 
-                return 0;
+
+        // comparator that sorts mix list of orders and deposits
+        Comparator<OrderOrDeposit> comparator = new Comparator<OrderOrDeposit>() {
+            @Override
+            public int compare(OrderOrDeposit t1, OrderOrDeposit t2) {
+                if(t1.isOrder() && t2.isOrder()){
+                    return t1.getKaleidoOrder().getOrdertype().time.compareTo(t2.getKaleidoOrder().getOrdertype().time);
+                }else if(!t1.isOrder() && !t2.isOrder()){
+                    return t1.getKaleidoDeposits().getTime().compareTo(t2.getKaleidoDeposits().getTime());
+                }else if(t1.isOrder() && !t2.isOrder()){
+                    return t1.getKaleidoOrder().getOrdertype().time.compareTo(t2.getKaleidoDeposits().getTime());
+                }else{
+                    return t1.getKaleidoDeposits().getTime().compareTo(t2.getKaleidoOrder().getOrdertype().time);
+                }
             }
         };
 
-        for (KaleidoOrder order : orders) {
-            String key = order.getOrdertype().convertedSymbol;
+        // sort using comparator
+        Collections.sort(orderOrDepositsList, comparator);
 
-            //
-            KaleidoPosition position;
-            if (positionMap.containsKey(key)) {
-                position = positionMap.get(key);
-
-
-            } else {
-
-            }
-        }
-
+        
 
         return null;
 
