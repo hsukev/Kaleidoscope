@@ -82,4 +82,9 @@ public class KaleidoFunctions {
         return balanceId.substring(0, dashIndex);
     }
 
+    public static String decodeMarketCoin(LiveMarketType liveMarketType){
+        return liveMarketType.symbol.substring(0,liveMarketType.symbol.length()-3);
+    }
+
+
 }

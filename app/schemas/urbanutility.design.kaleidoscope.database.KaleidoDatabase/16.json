@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 16,
-    "identityHash": "30219adc74bb51b93a21b50055a1d280",
+    "identityHash": "f2894955658a7a25b5cf70529d06dad6",
     "entities": [
       {
         "tableName": "kaleido_orders",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`primaryId` TEXT NOT NULL, `exchange` TEXT, `symbol` TEXT, `convertedSymbol` TEXT, `side` TEXT, `price` REAL, `btcUsdRate` REAL, `amount` REAL, `btcPrice` REAL, `txFee` REAL, `time` TEXT, PRIMARY KEY(`primaryId`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`primaryId` TEXT NOT NULL, `exchange` TEXT, `symbol` TEXT, `convertedSymbol` TEXT, `side` TEXT, `price` REAL NOT NULL, `btcUsdRate` REAL NOT NULL, `amount` REAL NOT NULL, `btcPrice` REAL NOT NULL, `txFee` REAL NOT NULL, `time` TEXT, PRIMARY KEY(`primaryId`))",
         "fields": [
           {
             "fieldPath": "primaryId",
@@ -15,61 +15,61 @@
             "notNull": true
           },
           {
-            "fieldPath": "ordertype.exchange",
+            "fieldPath": "exchange",
             "columnName": "exchange",
             "affinity": "TEXT",
             "notNull": false
           },
           {
-            "fieldPath": "ordertype.symbol",
+            "fieldPath": "symbol",
             "columnName": "symbol",
             "affinity": "TEXT",
             "notNull": false
           },
           {
-            "fieldPath": "ordertype.convertedSymbol",
+            "fieldPath": "convertedSymbol",
             "columnName": "convertedSymbol",
             "affinity": "TEXT",
             "notNull": false
           },
           {
-            "fieldPath": "ordertype.side",
+            "fieldPath": "side",
             "columnName": "side",
             "affinity": "TEXT",
             "notNull": false
           },
           {
-            "fieldPath": "ordertype.price",
+            "fieldPath": "price",
             "columnName": "price",
             "affinity": "REAL",
-            "notNull": false
+            "notNull": true
           },
           {
-            "fieldPath": "ordertype.btcUsdRate",
+            "fieldPath": "btcUsdRate",
             "columnName": "btcUsdRate",
             "affinity": "REAL",
-            "notNull": false
+            "notNull": true
           },
           {
-            "fieldPath": "ordertype.amount",
+            "fieldPath": "amount",
             "columnName": "amount",
             "affinity": "REAL",
-            "notNull": false
+            "notNull": true
           },
           {
-            "fieldPath": "ordertype.btcPrice",
+            "fieldPath": "btcPrice",
             "columnName": "btcPrice",
             "affinity": "REAL",
-            "notNull": false
+            "notNull": true
           },
           {
-            "fieldPath": "ordertype.txFee",
+            "fieldPath": "txFee",
             "columnName": "txFee",
             "affinity": "REAL",
-            "notNull": false
+            "notNull": true
           },
           {
-            "fieldPath": "ordertype.time",
+            "fieldPath": "time",
             "columnName": "time",
             "affinity": "TEXT",
             "notNull": false
@@ -181,7 +181,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"30219adc74bb51b93a21b50055a1d280\")"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"f2894955658a7a25b5cf70529d06dad6\")"
     ]
   }
 }

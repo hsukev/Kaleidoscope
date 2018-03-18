@@ -39,8 +39,8 @@ import urbanutility.design.kaleidoscope.datatypes.LiveMarketType;
 import urbanutility.design.kaleidoscope.datatypes.PositionType;
 import urbanutility.design.kaleidoscope.exchange.binance.client.BinanceService;
 import urbanutility.design.kaleidoscope.exchange.gdax.client.GdaxService;
-import urbanutility.design.kaleidoscope.model.KaleidoBalance;
 import urbanutility.design.kaleidoscope.model.KaleidoBaseCurrency;
+import urbanutility.design.kaleidoscope.model.KaleidoDeposits;
 import urbanutility.design.kaleidoscope.model.KaleidoOrder;
 import urbanutility.design.kaleidoscope.view.CurrentAdapter;
 import urbanutility.design.kaleidoscope.view.KaleidoViewModel;
@@ -111,10 +111,10 @@ public class CurrentFragment extends Fragment {
             }
         };
 
-        final Observer<List<KaleidoBalance>> balanceObserver = new Observer<List<KaleidoBalance>>() {
+        final Observer<List<KaleidoDeposits>> balanceObserver = new Observer<List<KaleidoDeposits>>() {
             @Override
-            public void onChanged(@Nullable List<KaleidoBalance> kaleidoBalances) {
-                kaleidoViewModel.setTripletBalances(kaleidoBalances);
+            public void onChanged(@Nullable List<KaleidoDeposits> kaleidoDeposits) {
+                kaleidoViewModel.setTripletDeposits(kaleidoDeposits);
             }
         };
 

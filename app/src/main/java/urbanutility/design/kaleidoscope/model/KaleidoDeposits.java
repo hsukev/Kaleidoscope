@@ -86,4 +86,8 @@ public class KaleidoDeposits {
     public void setTime(String time) {
         this.time = time;
     }
+
+    public boolean isDeposit(){
+        return this.side.equalsIgnoreCase("deposit");
+    }
 }

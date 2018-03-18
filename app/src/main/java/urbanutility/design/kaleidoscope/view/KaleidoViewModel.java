@@ -19,11 +19,11 @@ import urbanutility.design.kaleidoscope.client.KaleidoService;
 import urbanutility.design.kaleidoscope.database.KaleidoDatabase;
 import urbanutility.design.kaleidoscope.datatypes.LiveMarketType;
 import urbanutility.design.kaleidoscope.model.KaleidoBalance;
-import urbanutility.design.kaleidoscope.model.KaleidoBaseCurrency;
 import urbanutility.design.kaleidoscope.model.KaleidoDeposits;
 import urbanutility.design.kaleidoscope.model.KaleidoOrder;
+import urbanutility.design.kaleidoscope.model.KaleidoPosition;
 import urbanutility.design.kaleidoscope.utility.Doublet;
-import urbanutility.design.kaleidoscope.utility.KaleidoCalculator;
+import urbanutility.design.kaleidoscope.utility.KaleidoCalculator2;
 import urbanutility.design.kaleidoscope.utility.KaleidoFunctions;
 import urbanutility.design.kaleidoscope.utility.Triplet;
 
@@ -33,7 +33,7 @@ import urbanutility.design.kaleidoscope.utility.Triplet;
 
 public class KaleidoViewModel extends AndroidViewModel {
     private String TAG = getClass().getName();
-    private MutableLiveData<Triplet<List<KaleidoBalance>, List<KaleidoOrder>, List<LiveMarketType>>> tripletMutableLiveData;
+    private MutableLiveData<Triplet<List<KaleidoDeposits>, List<KaleidoOrder>, List<LiveMarketType>>> tripletMutableLiveData;
     private MutableLiveData<Doublet<List<KaleidoBalance>, List<LiveMarketType>>> doubletMutableLiveData;
     private KaleidoDatabase kaleidoDatabase;
 
@@ -78,12 +78,12 @@ public class KaleidoViewModel extends AndroidViewModel {
         kaleidoDatabase.kaleidoDao().insertDeposit(kaleidoDeposit);
     }
 
-    private MutableLiveData<Triplet<List<KaleidoBalance>, List<KaleidoOrder>, List<LiveMarketType>>> getTripletMutableLiveData() {
+    private MutableLiveData<Triplet<List<KaleidoDeposits>, List<KaleidoOrder>, List<LiveMarketType>>> getTripletMutableLiveData() {
         if (tripletMutableLiveData == null) {
             tripletMutableLiveData = new MutableLiveData<>();
             tripletMutableLiveData.setValue(
-                    new Triplet<List<KaleidoBalance>, List<KaleidoOrder>, List<LiveMarketType>>(
-                            new ArrayList<KaleidoBalance>(),
+                    new Triplet<List<KaleidoDeposits>, List<KaleidoOrder>, List<LiveMarketType>>(
+                            new ArrayList<KaleidoDeposits>(),
                             new ArrayList<KaleidoOrder>(),
                             new ArrayList<LiveMarketType>())
             );
@@ -104,20 +104,20 @@ public class KaleidoViewModel extends AndroidViewModel {
         return doubletMutableLiveData;
     }
 
-    public void setTripletBalances(List<KaleidoBalance> balances) {
-        Triplet<List<KaleidoBalance>, List<KaleidoOrder>, List<LiveMarketType>> triplet = getTripletMutableLiveData().getValue();
-        triplet.setFirst(balances);
+    public void setTripletDeposits(List<KaleidoDeposits> deposits) {
+        Triplet<List<KaleidoDeposits>, List<KaleidoOrder>, List<LiveMarketType>> triplet = getTripletMutableLiveData().getValue();
+        triplet.setFirst(deposits);
         getTripletMutableLiveData().setValue(triplet);
     }
 
     public void setTripletOrders(List<KaleidoOrder> orders) {
-        Triplet<List<KaleidoBalance>, List<KaleidoOrder>, List<LiveMarketType>> triplet = getTripletMutableLiveData().getValue();
+        Triplet<List<KaleidoDeposits>, List<KaleidoOrder>, List<LiveMarketType>> triplet = getTripletMutableLiveData().getValue();
         triplet.setSecond(orders);
         getTripletMutableLiveData().setValue(triplet);
     }
 
     public void setTripletMarkets(List<LiveMarketType> markets) {
-        Triplet<List<KaleidoBalance>, List<KaleidoOrder>, List<LiveMarketType>> triplet = getTripletMutableLiveData().getValue();
+        Triplet<List<KaleidoDeposits>, List<KaleidoOrder>, List<LiveMarketType>> triplet = getTripletMutableLiveData().getValue();
         triplet.setThird(markets);
         getTripletMutableLiveData().setValue(triplet);
     }
@@ -135,15 +135,11 @@ public class KaleidoViewModel extends AndroidViewModel {
     }
 
     //Transformation of balance, order, liveMarket data into List of Base Currencies for display (realized gain etc.)
-    public LiveData<List<KaleidoBaseCurrency>> getBaseCurrency() {
-        return Transformations.map(getTripletMutableLiveData(), new Function<Triplet<List<KaleidoBalance>, List<KaleidoOrder>, List<LiveMarketType>>, List<KaleidoBaseCurrency>>() {
+    public LiveData<Iterable<KaleidoPosition>> getBaseCurrency() {
+        return Transformations.map(getTripletMutableLiveData(), new Function<Triplet<List<KaleidoDeposits>, List<KaleidoOrder>, List<LiveMarketType>>, Iterable<KaleidoPosition>>() {
             @Override
-            public List<KaleidoBaseCurrency> apply(Triplet<List<KaleidoBalance>, List<KaleidoOrder>, List<LiveMarketType>> input) {
-                Log.d("viewmodel", input.getFirst().size() + "," + input.getSecond().size() + "," + input.getThird().size());
-                List<KaleidoBaseCurrency> baseCurrencyTypes = new ArrayList<>();
-                baseCurrencyTypes.add(new KaleidoBaseCurrency("USD"));
-                baseCurrencyTypes.add(new KaleidoBaseCurrency("BTC"));
-                return KaleidoCalculator.CalculatePosition(input.getFirst(), input.getSecond(), baseCurrencyTypes, input.getThird());
+            public Iterable<KaleidoPosition> apply(Triplet<List<KaleidoDeposits>, List<KaleidoOrder>, List<LiveMarketType>> input) {
+                return KaleidoCalculator2.CalculatePositions(input.getFirst(), input.getSecond(), input.getThird());
             }
         });
     }
@@ -198,6 +194,4 @@ public class KaleidoViewModel extends AndroidViewModel {
             }
         });
     }
-
-
 }
