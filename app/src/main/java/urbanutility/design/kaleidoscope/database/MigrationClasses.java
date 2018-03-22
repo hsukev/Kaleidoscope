@@ -25,4 +25,11 @@ public class MigrationClasses {
            database.execSQL("ALTER TABLE kaleido_deposits ADD COLUMN time TEXT");
        }
    };
+
+   public static Migration MIGRATION_16_17 = new Migration(16, 17) {
+       @Override
+       public void migrate(@NonNull SupportSQLiteDatabase database) {
+
+       }
+   };
 }

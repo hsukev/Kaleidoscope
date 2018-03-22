@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit;
 
 import urbanutility.design.kaleidoscope.client.KaleidoService;
 import urbanutility.design.kaleidoscope.database.KaleidoDatabase;
-import urbanutility.design.kaleidoscope.datatypes.LiveMarketType;
+import urbanutility.design.kaleidoscope.model.KaleidoLiveMarket;
 import urbanutility.design.kaleidoscope.model.KaleidoBalance;
 import urbanutility.design.kaleidoscope.model.KaleidoDeposits;
 import urbanutility.design.kaleidoscope.model.KaleidoOrder;
@@ -33,8 +33,8 @@ import urbanutility.design.kaleidoscope.utility.Triplet;
 
 public class KaleidoViewModel extends AndroidViewModel {
     private String TAG = getClass().getName();
-    private MutableLiveData<Triplet<List<KaleidoDeposits>, List<KaleidoOrder>, List<LiveMarketType>>> tripletMutableLiveData;
-    private MutableLiveData<Doublet<List<KaleidoBalance>, List<LiveMarketType>>> doubletMutableLiveData;
+    private MutableLiveData<Triplet<List<KaleidoDeposits>, List<KaleidoOrder>, List<KaleidoLiveMarket>>> tripletMutableLiveData;
+    private MutableLiveData<Doublet<List<KaleidoBalance>, List<KaleidoLiveMarket>>> doubletMutableLiveData;
     private KaleidoDatabase kaleidoDatabase;
 
     public KaleidoViewModel(Application application) {
@@ -61,7 +61,7 @@ public class KaleidoViewModel extends AndroidViewModel {
         return kaleidoDatabase.kaleidoDao().getAllDeposits();
     }
 
-    public LiveData<List<LiveMarketType>> getAllLiveMarkets(KaleidoService kaleidoService) {
+    public LiveData<List<KaleidoLiveMarket>> getAllLiveMarkets(KaleidoService kaleidoService) {
         return LiveDataReactiveStreams.fromPublisher(kaleidoService.requestLiveMarkets().toFlowable()
                 .delay(5000, TimeUnit.MILLISECONDS).repeat());
     }
@@ -78,26 +78,26 @@ public class KaleidoViewModel extends AndroidViewModel {
         kaleidoDatabase.kaleidoDao().insertDeposit(kaleidoDeposit);
     }
 
-    private MutableLiveData<Triplet<List<KaleidoDeposits>, List<KaleidoOrder>, List<LiveMarketType>>> getTripletMutableLiveData() {
+    private MutableLiveData<Triplet<List<KaleidoDeposits>, List<KaleidoOrder>, List<KaleidoLiveMarket>>> getTripletMutableLiveData() {
         if (tripletMutableLiveData == null) {
             tripletMutableLiveData = new MutableLiveData<>();
             tripletMutableLiveData.setValue(
-                    new Triplet<List<KaleidoDeposits>, List<KaleidoOrder>, List<LiveMarketType>>(
+                    new Triplet<List<KaleidoDeposits>, List<KaleidoOrder>, List<KaleidoLiveMarket>>(
                             new ArrayList<KaleidoDeposits>(),
                             new ArrayList<KaleidoOrder>(),
-                            new ArrayList<LiveMarketType>())
+                            new ArrayList<KaleidoLiveMarket>())
             );
         }
         return tripletMutableLiveData;
     }
 
-    private MutableLiveData<Doublet<List<KaleidoBalance>, List<LiveMarketType>>> getDoubletMutableLiveData() {
+    private MutableLiveData<Doublet<List<KaleidoBalance>, List<KaleidoLiveMarket>>> getDoubletMutableLiveData() {
         if (doubletMutableLiveData == null) {
             doubletMutableLiveData = new MutableLiveData<>();
             doubletMutableLiveData.setValue(
-                    new Doublet<List<KaleidoBalance>, List<LiveMarketType>>(
+                    new Doublet<List<KaleidoBalance>, List<KaleidoLiveMarket>>(
                             new ArrayList<KaleidoBalance>(),
-                            new ArrayList<LiveMarketType>()
+                            new ArrayList<KaleidoLiveMarket>()
                     )
             );
         }
@@ -105,40 +105,40 @@ public class KaleidoViewModel extends AndroidViewModel {
     }
 
     public void setTripletDeposits(List<KaleidoDeposits> deposits) {
-        Triplet<List<KaleidoDeposits>, List<KaleidoOrder>, List<LiveMarketType>> triplet = getTripletMutableLiveData().getValue();
+        Triplet<List<KaleidoDeposits>, List<KaleidoOrder>, List<KaleidoLiveMarket>> triplet = getTripletMutableLiveData().getValue();
         triplet.setFirst(deposits);
         getTripletMutableLiveData().setValue(triplet);
     }
 
     public void setTripletOrders(List<KaleidoOrder> orders) {
-        Triplet<List<KaleidoDeposits>, List<KaleidoOrder>, List<LiveMarketType>> triplet = getTripletMutableLiveData().getValue();
+        Triplet<List<KaleidoDeposits>, List<KaleidoOrder>, List<KaleidoLiveMarket>> triplet = getTripletMutableLiveData().getValue();
         triplet.setSecond(orders);
         getTripletMutableLiveData().setValue(triplet);
     }
 
-    public void setTripletMarkets(List<LiveMarketType> markets) {
-        Triplet<List<KaleidoDeposits>, List<KaleidoOrder>, List<LiveMarketType>> triplet = getTripletMutableLiveData().getValue();
+    public void setTripletMarkets(List<KaleidoLiveMarket> markets) {
+        Triplet<List<KaleidoDeposits>, List<KaleidoOrder>, List<KaleidoLiveMarket>> triplet = getTripletMutableLiveData().getValue();
         triplet.setThird(markets);
         getTripletMutableLiveData().setValue(triplet);
     }
 
     public void setPairBalances(List<KaleidoBalance> balances) {
-        Doublet<List<KaleidoBalance>, List<LiveMarketType>> pair = getDoubletMutableLiveData().getValue();
+        Doublet<List<KaleidoBalance>, List<KaleidoLiveMarket>> pair = getDoubletMutableLiveData().getValue();
         pair.setFirst(balances);
         getDoubletMutableLiveData().setValue(pair);
     }
 
-    public void setPairMarkets(List<LiveMarketType> markets) {
-        Doublet<List<KaleidoBalance>, List<LiveMarketType>> pair = getDoubletMutableLiveData().getValue();
+    public void setPairMarkets(List<KaleidoLiveMarket> markets) {
+        Doublet<List<KaleidoBalance>, List<KaleidoLiveMarket>> pair = getDoubletMutableLiveData().getValue();
         pair.setSecond(markets);
         getDoubletMutableLiveData().setValue(pair);
     }
 
     //Transformation of balance, order, liveMarket data into List of Base Currencies for display (realized gain etc.)
     public LiveData<Iterable<KaleidoPosition>> getBaseCurrency() {
-        return Transformations.map(getTripletMutableLiveData(), new Function<Triplet<List<KaleidoDeposits>, List<KaleidoOrder>, List<LiveMarketType>>, Iterable<KaleidoPosition>>() {
+        return Transformations.map(getTripletMutableLiveData(), new Function<Triplet<List<KaleidoDeposits>, List<KaleidoOrder>, List<KaleidoLiveMarket>>, Iterable<KaleidoPosition>>() {
             @Override
-            public Iterable<KaleidoPosition> apply(Triplet<List<KaleidoDeposits>, List<KaleidoOrder>, List<LiveMarketType>> input) {
+            public Iterable<KaleidoPosition> apply(Triplet<List<KaleidoDeposits>, List<KaleidoOrder>, List<KaleidoLiveMarket>> input) {
                 return KaleidoCalculator2.CalculatePositions(input.getFirst(), input.getSecond(), input.getThird());
             }
         });
@@ -146,35 +146,33 @@ public class KaleidoViewModel extends AndroidViewModel {
 
     // Transformation of Balance and LiveMarket data into Map of Exchanges and each of their total asset
     public LiveData<Map<String, Double>> getBalanceMapInBtc(final boolean isSummed) {
-        return Transformations.map(getDoubletMutableLiveData(), new Function<Doublet<List<KaleidoBalance>, List<LiveMarketType>>, Map<String, Double>>() {
+        return Transformations.map(getDoubletMutableLiveData(), new Function<Doublet<List<KaleidoBalance>, List<KaleidoLiveMarket>>, Map<String, Double>>() {
             @Override
-            public Map<String, Double> apply(Doublet<List<KaleidoBalance>, List<LiveMarketType>> input) {
+            public Map<String, Double> apply(Doublet<List<KaleidoBalance>, List<KaleidoLiveMarket>> input) {
                 List<KaleidoBalance> balances = input.getFirst();
-                List<LiveMarketType> liveMarkets = input.getSecond();
+                List<KaleidoLiveMarket> liveMarkets = input.getSecond();
 
                 Map<String, Double> balanceMap = new HashMap<>();
                 Map<String, Double> exchangeBalanceMap = new HashMap<>();
                 //dump balance in map
                 for (KaleidoBalance balance : balances) {
                     balanceMap.put(balance.getId(), balance.balanceType.amount);
+                    Log.d(TAG, balance.balanceType.exchange);
                 }
 
                 //convert all balances to BTC
-                for (LiveMarketType liveMarket : liveMarkets) {
-                    String symbolPair = liveMarket.symbol;
+                for (KaleidoLiveMarket liveMarket : liveMarkets) {
+                    String symbolPair = liveMarket.getSymbol();
 
                     //filter out nonBTC pairs
                     if (symbolPair.contains("BTC")) {
                         String matchBalanceId = KaleidoFunctions.createLiveMarketId(liveMarket);
-
                         //convert only if map contains
                         if (balanceMap.containsKey(matchBalanceId)) {
-                            double btcPrice = balanceMap.get(matchBalanceId) * liveMarket.price;
-                            String exchangeName = liveMarket.exchange;
-
+                            double btcPrice = balanceMap.get(matchBalanceId) * liveMarket.getPrice();
+                            String exchangeName = liveMarket.getExchange();
                             // return this if requested
                             balanceMap.put(matchBalanceId, btcPrice);
-                            Log.d(TAG, "isSummed: " + isSummed + " balanceMapSize: " + balanceMap.size());
                             // sum up balance by exchange name
                             if (exchangeBalanceMap.containsKey(exchangeName)) {
                                 btcPrice += exchangeBalanceMap.get(exchangeName);

@@ -7,22 +7,22 @@ package urbanutility.design.kaleidoscope.model;
 public class KaleidoPosition {
     private String symbol;
     private double totalGain;
-    private double costPerUnit;
-    private double currentVal;
+    private double avgUnitPrice;
+    private double currentUnitPrice;
     private double realizedGain;
     private double unrealizedGain;
     private double amount;
-    private double changePercent;
+    private double percentChange;
 
-    public KaleidoPosition(String symbol, double totalGain, double costPerUnit, double currentVal, double realizedGain, double unrealizedGain, double amount, double changePercent) {
+    public KaleidoPosition(String symbol, double totalGain, double avgUnitPrice, double currentUnitPrice, double realizedGain, double unrealizedGain, double amount, double percentChange) {
         this.symbol = symbol;
         this.totalGain = totalGain;
-        this.costPerUnit = costPerUnit;
-        this.currentVal = currentVal;
+        this.avgUnitPrice = avgUnitPrice;
+        this.currentUnitPrice = currentUnitPrice;
         this.realizedGain = realizedGain;
         this.unrealizedGain = unrealizedGain;
         this.amount = amount;
-        this.changePercent = changePercent;
+        this.percentChange = percentChange;
     }
 
     public String getSymbol() {
@@ -41,20 +41,20 @@ public class KaleidoPosition {
         this.totalGain = totalGain;
     }
 
-    public double getCostPerUnit() {
-        return costPerUnit;
+    public double getAvgUnitPrice() {
+        return avgUnitPrice;
     }
 
-    public void setCostPerUnit(double costPerUnit) {
-        this.costPerUnit = costPerUnit;
+    public void setAvgUnitPrice(double avgUnitPrice) {
+        this.avgUnitPrice = avgUnitPrice;
     }
 
-    public double getCurrentVal() {
-        return currentVal;
+    public double getCurrentUnitPrice() {
+        return currentUnitPrice;
     }
 
-    public void setCurrentVal(double currentVal) {
-        this.currentVal = currentVal;
+    public void setCurrentUnitPrice(double currentUnitPrice) {
+        this.currentUnitPrice = currentUnitPrice;
     }
 
     public double getRealizedGain() {
@@ -81,11 +81,11 @@ public class KaleidoPosition {
         this.amount = amount;
     }
 
-    public double getChangePercent() {
-        return changePercent;
+    public double getPercentChange() {
+        return percentChange;
     }
 
-    public void setChangePercent(double changePercent) {
-        this.changePercent = changePercent;
+    public void setPercentChange(double percentChange) {
+        this.percentChange = percentChange;
     }
 }

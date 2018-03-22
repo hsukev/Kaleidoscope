@@ -3,7 +3,7 @@ package urbanutility.design.kaleidoscope;
 import java.util.List;
 
 import io.reactivex.Single;
-import urbanutility.design.kaleidoscope.datatypes.LiveMarketType;
+import urbanutility.design.kaleidoscope.model.KaleidoLiveMarket;
 import urbanutility.design.kaleidoscope.model.KaleidoBalance;
 import urbanutility.design.kaleidoscope.model.KaleidoDeposits;
 import urbanutility.design.kaleidoscope.model.KaleidoOrder;
@@ -13,7 +13,7 @@ import urbanutility.design.kaleidoscope.model.KaleidoOrder;
  */
 
 public interface DataRequestor {
-    Single<List<LiveMarketType>> requestLiveMarkets();
+    Single<List<KaleidoLiveMarket>> requestLiveMarkets();
     Single<List<KaleidoBalance>> requestBalances();
     Single<List<KaleidoOrder>> requestOrders();
     Single<List<KaleidoDeposits>> requestDeposits();

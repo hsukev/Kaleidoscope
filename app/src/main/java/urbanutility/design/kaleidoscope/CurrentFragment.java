@@ -35,13 +35,12 @@ import butterknife.ButterKnife;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.observers.DisposableSingleObserver;
 import urbanutility.design.kaleidoscope.client.KaleidoService;
-import urbanutility.design.kaleidoscope.datatypes.LiveMarketType;
-import urbanutility.design.kaleidoscope.datatypes.PositionType;
+import urbanutility.design.kaleidoscope.model.KaleidoLiveMarket;
 import urbanutility.design.kaleidoscope.exchange.binance.client.BinanceService;
 import urbanutility.design.kaleidoscope.exchange.gdax.client.GdaxService;
-import urbanutility.design.kaleidoscope.model.KaleidoBaseCurrency;
 import urbanutility.design.kaleidoscope.model.KaleidoDeposits;
 import urbanutility.design.kaleidoscope.model.KaleidoOrder;
+import urbanutility.design.kaleidoscope.model.KaleidoPosition;
 import urbanutility.design.kaleidoscope.view.CurrentAdapter;
 import urbanutility.design.kaleidoscope.view.KaleidoViewModel;
 
@@ -111,37 +110,37 @@ public class CurrentFragment extends Fragment {
             }
         };
 
-        final Observer<List<KaleidoDeposits>> balanceObserver = new Observer<List<KaleidoDeposits>>() {
+        final Observer<List<KaleidoDeposits>> depositObserver = new Observer<List<KaleidoDeposits>>() {
             @Override
             public void onChanged(@Nullable List<KaleidoDeposits> kaleidoDeposits) {
                 kaleidoViewModel.setTripletDeposits(kaleidoDeposits);
             }
         };
 
-        Observer<List<KaleidoBaseCurrency>> tripletObserver = new Observer<List<KaleidoBaseCurrency>>() {
+        Observer<List<KaleidoPosition>> tripletObserver = new Observer<List<KaleidoPosition>>() {
             @Override
-            public void onChanged(@Nullable List<KaleidoBaseCurrency> baseCurrencies) {
-                Log.d(TAG,"positionSize"+ baseCurrencies.get(1).getBaseCurrencyType().positions.size());
+            public void onChanged(@Nullable List<KaleidoPosition> positions) {
+                Log.d(TAG,"positionSize"+ positions.size());
 
                 double baseTotal = 0.0d;
                 double btcTotal = 0.0d;
                 double percentTotal = 0.0d;
 
-                for (PositionType position : baseCurrencies.get(0).getBaseCurrencyType().positions) {
-                    baseTotal += position.cost;
-                    percentTotal += position.cost * position.changePercent;
+                for (KaleidoPosition position : positions) {
+                    baseTotal += position.getTotalGain();
+//                    percentTotal += position.cost * position.changePercent;
                 }
-
-                for (PositionType position : baseCurrencies.get(1).getBaseCurrencyType().positions) {
-                    btcTotal += position.cost;
-                }
-
-                if (baseTotal == 0.0d) baseTotal = 1.0d;
-                btcTotalView.setText(btcTotal + " -- " + baseTotal);
-                percentGrowthView.setText(percentTotal / baseTotal + "");
-
-                if (baseCurrencies.get(1).getBaseCurrencyType().positions.size() > 0)
-                    adapter.refresh(baseCurrencies);
+//
+//                for (PositionType position : positions) {
+//                    btcTotal += position.cost;
+//                }
+//
+//                if (baseTotal == 0.0d) baseTotal = 1.0d;
+//                btcTotalView.setText(btcTotal + " -- " + baseTotal);
+//                percentGrowthView.setText(percentTotal / baseTotal + "");
+//
+//                if (baseCurrencies.get(1).getBaseCurrencyType().positions.size() > 0)
+//                    adapter.refresh(baseCurrencies);
             }
         };
 
@@ -154,7 +153,7 @@ public class CurrentFragment extends Fragment {
 
         MediatorLiveData mediator = new MediatorLiveData();
         mediator.addSource(kaleidoViewModel.getAllOrders(), orderObserver);
-        mediator.addSource(kaleidoViewModel.getAllBalances(), balanceObserver);
+        mediator.addSource(kaleidoViewModel.getAllDeposits(), depositObserver);
         mediator.addSource(kaleidoViewModel.getBaseCurrency(), tripletObserver);
 
         mediator.observe(CurrentFragment.this, mediatorObserver);
@@ -210,10 +209,10 @@ public class CurrentFragment extends Fragment {
 
     private void requestLiveMarket() {
         swipeRefreshLayout.setRefreshing(true);
-        kaleidoService.requestLiveMarkets().observeOn(AndroidSchedulers.mainThread()).subscribe(new DisposableSingleObserver<List<LiveMarketType>>() {
+        kaleidoService.requestLiveMarkets().observeOn(AndroidSchedulers.mainThread()).subscribe(new DisposableSingleObserver<List<KaleidoLiveMarket>>() {
             @Override
-            public void onSuccess(List<LiveMarketType> liveMarketTypes) {
-                kaleidoViewModel.setTripletMarkets(liveMarketTypes);
+            public void onSuccess(List<KaleidoLiveMarket> kaleidoLiveMarkets) {
+                kaleidoViewModel.setTripletMarkets(kaleidoLiveMarkets);
                 swipeRefreshLayout.setRefreshing(false);
                 Log.d(TAG, "finished request");
             }

@@ -7,8 +7,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import urbanutility.design.kaleidoscope.datatypes.LiveMarketType;
 import urbanutility.design.kaleidoscope.model.KaleidoDeposits;
+import urbanutility.design.kaleidoscope.model.KaleidoLiveMarket;
 import urbanutility.design.kaleidoscope.model.KaleidoOrder;
 import urbanutility.design.kaleidoscope.model.KaleidoPosition;
 import urbanutility.design.kaleidoscope.model.OrderOrDeposit;
@@ -22,7 +22,7 @@ public class KaleidoCalculator2 {
     public static Iterable<KaleidoPosition> CalculatePositions(
             List<KaleidoDeposits> deposits,
             List<KaleidoOrder> orders,
-            List<LiveMarketType> liveMarkets
+            List<KaleidoLiveMarket> liveMarkets
     ) {
 
         List<OrderOrDeposit> orderOrDepositsList = new ArrayList<>();
@@ -119,7 +119,7 @@ public class KaleidoCalculator2 {
         }
 
         // live market calculations
-        for(LiveMarketType liveMarket : liveMarkets){
+        for(KaleidoLiveMarket liveMarket : liveMarkets){
             String coin = KaleidoFunctions.decodeMarketCoin(liveMarket);
             if(positionMap.containsKey(coin)){
                 KaleidoPosition position = calculateLivePosition(positionMap.get(coin), liveMarket);
@@ -134,27 +134,38 @@ public class KaleidoCalculator2 {
         double orderAmount = order.getAmount();
         double oldAmount = position.getAmount();
         double newAmount;
-        double newAvgPrice = position.getCostPerUnit();
+        double newAvgPrice = position.getAvgUnitPrice();
         double realizedGain = position.getRealizedGain();
 
         if (order.isBuy()) {
             newAmount = oldAmount + orderAmount;
-            newAvgPrice = (position.getCostPerUnit() * oldAmount + order.getPrice() * orderAmount) / newAmount;
+            newAvgPrice = (position.getAvgUnitPrice() * oldAmount + order.getPrice() * orderAmount) / newAmount;
             // realizedGain unchanged
         } else {
             newAmount = oldAmount - orderAmount;
             // avg price unchanged
-            realizedGain *= (order.getPrice() - position.getCostPerUnit());
+            realizedGain *= (order.getPrice() - position.getAvgUnitPrice());
         }
 
         position.setAmount(newAmount);
-        position.setCostPerUnit(newAvgPrice);
+        position.setAvgUnitPrice(newAvgPrice);
         position.setRealizedGain(realizedGain);
 
         return position;
     }
-    private static KaleidoPosition calculateLivePosition(KaleidoPosition position, LiveMarketType liveMarketType){
+    private static KaleidoPosition calculateLivePosition(KaleidoPosition position, KaleidoLiveMarket liveMarket){
+        //100 150 = +50% (150-100)/(100)
+        //100 50 = -50% (50-100)/100
+        double percentChange =  (liveMarket.getPrice() - position.getAvgUnitPrice())/ position.getAvgUnitPrice() * 100;
 
+        // livemarket $1 - avg $0.5 * units
+        double unrealizedGain = (liveMarket.getPrice() - position.getAvgUnitPrice()) * position.getAmount();
+
+        position.setPercentChange(percentChange);
+        position.setUnrealizedGain(unrealizedGain);
+        position.setCurrentUnitPrice(liveMarket.getPrice());
+
+        return position;
     }
 
 }

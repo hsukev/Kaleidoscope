@@ -33,7 +33,7 @@ import java.util.Set;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import urbanutility.design.kaleidoscope.client.KaleidoService;
-import urbanutility.design.kaleidoscope.datatypes.LiveMarketType;
+import urbanutility.design.kaleidoscope.model.KaleidoLiveMarket;
 import urbanutility.design.kaleidoscope.model.KaleidoBalance;
 import urbanutility.design.kaleidoscope.utility.KaleidoFunctions;
 import urbanutility.design.kaleidoscope.view.KaleidoViewModel;
@@ -93,9 +93,9 @@ public class ComparisonFragment extends Fragment implements OnChartValueSelected
             }
         };
 
-        Observer<List<LiveMarketType>> liveMarketObserver = new Observer<List<LiveMarketType>>() {
+        Observer<List<KaleidoLiveMarket>> liveMarketObserver = new Observer<List<KaleidoLiveMarket>>() {
             @Override
-            public void onChanged(@Nullable List<LiveMarketType> liveMarketTypes) {
+            public void onChanged(@Nullable List<KaleidoLiveMarket> liveMarketTypes) {
                 kaleidoViewModel.setPairMarkets(liveMarketTypes);
             }
         };
@@ -131,7 +131,7 @@ public class ComparisonFragment extends Fragment implements OnChartValueSelected
 
     // create pie chart from exchangeSumMap
     private void loadDistributionPieChart(Map<String, Double> exchangeSumMap) {
-        Log.d("exchange map", "binance"+exchangeSumMap.get("binance"));
+        Log.d("exchange map", "binance "+exchangeSumMap.get("binance"));
         List<PieEntry> entries = new ArrayList<>();
         exchangeSumMap.put("cryptopia", 2.312);
 

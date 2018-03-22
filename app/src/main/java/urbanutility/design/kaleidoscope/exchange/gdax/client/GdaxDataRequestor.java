@@ -8,7 +8,7 @@ import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 import urbanutility.design.kaleidoscope.DataRequestor;
 import urbanutility.design.kaleidoscope.client.KaleidoClients;
-import urbanutility.design.kaleidoscope.datatypes.LiveMarketType;
+import urbanutility.design.kaleidoscope.model.KaleidoLiveMarket;
 import urbanutility.design.kaleidoscope.exchange.gdax.model.GdaxTicker;
 import urbanutility.design.kaleidoscope.model.KaleidoBalance;
 import urbanutility.design.kaleidoscope.model.KaleidoDeposits;
@@ -27,7 +27,7 @@ public class GdaxDataRequestor implements DataRequestor {
     }
 
     @Override
-    public Single<List<LiveMarketType>> requestLiveMarkets() {
+    public Single<List<KaleidoLiveMarket>> requestLiveMarkets() {
         return gdaxService.getGdaxLiveMarket().subscribeOn(Schedulers.io()).map(gdaxLiveMarketFunction());
     }
 
@@ -46,17 +46,17 @@ public class GdaxDataRequestor implements DataRequestor {
         return null;
     }
 
-    private Function<GdaxTicker, List<LiveMarketType>> gdaxLiveMarketFunction() {
-        return new Function<GdaxTicker, List<LiveMarketType>>() {
+    private Function<GdaxTicker, List<KaleidoLiveMarket>> gdaxLiveMarketFunction() {
+        return new Function<GdaxTicker, List<KaleidoLiveMarket>>() {
             @Override
-            public List<LiveMarketType> apply(GdaxTicker gdaxTicker) throws Exception {
-                List<LiveMarketType> liveMarketTypes = new ArrayList<>();
-                LiveMarketType gdaxLive = new LiveMarketType();
-                gdaxLive.exchange = "gdax";
-                gdaxLive.symbol = "BTCUSD";
-                gdaxLive.price = Double.parseDouble(gdaxTicker.getPrice());
-                liveMarketTypes.add(gdaxLive);
-                return liveMarketTypes;
+            public List<KaleidoLiveMarket> apply(GdaxTicker gdaxTicker) throws Exception {
+                List<KaleidoLiveMarket> kaleidoLiveMarkets = new ArrayList<>();
+                KaleidoLiveMarket gdaxLive = new KaleidoLiveMarket(
+                        "BTCUSD",
+                        "gdax",
+                        Double.parseDouble(gdaxTicker.getPrice()));
+                kaleidoLiveMarkets.add(gdaxLive);
+                return kaleidoLiveMarkets;
             }
         };
     }

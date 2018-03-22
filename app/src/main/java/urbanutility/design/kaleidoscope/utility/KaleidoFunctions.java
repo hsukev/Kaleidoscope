@@ -10,7 +10,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
-import urbanutility.design.kaleidoscope.datatypes.LiveMarketType;
+import urbanutility.design.kaleidoscope.model.KaleidoLiveMarket;
 
 /**
  * Created by jerye on 1/17/2018.
@@ -67,9 +67,9 @@ public class KaleidoFunctions {
         return myFormatter.format(value);
     }
 
-    public static String createLiveMarketId(LiveMarketType liveMarketType){
+    public static String createLiveMarketId(KaleidoLiveMarket kaleidoLiveMarket){
 
-        return liveMarketType.exchange + "-" + liveMarketType.symbol.substring(0,liveMarketType.symbol.length()-3);
+        return kaleidoLiveMarket.getExchange() + "-" + kaleidoLiveMarket.getSymbol().substring(0, kaleidoLiveMarket.getSymbol().length()-3);
     }
 
     public static String decodeBalanceIdCoin(String balanceId){
@@ -82,8 +82,8 @@ public class KaleidoFunctions {
         return balanceId.substring(0, dashIndex);
     }
 
-    public static String decodeMarketCoin(LiveMarketType liveMarketType){
-        return liveMarketType.symbol.substring(0,liveMarketType.symbol.length()-3);
+    public static String decodeMarketCoin(KaleidoLiveMarket kaleidoLiveMarket){
+        return kaleidoLiveMarket.getSymbol().substring(0, kaleidoLiveMarket.getSymbol().length()-3);
     }
 
 

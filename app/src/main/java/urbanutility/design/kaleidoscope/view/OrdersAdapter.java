@@ -38,12 +38,12 @@ public class OrdersAdapter extends RecyclerView.Adapter<OrdersAdapter.OrdersView
 
     @Override
     public void onBindViewHolder(OrdersViewHolder holder, int position) {
-        holder.orderSymbol.setText(list.get(position).getOrdertype().symbol);
-        holder.orderAmount.setText(KaleidoFunctions.doubleToFormatedString(list.get(position).getOrdertype().amount));
-        holder.orderExchange.setText(list.get(position).getOrdertype().exchange);
-        holder.orderPrice.setText(KaleidoFunctions.doubleToFormatedString(list.get(position).getOrdertype().price));
-        holder.orderSide.setText(list.get(position).getOrdertype().side);
-        holder.orderTime.setText(list.get(position).getOrdertype().time);
+        holder.orderSymbol.setText(list.get(position).getSymbol());
+        holder.orderAmount.setText(KaleidoFunctions.doubleToFormatedString(list.get(position).getAmount()));
+        holder.orderExchange.setText(list.get(position).getExchange());
+        holder.orderPrice.setText(KaleidoFunctions.doubleToFormatedString(list.get(position).getPrice()));
+        holder.orderSide.setText(list.get(position).getSide());
+        holder.orderTime.setText(list.get(position).getTime());
     }
 
     @Override

@@ -6,8 +6,7 @@ import java.util.Map;
 
 import io.reactivex.Single;
 import urbanutility.design.kaleidoscope.DataRequestor;
-import urbanutility.design.kaleidoscope.KaleidoActivity;
-import urbanutility.design.kaleidoscope.datatypes.LiveMarketType;
+import urbanutility.design.kaleidoscope.model.KaleidoLiveMarket;
 import urbanutility.design.kaleidoscope.exchange.binance.client.BinanceDataRequestor;
 import urbanutility.design.kaleidoscope.exchange.gdax.client.GdaxDataRequestor;
 import urbanutility.design.kaleidoscope.model.KaleidoBalance;
@@ -20,7 +19,7 @@ import urbanutility.design.kaleidoscope.model.KaleidoOrder;
 
 public class ExchangePort {
     // Maps of all supported request RxJava singles
-    private Map<String, Single<List<LiveMarketType>>> liveMarketMap = new HashMap<>();
+    private Map<String, Single<List<KaleidoLiveMarket>>> liveMarketMap = new HashMap<>();
     private Map<String, Single<List<KaleidoOrder>>> ordersMap = new HashMap<>();
     private Map<String, Single<List<KaleidoBalance>>> balancesMap = new HashMap<>();
     private Map<String, Single<List<KaleidoDeposits>>> depositsMap = new HashMap<>();
@@ -43,7 +42,7 @@ public class ExchangePort {
     }
 
     // Exposed getter methods
-    public Map<String, Single<List<LiveMarketType>>> getLiveMarketMap() {
+    public Map<String, Single<List<KaleidoLiveMarket>>> getLiveMarketMap() {
         return liveMarketMap;
     }
 
