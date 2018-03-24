@@ -65,7 +65,7 @@ public class KaleidoCalculator2 {
             if (orderOrDeposit.isOrder()) {
                 KaleidoOrder order = orderOrDeposit.getKaleidoOrder();
                 String symbolPair = order.getConvertedSymbol();
-                coin = symbolPair.substring(symbolPair.length() - 3);
+                coin = symbolPair.substring(0,symbolPair.length() - 3);
 
                 // add orders to map
                 if (positionMap.containsKey(coin)) {

@@ -2,7 +2,6 @@ package urbanutility.design.kaleidoscope.view;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,7 +14,7 @@ import java.util.Locale;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import urbanutility.design.kaleidoscope.R;
-import urbanutility.design.kaleidoscope.model.KaleidoBaseCurrency;
+import urbanutility.design.kaleidoscope.model.KaleidoPosition;
 import urbanutility.design.kaleidoscope.utility.KaleidoFunctions;
 
 /**
@@ -23,7 +22,7 @@ import urbanutility.design.kaleidoscope.utility.KaleidoFunctions;
  */
 
 public class CurrentAdapter extends RecyclerView.Adapter<CurrentAdapter.BalanceViewHolder> {
-    private List<KaleidoBaseCurrency> list = new ArrayList<>();
+    private List<KaleidoPosition> list = new ArrayList<>();
     private Context mContext;
 
     public CurrentAdapter(Context context){
@@ -38,20 +37,19 @@ public class CurrentAdapter extends RecyclerView.Adapter<CurrentAdapter.BalanceV
 
     @Override
     public void onBindViewHolder(BalanceViewHolder holder, int position) {
-        holder.symbol.setText(list.get(1).getBaseCurrencyType().positions.get(position).symbol);
-        Log.d("currentadapter", list.get(1).getBaseCurrencyType().positions.get(position).symbol);
-        holder.totalGain.setText(KaleidoFunctions.doubleToFormatedString(list.get(1).getBaseCurrencyType().positions.get(position).cost));
-        holder.costPerUnit.setText(KaleidoFunctions.doubleToFormatedString(list.get(1).getBaseCurrencyType().positions.get(position).costPerUnit));
-        holder.currentValue.setText(KaleidoFunctions.doubleToFormatedString(list.get(1).getBaseCurrencyType().positions.get(position).currentVal));
-        holder.realizedGain.setText(KaleidoFunctions.doubleToFormatedString(list.get(1).getBaseCurrencyType().positions.get(position).realizedGain));
-        holder.unrealizedGain.setText(KaleidoFunctions.doubleToFormatedString(list.get(1).getBaseCurrencyType().positions.get(position).unrealizedGain));
-        holder.amount.setText(KaleidoFunctions.doubleToFormatedString(list.get(1).getBaseCurrencyType().positions.get(position).amount));
-        holder.changedPercent.setText(String.format(Locale.ENGLISH,"%.2f", list.get(1).getBaseCurrencyType().positions.get(position).changePercent));
+        holder.symbol.setText(list.get(position).getSymbol());
+        holder.totalGain.setText(KaleidoFunctions.doubleToFormatedString(list.get(position).getTotalGain()));
+        holder.costPerUnit.setText(KaleidoFunctions.doubleToFormatedString(list.get(position).getAvgUnitPrice()));
+        holder.currentValue.setText(KaleidoFunctions.doubleToFormatedString(list.get(position).getCurrentUnitPrice()));
+        holder.realizedGain.setText(KaleidoFunctions.doubleToFormatedString(list.get(position).getRealizedGain()));
+        holder.unrealizedGain.setText(KaleidoFunctions.doubleToFormatedString(list.get(position).getUnrealizedGain()));
+        holder.amount.setText(KaleidoFunctions.doubleToFormatedString(list.get(position).getAmount()));
+        holder.changedPercent.setText(String.format(Locale.ENGLISH,"%.2f", list.get(position).getPercentChange()));
 
     }
 
-    public void refresh(List<KaleidoBaseCurrency> baseCurrencies){
-        list = baseCurrencies;
+    public void refresh(List<KaleidoPosition> positionList){
+        list = positionList;
         notifyDataSetChanged();
     }
 
@@ -60,7 +58,7 @@ public class CurrentAdapter extends RecyclerView.Adapter<CurrentAdapter.BalanceV
         if(list.isEmpty()){
             return 0;
         }else{
-            return list.get(1).getBaseCurrencyType().positions.size();
+            return list.size();
         }
 
     }

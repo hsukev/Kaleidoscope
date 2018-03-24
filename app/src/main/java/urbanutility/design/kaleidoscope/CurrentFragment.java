@@ -139,8 +139,8 @@ public class CurrentFragment extends Fragment {
 //                btcTotalView.setText(btcTotal + " -- " + baseTotal);
 //                percentGrowthView.setText(percentTotal / baseTotal + "");
 //
-//                if (baseCurrencies.get(1).getBaseCurrencyType().positions.size() > 0)
-//                    adapter.refresh(baseCurrencies);
+                if (positions.size() > 0)
+                    adapter.refresh(positions);
             }
         };
 
@@ -203,7 +203,7 @@ public class CurrentFragment extends Fragment {
 
     private void setUpViewModelAndObserver() {
         //move to main activity
-        kaleidoViewModel = ViewModelProviders.of(this).get(KaleidoViewModel.class);
+        kaleidoViewModel = ViewModelProviders.of(getActivity()).get(KaleidoViewModel.class);
 
     }
 

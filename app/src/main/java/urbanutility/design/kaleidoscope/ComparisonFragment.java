@@ -82,7 +82,7 @@ public class ComparisonFragment extends Fragment implements OnChartValueSelected
 
     private void setUpViewModel() {
         //move to main activity
-        kaleidoViewModel = ViewModelProviders.of(this).get(KaleidoViewModel.class);
+        kaleidoViewModel = ViewModelProviders.of(getActivity()).get(KaleidoViewModel.class);
     }
 
     private void observeLiveData() {
