@@ -95,7 +95,7 @@ public class CurrentFragment extends Fragment {
     @Override
     public View onCreateView(final LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.current_price_page, container, false);
+        View view = inflater.inflate(R.layout.current_fragment_layout, container, false);
         setUpViewModelAndObserver();
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
         kaleidoService = ((KaleidoActivity) getActivity()).getKaleidoService();

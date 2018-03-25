@@ -71,7 +71,7 @@ public class ComparisonFragment extends Fragment implements OnChartValueSelected
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.exchange_compare_page, container, false);
+        View view = inflater.inflate(R.layout.comparison_fragment_layout, container, false);
         ButterKnife.bind(this, view);
         sharedPreferences = getActivity().getSharedPreferences("exchange", Context.MODE_PRIVATE);
         kaleidoService = ((KaleidoActivity) getActivity()).getKaleidoService();
