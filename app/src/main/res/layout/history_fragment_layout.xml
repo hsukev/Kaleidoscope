@@ -113,5 +113,17 @@
             android:id="@+id/history_tabLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
+
+        <include
+            android:id="@+id/history_tab_orders"
+            layout="@layout/history_orders_tab"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <include
+            android:id="@+id/history_tab_exchanges"
+            layout="@layout/history_exchanges_tab"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
     </android.support.v4.view.ViewPager>
 </android.support.constraint.ConstraintLayout>

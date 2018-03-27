@@ -8,9 +8,11 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -64,6 +66,10 @@ public class HistoryFragment extends Fragment implements ExchangeListAdapter.Exc
     TabLayout tabLayout;
     @BindView(R.id.history_viewPager)
     ViewPager viewPager;
+    @BindView(R.id.history_tab_orders)
+    ConstraintLayout ordersTab;
+    @BindView(R.id.history_tab_exchanges)
+    ConstraintLayout exchangesTab;
 
     static class TabExchangesLayout {
         @BindView(R.id.sync_all_button)
@@ -116,19 +122,23 @@ public class HistoryFragment extends Fragment implements ExchangeListAdapter.Exc
     }
 
     private void setUpTabs() {
-        viewPager.setAdapter(new HistoryPagerAdapter(getContext()));
+        HistoryPagerAdapter pagerAdapter = new HistoryPagerAdapter(getContext());
+        viewPager.setAdapter(pagerAdapter);
         tabLayout.setupWithViewPager(viewPager);
 
-//        TabExchangesLayout tabExchangesLayout = new TabExchangesLayout();
-//        TabOrdersLayout tabOrdersLayout = new TabOrdersLayout();
-//        ButterKnife.bind(tabOrdersLayout, ordersTab);
-//        ButterKnife.bind(tabExchangesLayout, history_tab2);
-//
-//        tabOrdersLayout.recyclerOrders.setAdapter(ordersAdapter);
-//        tabOrdersLayout.recyclerOrders.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
-//        tabExchangesLayout.syncAllButton.setOnClickListener(HistoryClickListeners.syncAllClickListener(kaleidoService, kaleidoViewModel));
-//        tabExchangesLayout.recyclerExchangeList.setAdapter(exchangeListAdapter);
-//        tabExchangesLayout.recyclerExchangeList.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
+//        View tabOrdersView = viewPager.findViewById(R.id.history_tab_orders);
+//        View tabExchangesView = viewPager.findViewWithTag("exchanges_tab");
+        TabOrdersLayout tabOrdersLayout = new TabOrdersLayout();
+        TabExchangesLayout tabExchangesLayout = new TabExchangesLayout();
+
+        ButterKnife.bind(tabOrdersLayout, ordersTab);
+        ButterKnife.bind(tabExchangesLayout, exchangesTab);
+
+        tabOrdersLayout.recyclerOrders.setAdapter(ordersAdapter);
+        tabOrdersLayout.recyclerOrders.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
+        tabExchangesLayout.syncAllButton.setOnClickListener(HistoryClickListeners.syncAllClickListener(kaleidoService, kaleidoViewModel));
+        tabExchangesLayout.recyclerExchangeList.setAdapter(exchangeListAdapter);
+        tabExchangesLayout.recyclerExchangeList.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
 
     }
 
