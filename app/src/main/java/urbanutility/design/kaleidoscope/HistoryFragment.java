@@ -19,7 +19,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -55,13 +55,13 @@ public class HistoryFragment extends Fragment implements ExchangeListAdapter.Exc
     @BindView(R.id.private_key_box)
     EditText privateKeyBox;
     @BindView(R.id.public_key_camera)
-    ImageButton public_key_camera;
+    ImageView public_key_camera;
     @BindView(R.id.private_key_camera)
-    ImageButton private_key_camera;
+    ImageView private_key_camera;
     @BindView(R.id.include_history_help)
     LinearLayout includeHistoryHelp;
     @BindView(R.id.help_button)
-    ImageButton helpButton;
+    ImageView helpButton;
     @BindView(R.id.history_tabLayout)
     TabLayout tabLayout;
     @BindView(R.id.history_viewPager)

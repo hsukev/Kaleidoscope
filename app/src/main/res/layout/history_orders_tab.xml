@@ -9,13 +9,26 @@
         android:id="@+id/textView10"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginTop="8dp"
         android:gravity="center"
         android:padding="8dp"
         android:text="@string/latest_transactions"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
+    <TextView
+        android:id="@+id/order_side"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="side"
+        app:layout_constraintEnd_toStartOf="@+id/order_symbol"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView10" />
     <TextView
         android:id="@+id/order_symbol"
         android:layout_width="wrap_content"
@@ -25,18 +38,9 @@
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/order_side"
         app:layout_constraintTop_toTopOf="@+id/order_side"
-        tools:text="Symbol" />
+        android:text="side" />
 
-    <TextView
-        android:id="@+id/order_side"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        app:layout_constraintEnd_toStartOf="@+id/order_symbol"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView10"
-        tools:text="Side" />
+
 
     <TextView
         android:id="@+id/order_price"
@@ -47,7 +51,7 @@
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/order_amount"
         app:layout_constraintTop_toTopOf="@+id/order_amount"
-        tools:text="Price" />
+        android:text="price"/>
 
     <TextView
         android:id="@+id/order_amount"
@@ -58,20 +62,22 @@
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/order_symbol"
         app:layout_constraintTop_toTopOf="@+id/order_symbol"
-        tools:text="Amount" />
+        android:text="amount"/>
 
     <TextView
         android:id="@+id/order_time"
         android:layout_width="32dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
+        android:ellipsize="end"
+        android:maxLines="2"
         app:layout_constraintBottom_toBottomOf="@+id/order_exchange"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/order_exchange"
         app:layout_constraintTop_toTopOf="@+id/order_exchange"
         app:layout_constraintVertical_bias="1.0"
-        tools:text="Date" />
+        android:text="time" />
 
     <TextView
         android:id="@+id/order_exchange"
@@ -82,7 +88,7 @@
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/order_price"
         app:layout_constraintTop_toTopOf="@+id/order_price"
-        tools:text="Exchange" />
+        android:text="exchange" />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recyclerOrderHistory"
