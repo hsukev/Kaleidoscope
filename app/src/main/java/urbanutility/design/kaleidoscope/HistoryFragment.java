@@ -28,6 +28,7 @@ import android.widget.ViewSwitcher;
 
 import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.vision.barcode.Barcode;
+import com.google.gson.Gson;
 
 import java.util.HashSet;
 import java.util.List;
@@ -37,6 +38,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import urbanutility.design.kaleidoscope.barcode.BarcodeCaptureActivity;
 import urbanutility.design.kaleidoscope.client.KaleidoService;
+import urbanutility.design.kaleidoscope.model.APIKeysObject;
 import urbanutility.design.kaleidoscope.model.KaleidoOrder;
 import urbanutility.design.kaleidoscope.view.ExchangeListAdapter;
 import urbanutility.design.kaleidoscope.view.KaleidoViewModel;
@@ -147,12 +149,24 @@ public class HistoryFragment extends Fragment implements ExchangeListAdapter.Exc
         importButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                update(spinner.getSelectedItem().toString());
+                String name = spinner.getSelectedItem().toString();
 
+                // update live data
+                update(name);
+
+                // save API keys to sharedPreferenecs
+                Gson gson = new Gson();
+                String json = gson.toJson(new APIKeysObject(name,
+                        System.currentTimeMillis(),
+                        privateKeyBox.getText().toString(),
+                        publicKeyBox.getText().toString()));
+
+                // add new exchange to set
                 Set<String> oldSet = sharedPreferences.getStringSet("exchange", newSet);
-                oldSet.add(spinner.getSelectedItem().toString());
+                oldSet.add(json);
                 oldSet.add("gdax");
                 sharedPreferences.edit().putStringSet("exchange", oldSet).apply();
+
             }
         });
         exchangeListAdapter = new ExchangeListAdapter(this);

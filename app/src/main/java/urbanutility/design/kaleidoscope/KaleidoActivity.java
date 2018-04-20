@@ -10,6 +10,8 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
+import com.facebook.network.connectionclass.ConnectionClassManager;
+import com.facebook.network.connectionclass.ConnectionQuality;
 import com.facebook.stetho.Stetho;
 
 import butterknife.BindView;
@@ -26,7 +28,7 @@ import urbanutility.design.kaleidoscope.client.KaleidoService;
  * http://www.vogella.com/tutorials/RxJava/article.html
  */
 
-public class KaleidoActivity extends AppCompatActivity {
+public class KaleidoActivity extends AppCompatActivity implements ConnectionClassManager.ConnectionClassStateChangeListener{
     @BindView(R.id.pager)
     ViewPager pager;
     @BindView(R.id.pager_title_strip)
@@ -44,6 +46,7 @@ public class KaleidoActivity extends AppCompatActivity {
         ButterKnife.bind(this);
         Stetho.initializeWithDefaults(this);
         kaleidoService = new KaleidoService(this);
+        ConnectionClassManager.getInstance().register(this);
 
         KaleidoFragmentStatePagerAdapter fragmentStatePagerAdapter = new KaleidoFragmentStatePagerAdapter(getSupportFragmentManager());
         pager.setOffscreenPageLimit(2);
@@ -92,5 +95,14 @@ public class KaleidoActivity extends AppCompatActivity {
 
     public KaleidoService getKaleidoService() {
         return kaleidoService;
+    }
+
+    @Override
+    public void onBandwidthStateChange(ConnectionQuality bandwidthState) {
+        Log.d(TAG, bandwidthState.toString());
+        if(bandwidthState==ConnectionQuality.UNKNOWN){
+            Log.d(TAG, bandwidthState.toString());
+            //lock app with message
+        }
     }
 }
