@@ -120,9 +120,10 @@ public class ComparisonFragment extends Fragment implements OnChartValueSelected
             }
         };
 
+        // TODO: Uncomment allLiveMarket when upstream error handling is fixed
         MediatorLiveData mediatorLiveData = new MediatorLiveData();
         mediatorLiveData.addSource(kaleidoViewModel.getAllBalances(), balanceObserver);
-        mediatorLiveData.addSource(kaleidoViewModel.getAllLiveMarkets(kaleidoService), liveMarketObserver);
+//        mediatorLiveData.addSource(kaleidoViewModel.getAllLiveMarkets(kaleidoService), liveMarketObserver);
         mediatorLiveData.addSource(kaleidoViewModel.getBalanceMapInBtc(true), distributedMapObserver);
         mediatorLiveData.addSource(kaleidoViewModel.getBalanceMapInBtc(false), balanceMapObserver);
 

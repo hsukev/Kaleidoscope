@@ -2,6 +2,7 @@ package urbanutility.design.kaleidoscope.client;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -14,9 +15,9 @@ import java.util.prefs.PreferenceChangeListener;
 import io.reactivex.Single;
 import io.reactivex.functions.Function;
 import urbanutility.design.kaleidoscope.KaleidoActivity;
-import urbanutility.design.kaleidoscope.model.KaleidoLiveMarket;
 import urbanutility.design.kaleidoscope.model.KaleidoBalance;
 import urbanutility.design.kaleidoscope.model.KaleidoDeposits;
+import urbanutility.design.kaleidoscope.model.KaleidoLiveMarket;
 import urbanutility.design.kaleidoscope.model.KaleidoOrder;
 
 /**
@@ -30,7 +31,8 @@ public class KaleidoService implements PreferenceChangeListener{
 
 
     public KaleidoService(KaleidoActivity kaleidoActivity) {
-        exchangeSet = kaleidoActivity.getPreferences(Context.MODE_PRIVATE).getStringSet("exchange",null );
+        exchangeSet = kaleidoActivity.getSharedPreferences("exchange",Context.MODE_PRIVATE).getStringSet("exchange", new HashSet<String>() );
+        Log.d(getClass().getSimpleName(), exchangeSet.size() + " exchangeSet size");
         KaleidoClients kaleidoClients = new KaleidoClients();
         exchangePort = new ExchangePort(kaleidoClients);
     }
@@ -48,6 +50,7 @@ public class KaleidoService implements PreferenceChangeListener{
         return exchangePort.getDepositsMap().get(exchange);
     }
 
+    // TODO: Handle further upstream
     public Single<List<KaleidoLiveMarket>> requestLiveMarkets() {
         return Single.zip(getLiveMarketSingles(), new Function<Object[], List<KaleidoLiveMarket>>() {
             @Override
@@ -57,6 +60,12 @@ public class KaleidoService implements PreferenceChangeListener{
                     list.addAll((List<KaleidoLiveMarket>) object);
                 }
                 return list;
+            }
+        }).onErrorReturn(new Function<Throwable, List<KaleidoLiveMarket>>() {
+            @Override
+            public List<KaleidoLiveMarket> apply(Throwable throwable) throws Exception {
+                Log.d(getClass().getSimpleName(), "error return flagged");
+                return null;
             }
         });
     }
@@ -101,7 +110,9 @@ public class KaleidoService implements PreferenceChangeListener{
     private List<Single<List<KaleidoLiveMarket>>> getLiveMarketSingles() {
         List<Single<List<KaleidoLiveMarket>>> list = new ArrayList<>();
         Map<String, Single<List<KaleidoLiveMarket>>> map = exchangePort.getLiveMarketMap();
+
         for(String exchange : exchangeSet){
+
             list.add(map.get(exchange));
         }
         return list;

@@ -61,6 +61,7 @@ public class KaleidoViewModel extends AndroidViewModel {
         return kaleidoDatabase.kaleidoDao().getAllDeposits();
     }
 
+    // TODO: Wrap publisher with error handling class. Error is not propogated due to subscription bypass using LiveData
     public LiveData<List<KaleidoLiveMarket>> getAllLiveMarkets(KaleidoService kaleidoService) {
         return LiveDataReactiveStreams.fromPublisher(kaleidoService.requestLiveMarkets().toFlowable()
                 .delay(5000, TimeUnit.MILLISECONDS).repeat());

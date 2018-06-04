@@ -162,10 +162,10 @@ public class HistoryFragment extends Fragment implements ExchangeListAdapter.Exc
                         publicKeyBox.getText().toString()));
 
                 // add new exchange to set
-                Set<String> oldSet = sharedPreferences.getStringSet("exchange", newSet);
+                Set<String> oldSet = sharedPreferences.getStringSet("exchangeSet", newSet);
                 oldSet.add(json);
-                oldSet.add("gdax");
-                sharedPreferences.edit().putStringSet("exchange", oldSet).apply();
+//                oldSet.add("gdax");
+                sharedPreferences.edit().putStringSet("exchangeSet", oldSet).apply();
 
             }
         });

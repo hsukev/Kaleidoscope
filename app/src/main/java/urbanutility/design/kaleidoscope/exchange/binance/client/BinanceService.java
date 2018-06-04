@@ -40,7 +40,7 @@ public interface BinanceService {
     @GET("/api/v1/ticker/24h")
     Single<Binance24hTicker> get24hTicker(@Query("symbol") String symbol);
 
-    @GET("/api/v1/ticker/allPrices")
+    @GET("/api/v3/ticker/price")
     Single<List<BinancePriceTicker>> getPriceTickers();
 
     @Headers(BinanceApiConstants.ENDPOINT_SECURITY_TYPE_SIGNED_HEADER)
